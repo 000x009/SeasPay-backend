@@ -1,6 +1,8 @@
-from .user import UserDTO
+from .user import UserDTO, UpdateUserDTO, CreateUserDTO
 
 
 __all__ = [
-    'UserDTO'
+    'UserDTO',
+    'UpdateUserDTO',
+    'CreateUserDTO'
 ]
