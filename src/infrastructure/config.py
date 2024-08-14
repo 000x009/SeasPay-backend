@@ -32,7 +32,7 @@ def load_settings() -> Settings:
     """Get app settings"""
 
     db = DB(
-        host=os.environ['DB_PORT'],
+        host=os.environ['DB_HOST'],
         db_name=os.environ['DB_NAME'],
         user=os.environ['POSTGRES_USER'],
         password=os.environ['POSTGRES_PASSWORD'],

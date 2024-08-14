@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from src.infrastructure.data.models import Base
-from src.infrastructure import load_settings
+from src.infrastructure.config import load_settings
 
 
 # this is the Alembic Config object, which provides
@@ -52,8 +52,8 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    settings = load_settings()
     configuration = config.get_section(config.config_ini_section)
+    settings = load_settings()
     configuration["sqlalchemy.url"] = settings.db.connection_url
 
     connectable = async_engine_from_config(
