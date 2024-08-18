@@ -1,13 +1,10 @@
 from abc import abstractmethod
-from typing import Protocol, TypeAlias, Optional, List
+from typing import Protocol, Optional, List
 
-from sqlalchemy.ext.asyncio import AsyncSession, Result
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.application.dto import UserDTO, UpdateUserDTO
-from src.infrastructure.data.models import UserModel
 from src.domain.value_objects.user.user_id import UserID
-
-
-_UserDBResult: TypeAlias = Result[tuple[UserModel]]
 
 
 class BaseUserDAL(Protocol):
@@ -18,10 +15,6 @@ class BaseUserDAL(Protocol):
     async def insert(self, values: UserDTO) -> None:
         pass
     
-    @abstractmethod
-    async def _get(self, values: UserDTO) -> Optional[_UserDBResult]:
-        pass
-
     @abstractmethod  
     async def get_one(self, values: UserDTO) -> Optional[UserDTO]:
         pass
