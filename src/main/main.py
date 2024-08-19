@@ -7,6 +7,7 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 
 from src.main.ioc import DALProvider, DatabaseProvider, ServiceProvider
+from src.presentation.endpoints import user
 
 
 logging.basicConfig(
@@ -26,6 +27,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(user.router)
 
 container = make_async_container(DALProvider(), DatabaseProvider(), ServiceProvider())
 setup_dishka(container, app)
