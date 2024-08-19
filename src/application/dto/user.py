@@ -8,18 +8,18 @@ from dataclasses import dataclass, field
 class UserDTO:
     user_id: int
     email: Optional[str] = field(default=None)
-    joining_date: datetime = field(default=datetime.now(UTC))
+    joined_at: datetime = field(default=datetime.now(UTC))
 
 
 @dataclass(frozen=True, kw_only=True)
-class CreateUserDTO(UserDTO):
+class CreateUserDTO:
     user_id: int
     email: Optional[str] = field(default=None)
-    joining_date: datetime = field(default=datetime.now(UTC))
+    joined_at: datetime = field(default=datetime.now(UTC))
 
 
 @dataclass(frozen=True)
-class UpdateUserDTO():
+class UpdateUserDTO:
     email: Optional[str] = field(default=None)
-    joining_date: datetime = field(default=datetime.now(UTC))
+    joined_at: datetime = field(default=datetime.now(UTC))
 

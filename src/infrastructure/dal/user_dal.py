@@ -4,13 +4,13 @@ from dataclasses import asdict
 from sqlalchemy import insert, update, select, exists, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.common import BaseUserDAL
+from src.application.common import DAL
 from src.application.dto import UserDTO, UpdateUserDTO
 from src.infrastructure.data.models import UserModel
 from src.domain.value_objects.user.user_id import UserID
 
 
-class UserDAL(BaseUserDAL):
+class UserDAL(DAL):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
@@ -19,8 +19,8 @@ class UserDAL(BaseUserDAL):
         await self._session.execute(query)
         await self._session.commit()
 
-    async def update(self, user_id: UserID, values: UpdateUserDTO) -> None:
-        query = update(UserModel).where(UserModel.user_id == user_id.value).values(**asdict(values))
+    async def update(self, id_: UserID, values: UserDTO) -> None:
+        query = update(UserModel).where(UserModel.user_id == id_.value).values(**asdict(values))
         await self._session.execute(query)
         await self._session.commit()
 
@@ -38,11 +38,11 @@ class UserDAL(BaseUserDAL):
         return result.scalar_one()
 
     async def get_one(self, values: UserDTO) -> Optional[UserDTO]:
-        exists = await self.exists(**asdict(UserDTO))
+        exists = await self.exists(**asdict(values))
         if not exists:
             return None
         
-        query = select(UserModel).filter_by(**asdict(UserDTO))
+        query = select(UserModel).filter_by(**asdict(values))
         result = await self._session.execute(query)
 
         if result:
@@ -54,11 +54,11 @@ class UserDAL(BaseUserDAL):
             )
 
     async def get_all(self, values: UserDTO) -> Optional[List[UserDTO]]:
-        exists = await self.exists(**asdict(UserDTO))
+        exists = await self.exists(**asdict(values))
         if not exists:
             return None
         
-        query = select(UserModel).filter_by(**asdict(UserDTO))
+        query = select(UserModel).filter_by(**asdict(values))
         result = await self._session.execute(query)
 
         if result:
