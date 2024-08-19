@@ -1,7 +1,8 @@
-import datetime
+from datetime import datetime, UTC
 from typing import Optional
+from decimal import Decimal
 
-from sqlalchemy import Integer, DateTime, String, BigInteger
+from sqlalchemy import TIMESTAMP, String, BigInteger, func, Integer, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
@@ -12,11 +13,15 @@ class UserModel(Base):
 
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    joining_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
+    joined_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
         nullable=False,
-        default=datetime.datetime.now(datetime.UTC),
+        server_default=func.now,
+        default=datetime.now(UTC),
     )
+    commission: Mapped[int] = mapped_column(Integer, nullable=False, default=15)
+    total_withdrawn: Mapped[float] = mapped_column(DECIMAL, nullable=False, default=0)
 
-    order = relationship('PaymentDetailsModel', back_populates='user')
-    
+    orders = relationship('OrderModel', back_populates='user', uselist=True)
+    invoices = relationship('InvoiceModel', back_populates='user', uselist=True)
+    feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True)

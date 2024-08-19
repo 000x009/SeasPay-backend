@@ -1,4 +1,4 @@
-from .dal import BaseUserDAL
+from .dal import DAL
 
 
-__all__ = ['BaseUserDAL']
+__all__ = ['DAL']
