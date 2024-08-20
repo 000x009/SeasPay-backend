@@ -37,4 +37,3 @@ class OrderModel(Base):
 
     user: Mapped['UserModel'] = relationship(back_populates='order', uselist=False)
     invoice: Mapped['InvoiceModel'] = relationship(back_populates='order', uselist=False)
-    feedback: Mapped['FeedbackModel'] = relationship(back_populates='order', uselist=False)
