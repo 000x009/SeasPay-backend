@@ -22,10 +22,16 @@ class DB(BaseDB):
 
 
 @dataclass
+class BotSettings:
+    bot_token: str
+
+
+@dataclass
 class Settings:
     """App settings"""
 
     db: DB
+    bot: BotSettings
 
 
 def load_settings() -> Settings:
@@ -37,5 +43,11 @@ def load_settings() -> Settings:
         user=os.environ['POSTGRES_USER'],
         password=os.environ['POSTGRES_PASSWORD'],
     )
+    bot = BotSettings(
+        bot_token=os.environ['BOT_TOKEN'],
+    )
 
-    return Settings(db=db)
+    return Settings(
+        db=db,
+        bot=bot,
+    )
