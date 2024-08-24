@@ -1,1 +1,1 @@
-from .base import DomainError
+from .base import DomainError, ValueObjectError

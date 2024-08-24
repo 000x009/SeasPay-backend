@@ -25,6 +25,7 @@ async def get_feedback_list(
     limit: int,
     offset: int,
     feedback_service: FromDishka[FeedbackService],
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> List[FeedbackDTO]:
     response = await feedback_service.list_(
         data=ListInputDTO(
@@ -40,6 +41,7 @@ async def get_feedback_list(
 async def get_feedback(
     feedback_id: int,
     feedback_service: FromDishka[FeedbackService],
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> Optional[FeedbackDTO]:
     response = await feedback_service.get(
         GetFeedbackDTO(feedback_id=feedback_id),

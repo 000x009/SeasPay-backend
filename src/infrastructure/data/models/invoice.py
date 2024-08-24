@@ -17,8 +17,6 @@ class InvoiceModel(Base):
         ForeignKey('user.user_id', ondelete='CASCADE'),
         nullable=False,
     )
-    subject: Mapped[Optional[str]] = mapped_column(String(length=4000), nullable=True)
-    note: Mapped[Optional[str]] = mapped_column(String(length=4000), nullable=True)
     status: Mapped[InvoiceStatus] = mapped_column(
         Enum(InvoiceStatus),
         default=InvoiceStatus.DRAFT,
@@ -30,6 +28,3 @@ class InvoiceModel(Base):
         default=datetime.now(UTC),
         nullable=False,
     )
-    term: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    recipient_email: Mapped[str] = mapped_column(String, nullable=True)
-    amount: Mapped[float] = mapped_column(DECIMAL, nullable=False)
