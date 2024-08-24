@@ -1,5 +1,4 @@
 from datetime import datetime, UTC
-from typing import Optional
 from decimal import Decimal
 
 from sqlalchemy import TIMESTAMP, String, BigInteger, func, Integer, DECIMAL
@@ -12,7 +11,6 @@ class UserModel(Base):
     __tablename__ = 'user'
 
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     joined_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,
@@ -20,7 +18,7 @@ class UserModel(Base):
         default=datetime.now(UTC),
     )
     commission: Mapped[int] = mapped_column(Integer, nullable=False, default=15)
-    total_withdrawn: Mapped[float] = mapped_column(DECIMAL, nullable=False, default=0)
+    total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False, default=0)
 
     orders = relationship('OrderModel', back_populates='user', uselist=True)
     invoices = relationship('InvoiceModel', back_populates='user', uselist=True)
