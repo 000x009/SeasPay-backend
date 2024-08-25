@@ -24,7 +24,7 @@ class OrderModel(Base):
     invoice_id: Mapped[Optional[str]] = mapped_column(
         String,
         ForeignKey('invoice.id', ondelete='CASCADE'),
-        nullable=True,
+        nullable=False,
     )
     payment_receipt: Mapped[str] = mapped_column(String, nullable=False)
     final_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)  # итоговая сумма в usd

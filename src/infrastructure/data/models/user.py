@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
 from decimal import Decimal
 
-from sqlalchemy import TIMESTAMP, String, BigInteger, func, Integer, DECIMAL
+from sqlalchemy import TIMESTAMP, BigInteger, func, Integer, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
@@ -21,5 +21,4 @@ class UserModel(Base):
     total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False, default=0)
 
     orders = relationship('OrderModel', back_populates='user', uselist=True)
-    invoices = relationship('InvoiceModel', back_populates='user', uselist=True)
     feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True)

@@ -1,14 +1,12 @@
 from typing import Optional, List
 from dataclasses import asdict
 
-from sqlalchemy import insert, update, select, exists
+from sqlalchemy import insert, select, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseUserDAL
 from src.application.dto.user import UserDTO, CreateUserDTO, GetUserDTO
 from src.infrastructure.data.models import UserModel
-from src.domain.value_objects.user.user_id import UserID
-from src.domain.entity.user import User
 
 
 class UserDAL(BaseUserDAL):
