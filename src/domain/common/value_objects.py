@@ -1,6 +1,7 @@
+from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, Union
 
 
 V = TypeVar('V', bound=Any)
@@ -18,3 +19,8 @@ class BaseValueObject(ABC):
 @dataclass(frozen=True)
 class ValueObject(BaseValueObject, ABC, Generic[V]):
     value: V
+
+    def __eq__(self, other: Union[ValueObject, Any]) -> bool:
+        if isinstance(other, ValueObject) and other.value == self.value:
+            return True
+        return False
