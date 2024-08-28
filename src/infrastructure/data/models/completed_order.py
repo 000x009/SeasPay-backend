@@ -28,6 +28,6 @@ class CompletedOrderModel(Base):
         server_default=func.now(),
         default=datetime.now(UTC),
     )
-    taken_commission: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
+    taken_commission: Mapped[int] = mapped_column(Integer, nullable=False)
 
     order: Mapped['OrderModel'] = relationship(back_populates='completed_order', uselist=False)
