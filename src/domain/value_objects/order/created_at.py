@@ -5,5 +5,5 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class Time(ValueObject[datetime]):
+class CreatedAt(ValueObject[datetime]):
     value: datetime
