@@ -1,6 +1,8 @@
 import os
 from dataclasses import dataclass
 
+from dotenv import load_dotenv
+
 
 @dataclass
 class BaseDB:
@@ -42,21 +44,18 @@ class Settings:
     """App settings"""
 
     db: DB
-    bot: BotSettings
     paypal: PayPal
 
 
 def load_settings() -> Settings:
     """Get app settings"""
+    load_dotenv()
 
     db = DB(
         host=os.environ['DB_HOST'],
         db_name=os.environ['DB_NAME'],
         user=os.environ['POSTGRES_USER'],
         password=os.environ['POSTGRES_PASSWORD'],
-    )
-    bot = BotSettings(
-        bot_token=os.environ['BOT_TOKEN'],
     )
     paypal = PayPal(
         client_id=os.environ['PAYPAL_CLIENT_ID'],
@@ -67,7 +66,6 @@ def load_settings() -> Settings:
 
     return Settings(
         db=db,
-        bot=bot,
         paypal=paypal,
     )
 
