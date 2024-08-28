@@ -14,7 +14,7 @@ from src.application.common.dto import Pagination
 from src.presentation.schema.order import CreateOrderSchema
 
 router = APIRouter(
-    prefix='orders',
+    prefix='/api/order',
     tags=['Order'],
     route_class=DishkaRoute,
 )

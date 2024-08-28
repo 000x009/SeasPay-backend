@@ -12,6 +12,7 @@ from src.presentation.schema.user import CreateUserSchema
 
 
 router = APIRouter(
+    prefix='api/user',
     tags=['User'],
     route_class=DishkaRoute,
 )

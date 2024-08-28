@@ -10,6 +10,7 @@ from src.domain.value_objects.invoice import InvoiceStatus
 if TYPE_CHECKING:
     from src.infrastructure.data.models import OrderModel
 
+
 class InvoiceModel(Base):
     __tablename__ = 'invoice'
 

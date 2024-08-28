@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.infrastructure.data.models import Base
 
 if TYPE_CHECKING:
-    from src.infrastructure.data.models import UserModel, OrderModel
+    from src.infrastructure.data.models import UserModel
 
 
 class FeedbackModel(Base):
@@ -22,8 +22,8 @@ class FeedbackModel(Base):
     stars: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[Optional[str]] = mapped_column(String(5000), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP,
-        server_default=func.now,
+        TIMESTAMP(timezone=True),
+        server_default=func.now(),
         default=datetime.now(UTC),
         nullable=False,
     )

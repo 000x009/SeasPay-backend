@@ -15,7 +15,7 @@ from src.presentation.dependencies.user_init_data import user_init_data_provider
 
 router = APIRouter(
     tags=['Feedback'],
-    prefix='/feedback',
+    prefix='/api/feedback',
     route_class=DishkaRoute,
 )
 

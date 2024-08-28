@@ -14,11 +14,11 @@ class UserModel(Base):
     joined_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,
-        server_default=func.now,
+        server_default=func.now(),
         default=datetime.now(UTC),
     )
-    commission: Mapped[int] = mapped_column(Integer, nullable=False, default=15)
-    total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False, default=0)
+    commission: Mapped[int] = mapped_column(Integer, nullable=True, default=15)
+    total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True, default=0)
 
     orders = relationship('OrderModel', back_populates='user', uselist=True)
     feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True)
