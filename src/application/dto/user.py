@@ -22,12 +22,17 @@ class CreateUserDTO:
 
 
 @dataclass(frozen=True)
-class UpdateUserDTO:
-    joined_at: datetime = field(default=datetime.now(UTC))
-    commission: int = field(default=15)
-    total_withdrawn: Decimal = field(default=0)
+class UpdateUserCommissionDTO:
+    user_id: int
+    commission: int
 
 
 @dataclass(frozen=True)
 class GetUserDTO:
     user_id: int
+
+
+@dataclass(frozen=True)
+class UpdateUserTotalWithdrawnDTO:
+    user_id: int
+    total_withdrawn: Decimal

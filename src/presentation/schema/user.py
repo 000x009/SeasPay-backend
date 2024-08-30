@@ -10,3 +10,10 @@ class CreateUserSchema(BaseModel):
     total_withdrawn: Decimal = Field(default=0)
 
 
+class UpdateUserTotalWithdrawnSchema(BaseModel):
+    total_withdrawn: Decimal
+
+
+class UpdateUserCommissionSchema(BaseModel):
+    commission: int
+

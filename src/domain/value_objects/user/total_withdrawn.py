@@ -4,7 +4,7 @@ from src.domain.common.value_objects import ValueObject
 from src.domain.exceptions.user import EmptyValueError
 
 
-class UserTotalWithdrawn(ValueObject[Decimal]):
+class TotalWithdrawn(ValueObject[Decimal]):
     value: Decimal
 
     def _validate(self) -> None:

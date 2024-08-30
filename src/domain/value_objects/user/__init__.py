@@ -1,11 +1,11 @@
-from user_id import UserID
-from joined_at import UserJoinedAt
-from .total_withdrawn import UserTotalWithdrawn
-from .commission import UserCommission
+from .user_id import UserID
+from .joined_at import JoinedAt
+from .total_withdrawn import TotalWithdrawn
+from .commission import Commission
 
 __all__ = [
     "UserID",
-    "UserJoinedAt",
-    "UserTotalWithdrawn",
-    "UserCommission",
+    "JoinedAt",
+    "TotalWithdrawn",
+    "Commission",
 ]

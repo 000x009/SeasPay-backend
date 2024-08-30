@@ -7,3 +7,7 @@ class NotAuthorizedError(DomainError):
 
 class EmptyValueError(ValueObjectError):
     pass
+
+
+class UserNotFoundError(DomainError):
+    pass

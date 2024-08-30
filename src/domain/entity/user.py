@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Union, Any
 
-from src.domain.value_objects.user import UserID, UserJoinedAt, UserCommission, UserTotalWithdrawn
+from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn, Commission
 
 
 class User:
@@ -15,9 +15,9 @@ class User:
     def __init__(
         self,
         user_id: UserID,
-        joined_at: UserJoinedAt,
-        commission: UserCommission,
-        total_withdrawn: UserTotalWithdrawn,
+        joined_at: JoinedAt,
+        commission: Commission,
+        total_withdrawn: TotalWithdrawn,
     ) -> None:
         self.user_id = user_id
         self.joined_at = joined_at

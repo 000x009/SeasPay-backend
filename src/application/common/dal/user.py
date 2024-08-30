@@ -1,30 +1,23 @@
 from abc import abstractmethod
 from typing import Protocol, Optional, List
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.application.dto.user import CreateUserDTO, GetUserDTO, UpdateUserDTO, UserDTO
 from src.domain.value_objects.user import UserID
 from src.domain.entity.user import User
 
 
 class BaseUserDAL(Protocol):
     @abstractmethod
-    async def insert(self, values: CreateUserDTO) -> None:
+    async def insert(self, user: User) -> User:
         pass
 
     @abstractmethod
-    async def get_one(self, values: GetUserDTO) -> Optional[UserDTO]:
+    async def get_one(self, user_id: UserID) -> Optional[User]:
         pass
 
     @abstractmethod
-    async def get_all(self, values: GetUserDTO) -> Optional[List[UserDTO]]:
+    async def get_all_users(self) -> Optional[List[User]]:
         pass
 
     @abstractmethod
-    async def exists(self, values: GetUserDTO) -> bool:
+    async def update(self, user_id: UserID, user: User) -> None:
         pass
-
-    # @abstractmethod
-    # async def update(self, id_: UserID, values: User) -> None:
-    #     pass
