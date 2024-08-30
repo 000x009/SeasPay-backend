@@ -56,7 +56,7 @@ async def get_order(
     return response
 
 
-@router.put('/')
+@router.post('/')
 async def create_order(
     data: CreateOrderSchema,
     order_service: FromDishka[OrderService],
