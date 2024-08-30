@@ -1,8 +1,6 @@
 from typing import Protocol
 from abc import abstractmethod
 
-# from src.domain.entity.
-
 
 class BaseFeedbackDAL(Protocol):
     @abstractmethod
