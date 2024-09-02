@@ -1,6 +1,6 @@
-from typing import AsyncGenerator
-
-from dishka import Provider, provide, Scope
+from typing import AsyncGenerator, List
+from aiohttp import ClientSession
+from dishka import Provider, provide, Scope, AsyncContainer, make_async_container
 
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker, AsyncSession
 
@@ -31,3 +31,16 @@ class DALProvider(Provider):
 
 class ServiceProvider(Provider):
     user_service = provide(UserService, scope=Scope.REQUEST, provides=UserService)
+
+
+def setup_providers() -> List[Provider]:
+    return [
+        DatabaseProvider(),
+        DALProvider(),
+        ServiceProvider(),
+    ]
+
+
+def get_di_container() -> AsyncContainer:
+    providers = setup_providers()
+    return make_async_container(*providers)
