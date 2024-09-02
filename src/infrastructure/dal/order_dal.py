@@ -6,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.common.dal import BaseOrderDAL
 from src.application.dto.order import OrderDTO
 from src.domain.entity.order import Order
-from src.domain.value_objects.order import OrderID
+from src.domain.value_objects.order import OrderID, PaymentReceipt, FinalAmount, CreatedAt
 from src.domain.value_objects.user import UserID
+from src.domain.value_objects.invoice import InvoiceID
 from src.infrastructure.data.models import OrderModel
 
 
@@ -37,11 +38,10 @@ class OrderDAL(BaseOrderDAL):
             OrderDTO(
                 id=order.id,
                 user_id=order.user_id,
-                invoice_id=order.invoice_id,
                 payment_receipt=order.payment_receipt,
                 final_amount=order.final_amount,
                 status=order.status,
-                time=order.time,
+                created_at=order.created_at,
             )
             for order in orders
         ]
@@ -61,21 +61,29 @@ class OrderDAL(BaseOrderDAL):
         return OrderDTO(
             id=order.id,
             user_id=order.user_id,
-            invoice_id=order.invoice_id,
             payment_receipt=order.payment_receipt,
             final_amount=order.final_amount,
-            time=order.time,
+            created_at=order.created_at,
             status=order.status,
         )
 
-    async def create(self, order: Order) -> None:
+    async def insert(self, order: Order) -> Order:
         query = insert(OrderModel).values(
             user_id=order.user_id.value,
-            invoice_id=order.invoice_id.value,
             payment_receipt=order.payment_receipt.value,
             final_amount=order.final_amount.value,
-            time=order.time.value,
+            created_at=order.created_at.value,
+            status=order.status,
+        ).returning(OrderModel)
+        result = await self._session.execute(query)
+        order_model = result.scalar_one()
+        await self._session.commit()
+
+        return Order(
+            id=OrderID(order_model.id),
+            user_id=UserID(order_model.user_id),
+            payment_receipt=PaymentReceipt(order_model.payment_receipt),
+            final_amount=FinalAmount(order_model.final_amount),
+            created_at=CreatedAt(order_model.created_at),
             status=order.status,
         )
-        await self._session.execute(query)
-        await self._session.commit()
