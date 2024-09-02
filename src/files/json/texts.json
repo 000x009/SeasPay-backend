@@ -1,0 +1,3 @@
+{
+    "paypal_withdraw_order_text": "<b>PayPal: вывод средств #{id}</b>\n\n<b>User:</b> <a href='tg://user?id={user_id}'>{username}</a>\n<b>Сумма:</b> <code>{amount}</code>\n<b>Дата:</b> <code>{created_at}</code>\n\n<b>Статус:</b> <code>{status}</code>"
+}
