@@ -1,3 +1,4 @@
+from typing import List, Optional
 from datetime import datetime, UTC
 from decimal import Decimal
 
@@ -5,6 +6,7 @@ from sqlalchemy import TIMESTAMP, BigInteger, func, Integer, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
+from src.infrastructure.data.models import UserTopicModel
 
 
 class UserModel(Base):
@@ -22,3 +24,5 @@ class UserModel(Base):
 
     orders = relationship('OrderModel', back_populates='user', uselist=True)
     feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True)
+
+    topics: Mapped[Optional[List[UserTopicModel]]] = relationship(back_populates='user', uselist=True)
