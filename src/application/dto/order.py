@@ -10,7 +10,6 @@ from src.application.common.dto import Pagination
 class OrderDTO:
     id: int
     user_id: int
-    invoice_id: int
     payment_receipt: str
     final_amount: Decimal
     time: datetime = field(default=datetime.now(UTC))
@@ -32,8 +31,7 @@ class GetOrderDTO:
 @dataclass(frozen=True)
 class CreateOrderDTO:
     user_id: int
-    invoice_id: int
     payment_receipt: str
     final_amount: Decimal
-    time: datetime = field(default=datetime.now(UTC))
+    created_at: datetime = field(default=datetime.now(UTC))
     status: OrderStatus = field(default=OrderStatus.WAIT)

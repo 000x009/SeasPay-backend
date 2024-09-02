@@ -21,5 +21,5 @@ class BaseOrderDAL(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def create(self, order: Order) -> None:
+    async def insert(self, order: Order) -> None:
         raise NotImplementedError

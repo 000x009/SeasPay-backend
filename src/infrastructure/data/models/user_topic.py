@@ -1,11 +1,13 @@
 from datetime import datetime, UTC
-from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import TIMESTAMP, BigInteger, Integer, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
-from src.infrastructure.data.models.user import UserModel
+
+if TYPE_CHECKING:
+    from src.infrastructure.data.models.user import UserModel
 
 
 class UserTopicModel(Base):
@@ -25,4 +27,4 @@ class UserTopicModel(Base):
         server_default=func.now(),
     )
 
-    user: Mapped[UserModel] = relationship(back_populates='topics', uselist=False)
+    user: Mapped["UserModel"] = relationship(back_populates='topics', uselist=False)

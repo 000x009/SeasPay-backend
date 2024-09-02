@@ -24,3 +24,12 @@ class ValueObject(BaseValueObject, ABC, Generic[V]):
         if isinstance(other, ValueObject) and other.value == self.value:
             return True
         return False
+
+    def __ne__(self, other: Union[ValueObject, Any]) -> bool:
+        return not (self.value == other.value)
+
+    def __le__(self, other: Union[ValueObject, Any]) -> bool:
+        return self.value <= other.value
+
+    def __ge__(self, other: Union[ValueObject, Any]) -> bool:
+        return self.value >= other.value

@@ -27,7 +27,7 @@ class Order:
         payment_receipt: PaymentReceipt,
         final_amount: FinalAmount,
         created_at: Optional[CreatedAt],
-        status: Optional[OrderStatus]
+        status: Optional[OrderStatus],
     ):
         self.id = id
         self.user_id = user_id
