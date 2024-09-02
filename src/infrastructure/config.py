@@ -28,6 +28,8 @@ class BotSettings:
     """Telegram bot settings"""
 
     bot_token: str
+    orders_group_id: str
+    webhook_url: str
 
 
 @dataclass
@@ -45,11 +47,12 @@ class Settings:
 
     db: DB
     paypal: PayPal
+    bot: BotSettings
 
 
 def load_settings() -> Settings:
     """Get app settings"""
-    load_dotenv()
+    load_dotenv(override=True)
 
     db = DB(
         host=os.environ['DB_HOST'],
@@ -61,18 +64,23 @@ def load_settings() -> Settings:
         client_id=os.environ['PAYPAL_CLIENT_ID'],
         client_secret=os.environ['PAYPAL_CLIENT_SECRET'],
         api_base_url=os.environ['PAYPAL_BASE_URL'],
-
+    )
+    bot = BotSettings(
+        bot_token=os.environ['BOT_TOKEN'],
+        orders_group_id=os.environ['ORDERS_GROUP_ID'],
+        webhook_url=os.environ['WEBHOOK_URL'],
     )
 
     return Settings(
         db=db,
         paypal=paypal,
+        bot=bot,
     )
 
 
 def load_paypal_settings() -> PayPal:
-    return PayPal(
-        client_id=os.environ['PAYPAL_CLIENT_ID'],
-        client_secret=os.environ['PAYPAL_CLIENT_SECRET'],
-        api_base_url=os.environ['PAYPAL_BASE_URL'],
-    )
+    return load_settings().paypal
+
+
+def load_bot_settings() -> BotSettings:
+    return load_settings().bot
