@@ -31,7 +31,6 @@ class OrderService:
             Order(
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt),
-                final_amount=FinalAmount(data.final_amount),
                 created_at=CreatedAt(data.created_at),
                 status=data.status,
             )
@@ -41,7 +40,6 @@ class OrderService:
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            final_amount=order.final_amount.value,
             created_at=order.created_at.value,
             status=order.status,
         )
