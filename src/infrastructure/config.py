@@ -28,7 +28,7 @@ class BotSettings:
     """Telegram bot settings"""
 
     bot_token: str
-    orders_group_id: str
+    orders_group_id: int
     webhook_url: str
 
 
@@ -67,7 +67,7 @@ def load_settings() -> Settings:
     )
     bot = BotSettings(
         bot_token=os.environ['BOT_TOKEN'],
-        orders_group_id=os.environ['ORDERS_GROUP_ID'],
+        orders_group_id=int(os.environ['ORDERS_GROUP_ID']),
         webhook_url=os.environ['WEBHOOK_URL'],
     )
 
