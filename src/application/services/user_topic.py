@@ -6,23 +6,18 @@ from src.domain.entity.user_topic import UserTopic
 from src.domain.value_objects.user_topic import ThreadId, SupergroupChatId, CreatedAt
 from src.domain.value_objects.user import UserID
 from src.domain.exceptions.user_topic import TopicNotFoundError
-from src.infrastructure.telegram import TelegramTopicManager
 
 
 class UserTopicService:
-    def __init__(self, user_topic_dal: UserTopicDAL, telegram_topic_manager: TelegramTopicManager):
+    def __init__(self, user_topic_dal: UserTopicDAL):
         self.user_topic_dal = user_topic_dal
-        self._telegram_topic_manager = telegram_topic_manager
 
     async def create_user_topic(self, data: CreateUserTopicDTO) -> UserTopicDTO:
-        user_topic = await self._telegram_topic_manager.create_topic(
-                name=data.username,
-            )
-        topic = await self.user_topic_dal.create_user_topic(
+        topic = await self.user_topic_dal.insert(
             UserTopic(
                 user_id=UserID(data.user_id),
                 supergroup_chat_id=SupergroupChatId(data.supergroup_chat_id),
-                thread_id=ThreadId(user_topic.message_thread_id),
+                thread_id=ThreadId(data.thread_id),
                 created_at=CreatedAt(data.created_at),
             )
         )

@@ -7,7 +7,7 @@ from src.domain.value_objects.user_topic import ThreadId
 
 
 
-class UserTopicDAL(Protocol):
+class BaseUserTopicDAL(Protocol):
     @abstractmethod
     async def insert(self, user_topic: UserTopic) -> UserTopic:
         raise NotImplementedError

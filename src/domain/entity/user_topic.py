@@ -26,4 +26,9 @@ class UserTopic:
         self.supergroup_chat_id = supergroup_chat_id
         self.thread_id = thread_id
         self.created_at = created_at or CreatedAt(datetime.now(UTC))
-        
+
+    def __str__(self) -> str:
+        return f'UserTopic(user_id={self.user_id}, supergroup_chat_id={self.supergroup_chat_id}, thread_id={self.thread_id}, created_at={self.created_at})'
+    
+    def __repr__(self) -> str:
+        return self.__str__()

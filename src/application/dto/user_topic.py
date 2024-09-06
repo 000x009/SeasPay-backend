@@ -16,6 +16,7 @@ class CreateUserTopicDTO:
     user_id: int
     supergroup_chat_id: int
     username: str
+    thread_id: int
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
 
 
