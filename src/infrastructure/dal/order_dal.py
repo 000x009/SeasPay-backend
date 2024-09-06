@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy import select, insert
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseOrderDAL
@@ -39,7 +40,6 @@ class OrderDAL(BaseOrderDAL):
                 id=order.id,
                 user_id=order.user_id,
                 payment_receipt=order.payment_receipt,
-                final_amount=order.final_amount,
                 status=order.status,
                 created_at=order.created_at,
             )
@@ -62,28 +62,24 @@ class OrderDAL(BaseOrderDAL):
             id=order.id,
             user_id=order.user_id,
             payment_receipt=order.payment_receipt,
-            final_amount=order.final_amount,
             created_at=order.created_at,
             status=order.status,
         )
 
     async def insert(self, order: Order) -> Order:
-        query = insert(OrderModel).values(
+        order_model = OrderModel(
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            final_amount=order.final_amount.value,
             created_at=order.created_at.value,
-            status=order.status,
-        ).returning(OrderModel)
-        result = await self._session.execute(query)
-        order_model = result.scalar_one()
-        await self._session.commit()
+            status=order.status.value,
+        )
+        self._session.add(order_model)
+        await self._session.flush(objects=[order_model])
 
         return Order(
             id=OrderID(order_model.id),
             user_id=UserID(order_model.user_id),
             payment_receipt=PaymentReceipt(order_model.payment_receipt),
-            final_amount=FinalAmount(order_model.final_amount),
             created_at=CreatedAt(order_model.created_at),
             status=order.status,
         )

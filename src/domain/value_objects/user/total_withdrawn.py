@@ -7,6 +7,6 @@ from src.domain.exceptions.user import EmptyValueError
 class TotalWithdrawn(ValueObject[Decimal]):
     value: Decimal
 
-    def _validate(self) -> None:
-        if not self.value:
-            raise EmptyValueError('Total withdrawn value is empty.')
+    # def _validate(self) -> None:
+    #     if not self.value:
+    #         raise EmptyValueError('Total withdrawn value is empty.')

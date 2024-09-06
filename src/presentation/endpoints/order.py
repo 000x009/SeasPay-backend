@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile, Body
 from fastapi.responses import JSONResponse
 
 from aiogram.utils.web_app import WebAppInitData
@@ -8,10 +8,16 @@ from aiogram.utils.web_app import WebAppInitData
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from src.application.services.order import OrderService
+from src.application.dto.user import GetUserDTO
+from src.application.services.user import UserService
 from src.presentation.dependencies.user_init_data import user_init_data_provider
 from src.application.dto.order import OrderDTO, ListOrderDTO, GetOrderDTO, CreateOrderDTO
 from src.application.common.dto import Pagination
 from src.presentation.schema.order import CreateOrderSchema
+from src.application.services.json_text_getter import get_paypal_withdraw_order_text
+from src.application.services.telegram_order_sender import TelegramOrderSender
+from src.application.dto.telegram import SendOrderDTO
+from src.application.common.dto import File as FileDTO
 
 router = APIRouter(
     prefix='/api/order',
@@ -56,20 +62,40 @@ async def get_order(
     return response
 
 
-@router.post('/')
+@router.post('/', response_class=JSONResponse)
 async def create_order(
-    data: CreateOrderSchema,
     order_service: FromDishka[OrderService],
-    user_data: WebAppInitData = Depends(user_init_data_provider),
+    telegram_order_sender: FromDishka[TelegramOrderSender],
+    user_service: FromDishka[UserService],
+    data: CreateOrderSchema = Body(),
+    payment_receipt: UploadFile = File(),
+    # user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> JSONResponse:
-    await order_service.create(
+    order = await order_service.create(
         CreateOrderDTO(
-            user_id=user_data.user.id,
-            invoice_id=data.invoice_id,
-            payment_receipt=data.payment_receipt,
-            final_amount=data.final_amount,
-            time=data.time,
+            user_id=12823,
+            payment_receipt="string",
+            created_at=data.created_at,
             status=data.status,
+        )
+    )
+    user = await user_service.get_user(GetUserDTO(user_id=12823))
+    await telegram_order_sender.send_order(
+        SendOrderDTO(
+            user_id=12823,
+            order_text=get_paypal_withdraw_order_text(
+                order_id=order.id,
+                user_id=order.user_id,
+                username=12823,
+                created_at=order.created_at,
+                status=order.status,
+                commission=user.commission,
+            ),
+            username="some username",
+            photo=FileDTO(
+                input_file=payment_receipt.file.read(),
+                filename=payment_receipt.filename,
+            ) if payment_receipt is not None else None,
         )
     )
 

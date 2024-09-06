@@ -27,7 +27,10 @@ class OrderModel(Base):
         server_default=func.now(),
         default=datetime.now(UTC),
     )
-    status: Mapped[OrderStatus] = mapped_column(Enum(OrderStatus), default=OrderStatus.WAIT)
+    status: Mapped[OrderStatus] = mapped_column(
+        Enum("WAIT", "COMPLETE", "CANCEL", "DELAY", name="order_status"),
+        default=OrderStatus.WAIT,
+    )
 
-    user: Mapped['UserModel'] = relationship(back_populates='order', uselist=False)
+    user: Mapped['UserModel'] = relationship(back_populates='orders', uselist=False)
     completed_order: Mapped[Optional['CompletedOrderModel']] = relationship(back_populates='order', uselist=False)

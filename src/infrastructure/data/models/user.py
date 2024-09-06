@@ -24,7 +24,6 @@ class UserModel(Base):
     commission: Mapped[int] = mapped_column(Integer, nullable=True, default=15)
     total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True, default=0)
 
-    orders = relationship('OrderModel', back_populates='user', uselist=True)
-    feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True)
-
-    topics: Mapped[Optional[List["UserTopicModel"]]] = relationship(back_populates='user', uselist=True)
+    orders = relationship('OrderModel', back_populates='user', uselist=True, lazy='joined')
+    feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True, lazy='joined')
+    topics: Mapped[Optional[List["UserTopicModel"]]] = relationship(back_populates='user', uselist=True, lazy='joined')

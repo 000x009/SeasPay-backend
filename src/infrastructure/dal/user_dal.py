@@ -34,11 +34,10 @@ class UserDAL(BaseUserDAL):
     async def get_one(self, user_id: UserID) -> Optional[User]:
         query = select(UserModel).filter(UserModel.user_id == user_id.value)
         result = await self._session.execute(query)
-        db_user = result.scalar_one_or_none()
-        
+        db_user = result.scalar()
         if not db_user:
             return None
-
+        print(db_user.commission)
         return User(
             user_id=UserID(db_user.user_id),
             joined_at=JoinedAt(db_user.joined_at),
