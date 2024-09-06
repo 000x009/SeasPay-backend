@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 import os
 from pathlib import Path
-from decimal import Decimal
 
 from src.domain.value_objects.order import OrderStatus
 
@@ -18,15 +17,22 @@ def get_paypal_withdraw_order_text(
     order_id: int,
     user_id: int,
     username: str,
-    amount: Decimal,
     created_at: datetime,
     status: OrderStatus,
+    commission: int,
 ) -> str:
+    status_text = {
+        OrderStatus.WAIT: "⌛ Ожидание",
+        OrderStatus.COMPLETE: "✅ Выполнен",
+        OrderStatus.CANCEL: "❌ Отменен",
+        OrderStatus.DELAY: "🕒 Отложен",
+    }
+
     return get_text_by_key("paypal_withdraw_order_text").format(
         id=order_id,
         user_id=user_id,
         username=username,
-        amount=amount,
-        created_at=created_at,
-        status=status,
+        created_at=created_at.strftime("%d.%m.%Y %H:%M"),
+        status=status_text[status],
+        commission=commission,
     )
