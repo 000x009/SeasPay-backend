@@ -14,11 +14,11 @@ class TelegramOrderSender(OrderSender):
         self,
         telegram_client: TelegramTopicManager,
         user_topic_service: UserTopicService,
-        config: BotSettings,
+        # config: BotSettings,
     ) -> Message:
         self._telegram_client = telegram_client
         self._user_topic_service = user_topic_service
-        self._config = config
+        self._config = load_bot_settings()
 
     async def send_order(self, data: SendOrderDTO) -> Message:
         user_topic = await self._user_topic_service.get_user_topic_by_user_id(

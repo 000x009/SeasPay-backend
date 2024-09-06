@@ -1,12 +1,18 @@
+from typing import Optional
+
 from aiogram import Bot
-from aiogram.types import ForumTopic, Message
+from aiogram.types import ForumTopic, Message, BufferedInputFile
 
 from src.application.common.telegram import TelegramTopic
 from src.infrastructure.config import BotSettings
 
 
 class TelegramTopicManager(TelegramTopic):
-    def __init__(self, bot: Bot, config: BotSettings):
+    def __init__(
+        self,
+        bot: Bot,
+        config: BotSettings,
+    ):
         self.bot = bot
         self.config = config
 
@@ -23,3 +29,17 @@ class TelegramTopicManager(TelegramTopic):
             message_thread_id=thread_id,
         )
     
+    async def send_message_photo(
+        self,
+        thread_id: int,
+        photo: bytes,
+        filename: Optional[str] = None,
+        caption: Optional[str] = None,
+    ) -> Message:
+        buffered_photo = BufferedInputFile(photo, filename=filename)
+        return await self.bot.send_photo(
+            chat_id=self.config.orders_group_id,
+            photo=buffered_photo,
+            message_thread_id=thread_id,
+            caption=caption,
+        )

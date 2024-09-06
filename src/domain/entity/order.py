@@ -1,39 +1,31 @@
 from __future__ import annotations
-
 from datetime import datetime, UTC
 from typing import Union, Any, Optional
 
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.invoice import InvoiceID
-from src.domain.value_objects.order import PaymentReceipt, FinalAmount, CreatedAt, OrderStatus, OrderID
+from src.domain.value_objects.order import PaymentReceipt, CreatedAt, OrderStatus, OrderID
 
 
 class Order:
     __slots__ = (
         'id',
         'user_id',
-        'invoice_id',
         'payment_receipt',
-        'final_amount',
         'created_at',
         'status',
     )
 
     def __init__(
         self,
-        id: OrderID,
         user_id: UserID,
-        invoice_id: InvoiceID,
         payment_receipt: PaymentReceipt,
-        final_amount: FinalAmount,
-        created_at: Optional[CreatedAt],
-        status: Optional[OrderStatus],
+        id: Optional[OrderID] = None,
+        created_at: Optional[CreatedAt] = None,
+        status: Optional[OrderStatus] = None,
     ):
         self.id = id
         self.user_id = user_id
-        self.invoice_id = invoice_id
         self.payment_receipt = payment_receipt
-        self.final_amount = final_amount
         self.created_at = created_at
         self.status = status
 
