@@ -2,7 +2,7 @@ import logging
 
 from fastapi import FastAPI
 
-from src.presentation.endpoints import user, feedback, order
+from src.presentation.web_api.endpoints import user, feedback, order
 
 
 def include_all_routers(app: FastAPI) -> None:

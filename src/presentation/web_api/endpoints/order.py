@@ -10,10 +10,10 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from src.application.services.order import OrderService
 from src.application.dto.user import GetUserDTO
 from src.application.services.user import UserService
-from src.presentation.dependencies.user_init_data import user_init_data_provider
+from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
 from src.application.dto.order import OrderDTO, ListOrderDTO, GetOrderDTO, CreateOrderDTO
 from src.application.common.dto import Pagination
-from src.presentation.schema.order import CreateOrderSchema
+from src.presentation.web_api.schema.order import CreateOrderSchema
 from src.application.services.json_text_getter import get_paypal_withdraw_order_text
 from src.application.services.telegram_order_sender import TelegramOrderSender
 from src.application.dto.telegram import SendOrderDTO

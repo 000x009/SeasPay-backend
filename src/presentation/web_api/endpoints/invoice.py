@@ -9,8 +9,8 @@ from aiogram.utils.web_app import WebAppInitData
 
 from src.application.services.invoice import InvoiceService
 from src.application.dto.invoice import GetInvoiceDTO, InvoiceDTO, UpdateInvoiceDTO
-from src.presentation.dependencies.user_init_data import user_init_data_provider
-from src.presentation.schema.invoice import UpdateInvoiceStatusSchema
+from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
+from src.presentation.web_api.schema.invoice import UpdateInvoiceStatusSchema
 
 router = APIRouter(
     tags=['Invoice'],

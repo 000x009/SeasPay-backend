@@ -7,8 +7,8 @@ from aiogram.utils.web_app import WebAppInitData
 
 from src.application.services.user import UserService
 from src.application.dto.user import CreateUserDTO, GetUserDTO, UserDTO, UpdateUserCommissionDTO, UpdateUserTotalWithdrawnDTO
-from src.presentation.dependencies.user_init_data import user_init_data_provider
-from src.presentation.schema.user import CreateUserSchema, UpdateUserTotalWithdrawnSchema, UpdateUserCommissionSchema
+from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
+from src.presentation.web_api.schema.user import CreateUserSchema, UpdateUserTotalWithdrawnSchema, UpdateUserCommissionSchema
 
 
 router = APIRouter(

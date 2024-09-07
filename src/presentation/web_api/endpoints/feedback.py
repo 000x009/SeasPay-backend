@@ -9,8 +9,8 @@ from aiogram.utils.web_app import WebAppInitData
 
 from src.application.dto.feedback import FeedbackDTO, ListInputDTO, GetFeedbackDTO, CreateFeedbackDTO
 from src.application.services.feedback import FeedbackService
-from src.presentation.schema.feedback import CreateFeedback
-from src.presentation.dependencies.user_init_data import user_init_data_provider
+from src.presentation.web_api.schema.feedback import CreateFeedback
+from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
 
 
 router = APIRouter(
