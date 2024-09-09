@@ -14,22 +14,16 @@ class UserDAL(BaseUserDAL):
         self._session = session
 
     async def insert(self, user: User) -> User:
-        query = insert(UserModel).values(
+        user_model = UserModel(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
             commission=user.commission.value,
             total_withdrawn=user.total_withdrawn.value
-        ).returning(UserModel)
-        result = await self._session.execute(query)
-        db_user = result.scalar_one()
-        await self._session.commit()
-
-        return User(
-            user_id=UserID(db_user.user_id),
-            joined_at=JoinedAt(db_user.joined_at),
-            commission=Commission(db_user.commission),
-            total_withdrawn=TotalWithdrawn(db_user.total_withdrawn)
         )
+        self._session.add(user_model)
+        await self._session.flush(objects=[user_model])
+        await self._session.commit()
+        return user
 
     async def get_one(self, user_id: UserID) -> Optional[User]:
         query = select(UserModel).filter(UserModel.user_id == user_id.value)
