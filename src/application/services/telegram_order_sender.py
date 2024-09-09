@@ -44,8 +44,10 @@ class TelegramOrderSender(OrderSender):
                 photo=data.photo.input_file,
                 filename=data.photo.filename,
                 caption=data.order_text,
+                order_id=data.order_id,
             )
         return await self._telegram_client.send_topic_message(
             thread_id=user_topic.thread_id,
             message=data.order_text,
+            order_id=data.order_id,
         )

@@ -5,6 +5,7 @@ from aiogram.types import ForumTopic, Message, BufferedInputFile
 
 from src.application.common.telegram import TelegramTopic
 from src.infrastructure.config import BotSettings
+from src.presentation.telegram.buttons.inline import get_order_kb_markup
 
 
 class TelegramTopicManager(TelegramTopic):
@@ -22,17 +23,19 @@ class TelegramTopicManager(TelegramTopic):
             name=name,
         )
     
-    async def send_topic_message(self, thread_id: int, message: str) -> Message:
+    async def send_topic_message(self, thread_id: int, message: str, order_id: int) -> Message:
         return await self.bot.send_message(
             chat_id=self.config.orders_group_id,
             text=message,
             message_thread_id=thread_id,
+            reply_markup=get_order_kb_markup(order_id=order_id),
         )
     
     async def send_message_photo(
         self,
         thread_id: int,
         photo: bytes,
+        order_id: int,
         filename: Optional[str] = None,
         caption: Optional[str] = None,
     ) -> Message:
@@ -42,4 +45,5 @@ class TelegramTopicManager(TelegramTopic):
             photo=buffered_photo,
             message_thread_id=thread_id,
             caption=caption,
+            reply_markup=get_order_kb_markup(order_id=order_id),
         )

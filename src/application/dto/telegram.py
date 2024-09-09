@@ -8,5 +8,6 @@ from src.application.common.dto import File
 class SendOrderDTO:
     user_id: int
     username: str
+    order_id: int
     order_text: str
     photo: Optional[File] = field(default=None)
