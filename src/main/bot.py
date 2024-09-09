@@ -10,6 +10,8 @@ from aiogram.enums import ParseMode
 
 from src.infrastructure.config import load_bot_settings
 from src.main.di import get_di_container
+from src.presentation.telegram.handlers import all_handlers
+from src.presentation.telegram.middlewares import LoginMiddleware
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +27,8 @@ async def setup_bot_dishka(dispatcher: Dispatcher):
 
 def get_dispatcher() -> Dispatcher:
     dispatcher = Dispatcher()
+    dispatcher.include_routers(*all_handlers)
+    LoginMiddleware(dishka_container=get_di_container(), router=dispatcher)
     setup_bot_dishka(dispatcher)
 
     return dispatcher
