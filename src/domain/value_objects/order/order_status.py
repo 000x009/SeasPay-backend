@@ -1,8 +1,9 @@
-from enum import Enum
+from enum import StrEnum, auto
 
 
-class OrderStatus(Enum):
-    COMPLETE = 'COMPLETE'
-    CANCEL = 'CANCEL'
-    WAIT = 'WAIT'
-    DELAY = 'DELAY'
+class OrderStatus(StrEnum):
+    COMPLETE = auto()
+    CANCEL = auto()
+    PROCESSING = auto()
+    NEW = auto()
+    DELAY = auto()
