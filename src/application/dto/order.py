@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
+from typing import Optional
 
 from src.domain.entity.order import OrderStatus
 from src.application.common.dto import Pagination
@@ -10,8 +11,9 @@ class OrderDTO:
     id: int
     user_id: int
     payment_receipt: str
-    created_at: datetime = field(default=datetime.now(UTC))
-    status: OrderStatus = field(default=OrderStatus.WAIT)
+    created_at: Optional[datetime] = field(default=datetime.now(UTC))
+    status: Optional[OrderStatus] = field(default=OrderStatus.NEW)
+    telegram_message_id: Optional[int] = field(default=None)
 
 
 @dataclass(frozen=True)
@@ -22,7 +24,6 @@ class ListOrderDTO:
 
 @dataclass(frozen=True)
 class GetOrderDTO:
-    user_id: int
     order_id: int
 
 
@@ -31,4 +32,17 @@ class CreateOrderDTO:
     user_id: int
     payment_receipt: str
     created_at: datetime = field(default=datetime.now(UTC))
-    status: OrderStatus = field(default=OrderStatus.WAIT)
+    status: OrderStatus = field(default=OrderStatus.NEW)
+    telegram_message_id: Optional[int] = field(default=None)
+
+
+@dataclass(frozen=True)
+class TakeOrderDTO:
+    order_id: int
+
+
+@dataclass(frozen=True)
+class AddTelegramMessageIdDTO:
+    order_id: int
+    telegram_message_id: int
+    

@@ -23,3 +23,8 @@ class BaseOrderDAL(Protocol):
     @abstractmethod
     async def insert(self, order: Order) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, order: Order) -> Optional[Order]:
+        raise 
+    

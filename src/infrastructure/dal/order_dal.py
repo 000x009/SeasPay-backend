@@ -19,7 +19,7 @@ class OrderDAL(BaseOrderDAL):
 
     async def list_(
         self, user_id: UserID, limit: int, offset: int
-    ) -> Optional[List[OrderDTO]]:
+    ) -> Optional[List[Order]]:
         query = (
             select(OrderModel)
             .filter_by(
@@ -36,33 +36,28 @@ class OrderDAL(BaseOrderDAL):
             return None
 
         return [
-            OrderDTO(
-                id=order.id,
-                user_id=order.user_id,
-                payment_receipt=order.payment_receipt,
+            Order(
+                id=OrderID(order.id),
+                user_id=UserID(order.user_id),
+                payment_receipt=PaymentReceipt(order.payment_receipt),
+                created_at=CreatedAt(order.created_at),
                 status=order.status,
-                created_at=order.created_at,
             )
             for order in orders
         ]
 
-    async def get(
-        self, user_id: UserID, order_id: OrderID,
-    ) -> Optional[OrderDTO]:
-        query = select(OrderModel).filter_by(
-            user_id=user_id.value,
-            id=order_id.value,
-        )
+    async def get(self, order_id: OrderID) -> Optional[Order]:
+        query = select(OrderModel).filter_by(id=order_id.value)
         result = await self._session.execute(query)
         order = result.scalar_one_or_none()
         if not order:
             return None
-
-        return OrderDTO(
-            id=order.id,
-            user_id=order.user_id,
-            payment_receipt=order.payment_receipt,
-            created_at=order.created_at,
+        
+        return Order(
+            id=OrderID(order.id),
+            user_id=UserID(order.user_id),
+            payment_receipt=PaymentReceipt(order.payment_receipt),
+            created_at=CreatedAt(order.created_at),
             status=order.status,
         )
 
@@ -83,3 +78,17 @@ class OrderDAL(BaseOrderDAL):
             created_at=CreatedAt(order_model.created_at),
             status=order.status,
         )
+
+    async def update(self, order: Order) -> Optional[Order]:
+        order_model = OrderModel(
+            id=order.id.value,
+            user_id=order.user_id.value,
+            payment_receipt=order.payment_receipt.value,
+            created_at=order.created_at.value,
+            status=order.status.value,
+            telegram_message_id=order.telegram_message_id.value,
+        )
+        await self._session.flush(objects=[order_model])
+        await self._session.commit()
+
+        return order

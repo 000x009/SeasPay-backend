@@ -44,3 +44,9 @@ class CompletedOrder:
         difference = self.received_at.value - order_created_at.value
 
         return difference.days
+
+    def __str__(self) -> str:
+        return f'<CompletedOrder: {self.order_id}>'
+
+    def __repr__(self) -> str:
+        return self.__str__()
