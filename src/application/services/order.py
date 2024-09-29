@@ -14,11 +14,19 @@ from src.domain.value_objects.order import OrderID, CreatedAt, PaymentReceipt, O
 from src.domain.entity.order import Order
 from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenError
 from src.domain.value_objects.order_message import MessageID
+from src.application.services.withdraw_service import WithdrawService
+from src.domain.value_objects.withdraw_method import MethodEnum
+from src.application.dto.withdraw_method import AddCardMethodDTO, AddCryptoMethodDTO
 
 
 class OrderService:
-    def __init__(self, order_dal: OrderDAL) -> None:
+    def __init__(
+        self,
+        order_dal: OrderDAL,
+        withdraw_service: WithdrawService,
+    ) -> None:
         self._order_dal = order_dal
+        self._withdraw_service = withdraw_service
 
     async def list_(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
         return await self._order_dal.list_(
@@ -31,11 +39,13 @@ class OrderService:
         order = await self._order_dal.get(OrderID(data.order_id))
         if not order:
             return None
-
+        
+        withdraw_method = await self._withdraw_service.get_withdraw_method(OrderID(data.order_id))
         return OrderDTO(
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
+            withdraw_method=withdraw_method,
             created_at=order.created_at.value,
             status=order.status,
         )
@@ -49,11 +59,31 @@ class OrderService:
                 status=data.status,
             )
         )
+        if data.withdraw_method.method == MethodEnum.CARD:
+            await self._withdraw_service.add_card_method(
+                AddCardMethodDTO(
+                    order_id=order.id.value,
+                    method=data.withdraw_method.method,
+                    card_number=data.withdraw_method.card_number,
+                    card_holder_name=data.withdraw_method.card_holder_name,
+                )
+            )
+        elif data.withdraw_method.method == MethodEnum.CRYPTO:
+            await self._withdraw_service.add_crypto_method(
+                AddCryptoMethodDTO(
+                    order_id=order.id.value,
+                    crypto_address=data.withdraw_method.crypto_address,
+                    method=data.withdraw_method.method,
+                    network=data.withdraw_method.network,
+                )
+            )
+        withdraw_method = await self._withdraw_service.get_withdraw_method(OrderID(order.id.value))
 
         return OrderDTO(
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
+            withdraw_method=withdraw_method,
             created_at=order.created_at.value,
             status=order.status,
         )
@@ -68,11 +98,13 @@ class OrderService:
 
         order.status = OrderStatus.PROCESSING
         updated_order = await self._order_dal.update(order)
+        withdraw_method = await self._withdraw_service.get_withdraw_method(OrderID(data.order_id))
 
         return OrderDTO(
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
+            withdraw_method=withdraw_method,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
         )
@@ -84,11 +116,13 @@ class OrderService:
 
         order.telegram_message_id = MessageID(data.telegram_message_id)
         updated_order = await self._order_dal.update(order)
+        withdraw_method = await self._withdraw_service.get_withdraw_method(OrderID(data.order_id))
 
         return OrderDTO(
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
+            withdraw_method=withdraw_method,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
             telegram_message_id=updated_order.telegram_message_id.value,

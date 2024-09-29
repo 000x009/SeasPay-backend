@@ -1,4 +1,3 @@
-from typing import Optional
 from decimal import Decimal
 
 from datetime import datetime, UTC
@@ -36,3 +35,15 @@ class GetUserDTO:
 class UpdateUserTotalWithdrawnDTO:
     user_id: int
     total_withdrawn: Decimal
+
+
+@dataclass(frozen=True)
+class CalculateCommissionDTO:
+    user_id: int
+    paypal_received_amount: Decimal
+
+
+@dataclass(frozen=True)
+class CommissionDTO:
+    commission: int
+    user_must_receive: Decimal

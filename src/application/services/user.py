@@ -1,9 +1,18 @@
 from typing import Optional, List
 
 from src.infrastructure.dal import UserDAL
-from src.application.dto.user import CreateUserDTO, GetUserDTO, UserDTO, UpdateUserCommissionDTO, UpdateUserTotalWithdrawnDTO
+from src.application.dto.user import (
+    CreateUserDTO,
+    GetUserDTO,
+    UserDTO,
+    UpdateUserCommissionDTO,
+    UpdateUserTotalWithdrawnDTO,
+    CalculateCommissionDTO,
+    CommissionDTO,
+)
 from src.domain.entity.user import User
 from src.domain.value_objects.user import UserID, JoinedAt, Commission, TotalWithdrawn
+from src.domain.value_objects.completed_order import PaypalReceivedAmount
 from src.domain.exceptions.user import UserNotFoundError
 
 
@@ -70,4 +79,14 @@ class UserService:
             joined_at=JoinedAt(user.joined_at.value),
             commission=Commission(user.commission.value),
             total_withdrawn=TotalWithdrawn(data.total_withdrawn)))
-        
+    
+    async def calculate_commission(self, data: CalculateCommissionDTO) -> CommissionDTO:
+        user = await self._user_dal.get_one(UserID(data.user_id))
+        if user is None:
+            raise UserNotFoundError(f"User with id {data.user_id} not found.")
+
+        user_must_receive = user.update_commission(PaypalReceivedAmount(data.paypal_received_amount))
+        return CommissionDTO(
+            commission=user.commission.value,
+            user_must_receive=user_must_receive.value
+        )

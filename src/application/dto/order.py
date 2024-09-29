@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
-from typing import Optional
+from typing import Optional, Union
 
 from src.domain.entity.order import OrderStatus
 from src.application.common.dto import Pagination
+from src.application.dto.withdraw_method import CardMethodDTO, CryptoMethodDTO
 
 
 @dataclass(frozen=True)
@@ -11,6 +12,7 @@ class OrderDTO:
     id: int
     user_id: int
     payment_receipt: str
+    withdraw_method: Union[CardMethodDTO, CryptoMethodDTO]
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatus] = field(default=OrderStatus.NEW)
     telegram_message_id: Optional[int] = field(default=None)
@@ -31,6 +33,7 @@ class GetOrderDTO:
 class CreateOrderDTO:
     user_id: int
     payment_receipt: str
+    withdraw_method: Union[CardMethodDTO, CryptoMethodDTO]
     created_at: datetime = field(default=datetime.now(UTC))
     status: OrderStatus = field(default=OrderStatus.NEW)
     telegram_message_id: Optional[int] = field(default=None)

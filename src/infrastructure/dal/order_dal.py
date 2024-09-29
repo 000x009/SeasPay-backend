@@ -42,6 +42,7 @@ class OrderDAL(BaseOrderDAL):
                 payment_receipt=PaymentReceipt(order.payment_receipt),
                 created_at=CreatedAt(order.created_at),
                 status=order.status,
+                telegram_message_id=order.telegram_message_id,
             )
             for order in orders
         ]
@@ -59,6 +60,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=PaymentReceipt(order.payment_receipt),
             created_at=CreatedAt(order.created_at),
             status=order.status,
+            telegram_message_id=order.telegram_message_id,
         )
 
     async def insert(self, order: Order) -> Order:
@@ -67,6 +69,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=order.payment_receipt.value,
             created_at=order.created_at.value,
             status=order.status.value,
+            telegram_message_id=order.telegram_message_id,
         )
         self._session.add(order_model)
         await self._session.flush(objects=[order_model])
@@ -77,6 +80,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=PaymentReceipt(order_model.payment_receipt),
             created_at=CreatedAt(order_model.created_at),
             status=order.status,
+            telegram_message_id=order.telegram_message_id,
         )
 
     async def update(self, order: Order) -> Optional[Order]:
@@ -86,7 +90,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=order.payment_receipt.value,
             created_at=order.created_at.value,
             status=order.status.value,
-            telegram_message_id=order.telegram_message_id.value,
+            telegram_message_id=order.telegram_message_id,
         )
         await self._session.flush(objects=[order_model])
         await self._session.commit()

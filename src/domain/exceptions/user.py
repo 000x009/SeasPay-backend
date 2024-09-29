@@ -11,3 +11,7 @@ class EmptyValueError(ValueObjectError):
 
 class UserNotFoundError(DomainError):
     pass
+
+
+class WithdrawAmountError(DomainError):
+    pass

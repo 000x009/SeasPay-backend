@@ -1,5 +1,5 @@
 from datetime import datetime, UTC
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Integer, String, BigInteger, ForeignKey, Enum, func, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -11,8 +11,7 @@ if TYPE_CHECKING:
     from src.infrastructure.data.models import (
         UserModel,
         CompletedOrderModel,
-        CardDetailsModel,
-        CryptoDetailsModel,
+        WithdrawMethodModel,
     )
 
 
@@ -40,4 +39,4 @@ class OrderModel(Base):
 
     user: Mapped['UserModel'] = relationship(back_populates='orders', uselist=False)
     completed_order: Mapped[Optional['CompletedOrderModel']] = relationship(back_populates='order', uselist=False)
-    withdraw_details: Mapped[Union['CardDetailsModel', 'CryptoDetailsModel']] = relationship(back_populates='order', uselist=False)
+    withdraw_method: Mapped['WithdrawMethodModel'] = relationship(back_populates='order', uselist=False)
