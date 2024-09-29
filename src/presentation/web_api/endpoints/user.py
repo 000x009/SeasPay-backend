@@ -12,7 +12,7 @@ from src.presentation.web_api.schema.user import CreateUserSchema, UpdateUserTot
 
 
 router = APIRouter(
-    prefix='/api/user',
+    prefix='/user',
     tags=['User'],
     route_class=DishkaRoute,
 )

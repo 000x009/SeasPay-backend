@@ -14,7 +14,7 @@ from src.presentation.web_api.schema.invoice import UpdateInvoiceStatusSchema
 
 router = APIRouter(
     tags=['Invoice'],
-    prefix='/api/invoice',
+    prefix='/invoice',
     route_class=DishkaRoute,
 )
 

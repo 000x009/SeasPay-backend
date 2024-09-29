@@ -14,13 +14,15 @@ from src.presentation.web_api.dependencies.user_init_data import user_init_data_
 from src.application.dto.order import OrderDTO, ListOrderDTO, GetOrderDTO, CreateOrderDTO
 from src.application.common.dto import Pagination
 from src.presentation.web_api.schema.order import CreateOrderSchema
-from src.application.services.json_text_getter import get_paypal_withdraw_order_text
+from src.infrastructure.json_text_getter import get_paypal_withdraw_order_text
 from src.application.services.telegram_order_sender import TelegramOrderSender
 from src.application.dto.telegram import SendOrderDTO
 from src.application.common.dto import File as FileDTO
+from src.application.dto.withdraw_method import CreateCardMethodDTO, CreateCryptoMethodDTO
+from src.domain.value_objects.withdraw_method import MethodEnum
 
 router = APIRouter(
-    prefix='/api/order',
+    prefix='/order',
     tags=['Order'],
     route_class=DishkaRoute,
 )
@@ -70,17 +72,29 @@ async def create_order(
     data: CreateOrderSchema = Body(),
     payment_receipt: UploadFile = File(),
     # user_data: WebAppInitData = Depends(user_init_data_provider),
-) -> JSONResponse:
+) -> OrderDTO:
+    if data.withdraw_method.method == MethodEnum.CARD:
+        withdraw_method = CreateCardMethodDTO(
+            card_number=data.withdraw_method.card_number,
+            card_holder_name=data.withdraw_method.card_holder_name,
+        )
+    elif data.withdraw_method.method == MethodEnum.CRYPTO:
+        withdraw_method = CreateCryptoMethodDTO(
+            crypto_address=data.withdraw_method.crypto_address,
+            network=data.withdraw_method.network,
+        )
+
     order = await order_service.create(
         CreateOrderDTO(
             user_id=12823,
             payment_receipt="string",
             created_at=data.created_at,
             status=data.status,
+            withdraw_method=withdraw_method,
         )
     )
     user = await user_service.get_user(GetUserDTO(user_id=12823))
-    await telegram_order_sender.send_order(
+    order = await telegram_order_sender.send_order(
         SendOrderDTO(
             user_id=12823,
             order_text=get_paypal_withdraw_order_text(
@@ -98,8 +112,5 @@ async def create_order(
             ) if payment_receipt is not None else None,
         )
     )
-
-    return JSONResponse(
-        status_code=200,
-        content={"message": "success"}
-    )
+    
+    return order
