@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
 from src.domain.common.value_objects import ValueObject
-from src.domain.exceptions.card_details import CardNumberError
+from src.domain.exceptions.withdraw_method import CardNumberError
 
 
 @dataclass(frozen=True)
-class CardNumber(ValueObject[int]):
-    value: int
+class CardNumber(ValueObject[str]):
+    value: str
 
     def _validate(self) -> None:
-        if self.value < 1000000000000000 or self.value > 9999999999999999:
+        if not self.value.strip().isdigit() or len(self.value.strip()) != 16:
             raise CardNumberError("Card number must be 16 digits")

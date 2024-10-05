@@ -4,5 +4,5 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class DBIdentity(ValueObject[int]):
-    value: int
+class CryptoNetwork(ValueObject[str]):
+    value: str

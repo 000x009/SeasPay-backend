@@ -5,8 +5,8 @@ from src.domain.common.value_objects import ValueObject
 
 
 class MethodEnum(StrEnum):
-    CARD = 'card'
-    CRYPTO = 'crypto'
+    CARD = 'CARD'
+    CRYPTO = 'CRYPTO'
 
 
 @dataclass(frozen=True)
