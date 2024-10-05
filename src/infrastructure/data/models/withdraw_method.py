@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+
 from sqlalchemy import String, Integer, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,8 +14,8 @@ class WithdrawMethodModel(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     order_id: Mapped[int] = mapped_column(Integer, ForeignKey('order.id', ondelete='CASCADE'), nullable=False)
-    method: Mapped[str] = mapped_column(Enum(MethodEnum), nullable=False)
-    card_number: Mapped[str] = mapped_column(String(16), nullable=True)
+    method: Mapped[str] = mapped_column(Enum("CARD", "CRYPTO", name="method_enum"), nullable=False)
+    card_number: Mapped[str] = mapped_column(String(20), nullable=True)
     card_holder_name: Mapped[str] = mapped_column(String, nullable=True)
     crypto_address: Mapped[str] = mapped_column(String, nullable=True)
     crypto_network: Mapped[str] = mapped_column(String, nullable=True)
