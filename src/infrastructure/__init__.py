@@ -1,6 +1,4 @@
-from src.infrastructure.config import load_settings
-
-settings = load_settings()
+from src.infrastructure.telegram import TelegramTopicManager
 
 
-__all__ = ['settings']
+__all__ = ['TelegramTopicManager']

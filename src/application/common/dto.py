@@ -9,6 +9,6 @@ class Pagination:
 
 
 @dataclass
-class File:
+class FileDTO:
     input_file: BinaryIO
     filename: Optional[str] = field(default=None)

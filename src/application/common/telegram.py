@@ -1,10 +1,10 @@
-from typing import Protocol
+from typing import Protocol, Optional
 from abc import abstractmethod
 
 from aiogram.types import ForumTopic, Message
 
 
-class TelegramTopic(Protocol):
+class TelegramClientInterface(Protocol):
     @abstractmethod
     async def create_topic(self, name: str) -> ForumTopic:
         raise NotImplementedError
@@ -12,4 +12,13 @@ class TelegramTopic(Protocol):
     @abstractmethod
     async def send_topic_message(self, thread_id: int, message: str) -> Message:
         raise NotImplementedError
-    
+
+    @abstractmethod
+    async def send_message_photo(
+        self,
+        thread_id: int,
+        photo: bytes,
+        order_id: int,
+        filename: Optional[str] = None,
+    ) -> Message:
+        raise NotImplementedError

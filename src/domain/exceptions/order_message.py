@@ -1,5 +1,5 @@
-from src.domain.exceptions.base import DomainException
+from src.domain.exceptions.base import DomainError
 
 
-class LongMessageError(DomainException):
+class LongMessageError(DomainError):
     pass

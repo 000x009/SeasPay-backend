@@ -15,6 +15,7 @@ class Order:
         'created_at',
         'status',
         'message_id',
+        'telegram_message_id',
     )
 
     def __init__(

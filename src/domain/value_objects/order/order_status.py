@@ -1,9 +1,9 @@
-from enum import StrEnum, auto
+from enum import StrEnum
 
 
 class OrderStatus(StrEnum):
-    COMPLETE = auto()
-    CANCEL = auto()
-    PROCESSING = auto()
-    NEW = auto()
-    DELAY = auto()
+    COMPLETE = "COMPLETE"
+    CANCEL = "CANCEL"
+    PROCESSING = "PROCESSING"
+    NEW = "NEW"
+    DELAY = "DELAY"

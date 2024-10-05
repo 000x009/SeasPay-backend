@@ -3,17 +3,13 @@ from typing import Optional
 from aiogram import Bot
 from aiogram.types import ForumTopic, Message, BufferedInputFile
 
-from src.application.common.telegram import TelegramTopic
+from src.application.common.telegram import TelegramClientInterface
 from src.infrastructure.config import BotSettings
-from src.presentation.telegram.buttons.inline import get_order_kb_markup
+from src.presentation.telegram.buttons.inline import get_order_fulfillment_kb_markup
 
 
-class TelegramTopicManager(TelegramTopic):
-    def __init__(
-        self,
-        bot: Bot,
-        config: BotSettings,
-    ):
+class TelegramClient(TelegramClientInterface):
+    def __init__(self, bot: Bot, config: BotSettings):
         self.bot = bot
         self.config = config
 
@@ -28,7 +24,7 @@ class TelegramTopicManager(TelegramTopic):
             chat_id=self.config.orders_group_id,
             text=message,
             message_thread_id=thread_id,
-            reply_markup=get_order_kb_markup(order_id=order_id),
+            reply_markup=get_order_fulfillment_kb_markup(order_id=order_id),
         )
     
     async def send_message_photo(
@@ -45,5 +41,5 @@ class TelegramTopicManager(TelegramTopic):
             photo=buffered_photo,
             message_thread_id=thread_id,
             caption=caption,
-            reply_markup=get_order_kb_markup(order_id=order_id),
+            reply_markup=get_order_fulfillment_kb_markup(order_id=order_id),
         )

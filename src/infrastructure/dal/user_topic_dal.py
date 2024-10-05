@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select, insert
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal.user_topic_dal import BaseUserTopicDAL

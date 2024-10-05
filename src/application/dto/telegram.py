@@ -5,9 +5,9 @@ from src.application.common.dto import File
 
 
 @dataclass(frozen=True)
-class SendOrderDTO:
+class SendMessageDTO:
     user_id: int
     username: str
     order_id: int
-    order_text: str
+    text: str
     photo: Optional[File] = field(default=None)

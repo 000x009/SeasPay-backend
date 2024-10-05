@@ -1,5 +1,4 @@
 from typing import AsyncGenerator, List
-from aiohttp import BasicAuth
 from contextlib import asynccontextmanager
 
 from dishka import Provider, provide, Scope, AsyncContainer, make_async_container
@@ -7,19 +6,27 @@ from dishka import Provider, provide, Scope, AsyncContainer, make_async_containe
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker, AsyncSession
 
 from aiogram import Bot
-from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
-from src.infrastructure.dal import UserDAL, OrderDAL, FeedbackDAL, UserTopicDAL, CompletedOrderDAL
+from src.infrastructure.dal import (
+    UserDAL,
+    OrderDAL,
+    FeedbackDAL,
+    UserTopicDAL,
+    CompletedOrderDAL,
+    WithdrawMethodDAL,
+)
 from src.application.services.user import UserService
 from src.application.services.order import OrderService
 from src.application.services.feedback import FeedbackService
 from src.application.services.user_topic import UserTopicService
 from src.application.services.completed_order import CompletedOrderService
+from src.application.services.withdraw_service import WithdrawService
 from src.infrastructure.config import load_settings, load_bot_settings, BotSettings
-from src.infrastructure.telegram import TelegramTopicManager
-from src.application.services.telegram_order_sender import TelegramOrderSender
+from src.infrastructure.telegram import TelegramClient
+from src.application.services.telegram_service import TelegramService
+from src.application.common.telegram import TelegramClientInterface
 
 
 class DatabaseProvider(Provider):
@@ -44,6 +51,7 @@ class DALProvider(Provider):
     feedback_dal = provide(FeedbackDAL, scope=Scope.REQUEST, provides=FeedbackDAL)
     user_topic_dal = provide(UserTopicDAL, scope=Scope.REQUEST, provides=UserTopicDAL)
     completed_order_dal = provide(CompletedOrderDAL, scope=Scope.REQUEST, provides=CompletedOrderDAL)
+    withdraw_method_dal = provide(WithdrawMethodDAL, scope=Scope.REQUEST, provides=WithdrawMethodDAL)
 
 
 class ServiceProvider(Provider):
@@ -52,37 +60,24 @@ class ServiceProvider(Provider):
     feedback_service = provide(FeedbackService, scope=Scope.REQUEST, provides=FeedbackService)
     user_topic_service = provide(UserTopicService, scope=Scope.REQUEST, provides=UserTopicService)
     completed_order_service = provide(CompletedOrderService, scope=Scope.REQUEST, provides=CompletedOrderService)
-
-
-# class ConfigProvider(Provider):
-#     config = provide(BotSettings, scope=Scope.ACTION, provides=BotSettings)
-
+    withdraw_service = provide(WithdrawService, scope=Scope.REQUEST, provides=WithdrawService)
+    telegram_service = provide(TelegramService, scope=Scope.REQUEST, provides=TelegramService)
 
 class TelegramProvider(Provider):
-    telegram_order_sender = provide(TelegramOrderSender, scope=Scope.REQUEST, provides=TelegramOrderSender)
-
     @asynccontextmanager
     async def _get_bot(self, config: BotSettings) -> AsyncGenerator[Bot, None]:
-        proxy_url = "http://95.215.1.84:58656"
-        auth = BasicAuth("TyTdCBZZ", "c9RVSrf7")
-        client_session = AiohttpSession(proxy=(proxy_url, auth))
         bot = Bot(
             token=config.bot_token,
             default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-            session=client_session
         )
         yield bot
         await bot.session.close()
-        await client_session.close()
 
-    @provide(scope=Scope.REQUEST, provides=TelegramTopicManager)
-    async def get_telegram_topic_manager(self) -> AsyncGenerator[TelegramTopicManager, None]:
+    @provide(scope=Scope.REQUEST, provides=TelegramClientInterface)
+    async def get_telegram_client(self) -> AsyncGenerator[TelegramClientInterface, None]:
         config = load_bot_settings()
         async with self._get_bot(config) as bot:
-            yield TelegramTopicManager(
-                bot=bot,
-                config=config,
-            )
+            yield TelegramClient(bot=bot, config=config)
 
 
 def setup_providers() -> List[Provider]:
@@ -91,7 +86,6 @@ def setup_providers() -> List[Provider]:
         DALProvider(),
         ServiceProvider(),
         TelegramProvider(),
-        # ConfigProvider(),
     ]
 
 
