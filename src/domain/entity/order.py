@@ -3,7 +3,7 @@ from datetime import datetime, UTC
 from typing import Union, Any, Optional
 
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.order import PaymentReceipt, CreatedAt, OrderStatus, OrderID
+from src.domain.value_objects.order import PaymentReceipt, CreatedAt, OrderStatus, OrderID, OrderStatusEnum
 from src.domain.value_objects.order_message import MessageID
 
 
@@ -37,12 +37,12 @@ class Order:
         if not created_at:
             self.created_at = CreatedAt(datetime.now(UTC))
         if not status:
-            self.status = OrderStatus.NEW
+            self.status = OrderStatus(OrderStatusEnum.NEW)
 
     def __str__(self):
-        return f'Order <{self.invoice_id}>'
+        return f'Order <{self.id}, {self.user_id}, {self.payment_receipt}, {self.created_at}, {self.status}, {self.telegram_message_id}>'
 
     def __eq__(self, other: Union[Order, Any]) -> bool:
-        if isinstance(other, Order) and other.invoice_id == self.invoice_id:
+        if isinstance(other, Order) and other.id == self.id:
             return True
         return False

@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 
-from src.domain.value_objects.order import OrderStatus
+from src.domain.value_objects.order import OrderStatusEnum
 
 
 def get_text_by_key(key: str) -> str:
@@ -17,15 +17,15 @@ def get_paypal_withdraw_order_text(
     order_id: int,
     user_id: int,
     created_at: datetime,
-    status: OrderStatus,
+    status: OrderStatusEnum,
     commission: int,
 ) -> str:
     status_text = {
-        OrderStatus.NEW: "⌛ Ожидание обработки",
-        OrderStatus.PROCESSING: "🔄 На обработке у администратора",
-        OrderStatus.COMPLETE: "✅ Выполнен",
-        OrderStatus.CANCEL: "❌ Отменен",
-        OrderStatus.DELAY: "🕒 Отложен по техническим причинам",
+        OrderStatusEnum.NEW: "⌛ Ожидание обработки",
+        OrderStatusEnum.PROCESSING: "🔄 На обработке у администратора",
+        OrderStatusEnum.COMPLETE: "✅ Выполнен",
+        OrderStatusEnum.CANCEL: "❌ Отменен",
+        OrderStatusEnum.DELAY: "🕒 Отложен по техническим причинам",
     }
 
     return get_text_by_key("paypal_withdraw_order_text").format(

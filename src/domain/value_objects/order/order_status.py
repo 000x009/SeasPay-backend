@@ -1,9 +1,18 @@
 from enum import StrEnum
+from dataclasses import dataclass
+
+from src.domain.common.value_objects import ValueObject
 
 
-class OrderStatus(StrEnum):
+class OrderStatusEnum(StrEnum):
     COMPLETE = "COMPLETE"
     CANCEL = "CANCEL"
     PROCESSING = "PROCESSING"
     NEW = "NEW"
     DELAY = "DELAY"
+    WAIT = "WAIT"
+
+
+@dataclass(frozen=True)
+class OrderStatus(ValueObject[OrderStatusEnum]):
+    value: OrderStatusEnum

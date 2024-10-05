@@ -1,15 +1,13 @@
 from typing import List, Optional
 
-from sqlalchemy import select, insert
-from sqlalchemy.orm import joinedload
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseOrderDAL
-from src.application.dto.order import OrderDTO
 from src.domain.entity.order import Order
-from src.domain.value_objects.order import OrderID, PaymentReceipt, FinalAmount, CreatedAt
+from src.domain.value_objects.order import OrderID, PaymentReceipt, CreatedAt, OrderStatus
+from src.domain.value_objects.order_message import MessageID
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.invoice import InvoiceID
 from src.infrastructure.data.models import OrderModel
 
 
@@ -41,7 +39,7 @@ class OrderDAL(BaseOrderDAL):
                 user_id=UserID(order.user_id),
                 payment_receipt=PaymentReceipt(order.payment_receipt),
                 created_at=CreatedAt(order.created_at),
-                status=order.status,
+                status=OrderStatus(order.status),
                 telegram_message_id=order.telegram_message_id,
             )
             for order in orders
@@ -59,8 +57,8 @@ class OrderDAL(BaseOrderDAL):
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
             created_at=CreatedAt(order.created_at),
-            status=order.status,
-            telegram_message_id=order.telegram_message_id,
+            status=OrderStatus(order.status),
+            telegram_message_id=MessageID(order.telegram_message_id),
         )
 
     async def insert(self, order: Order) -> Order:
@@ -79,8 +77,8 @@ class OrderDAL(BaseOrderDAL):
             user_id=UserID(order_model.user_id),
             payment_receipt=PaymentReceipt(order_model.payment_receipt),
             created_at=CreatedAt(order_model.created_at),
-            status=order.status,
-            telegram_message_id=order.telegram_message_id,
+            status=OrderStatus(order_model.status),
+            telegram_message_id=MessageID(order_model.telegram_message_id),
         )
 
     async def update(self, order: Order) -> Optional[Order]:
@@ -90,7 +88,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=order.payment_receipt.value,
             created_at=order.created_at.value,
             status=order.status.value,
-            telegram_message_id=order.telegram_message_id,
+            telegram_message_id=order.telegram_message_id.value,
         )
         await self._session.flush(objects=[order_model])
         await self._session.commit()

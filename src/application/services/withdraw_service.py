@@ -27,9 +27,19 @@ class WithdrawService:
             card_number=CardNumber(data.card_number),
             card_holder_name=CardHolderName(data.card_holder_name),
             crypto_address=CryptoAddress(data.crypto_address),
-            crypto_network=CryptoNetwork(data.network),
+            crypto_network=CryptoNetwork(data.crypto_network),
         )
-        await self.dal.insert(method)
+        withdraw_method = await self.dal.insert(method)
+
+        return WithdrawMethodDTO(
+            id=withdraw_method.id.value,
+            order_id=withdraw_method.order_id.value,
+            method=withdraw_method.method.value,
+            card_number=withdraw_method.card_number.value,
+            card_holder_name=withdraw_method.card_holder_name.value,
+            crypto_address=withdraw_method.crypto_address.value,
+            crypto_network=withdraw_method.crypto_network.value,
+        )
 
     async def get_withdraw_method(self, data: GetWithdrawMethodDTO) -> WithdrawMethodDTO:
         method = await self.dal.get(OrderID(data.order_id))
@@ -43,5 +53,5 @@ class WithdrawService:
             card_number=method.card_number.value,
             card_holder_name=method.card_holder_name.value,
             crypto_address=method.crypto_address.value,
-            network=method.crypto_network.value,
+            crypto_network=method.crypto_network.value,
         )

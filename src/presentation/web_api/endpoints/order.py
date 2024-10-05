@@ -63,6 +63,7 @@ async def create_order(
     data: CreateOrderSchema = Body(),
     payment_receipt: UploadFile = File(),
 ) -> OrderDTO:
+    print(data)
     response = await order_service.create(
         CreateOrderDTO(
             user_id=12823,

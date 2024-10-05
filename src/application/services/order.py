@@ -10,7 +10,7 @@ from src.application.dto.order import (
     AddTelegramMessageIdDTO,
 )
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.order import OrderID, CreatedAt, PaymentReceipt, OrderStatus
+from src.domain.value_objects.order import OrderID, CreatedAt, PaymentReceipt, OrderStatus, OrderStatusEnum
 from src.domain.entity.order import Order
 from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenError
 from src.domain.value_objects.order_message import MessageID
@@ -64,7 +64,7 @@ class OrderService:
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt),
                 created_at=CreatedAt(data.created_at),
-                status=data.status,
+                status=OrderStatus(data.status),
             )
         )
         withdraw_method = await self._withdraw_service.add_method(
@@ -74,19 +74,20 @@ class OrderService:
                 card_number=data.withdraw_method.card_number,
                 card_holder_name=data.withdraw_method.card_holder_name,
                 crypto_address=data.withdraw_method.crypto_address,
-                network=data.withdraw_method.network,
+                crypto_network=data.withdraw_method.crypto_network,
             )
         )
         user = await self._user_service.get_user(GetUserDTO(user_id=12823))
+
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
                 user_id=12823,
-                order_text=get_paypal_withdraw_order_text(
-                    order_id=order.id,
-                    user_id=order.user_id,
-                    username=12823,
-                    created_at=order.created_at,
-                    status=order.status,
+                order_id=order.id.value,
+                text=get_paypal_withdraw_order_text(
+                    order_id=order.id.value,
+                    user_id=order.user_id.value,
+                    created_at=order.created_at.value,
+                    status=order.status.value,
                     commission=user.commission,
                 ),
                 username="some username",
@@ -103,7 +104,7 @@ class OrderService:
             withdraw_method=withdraw_method,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
-            telegram_message_id=updated_order.telegram_message_id.value,
+            telegram_message_id=updated_order.telegram_message_id.value if updated_order.telegram_message_id else None,
         )
     
     async def take_order(self, data: TakeOrderDTO) -> OrderDTO:
@@ -111,10 +112,10 @@ class OrderService:
 
         if not order:
             raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
-        if order.status not in (OrderStatus.NEW, OrderStatus.DELAY):
+        if order.status.value not in (OrderStatusEnum.NEW, OrderStatusEnum.DELAY):
             raise OrderAlreadyTakenError(f"Order with id {data.order_id} already taken.")
 
-        order.status = OrderStatus.PROCESSING
+        order.status = OrderStatus(OrderStatusEnum.PROCESSING)
         updated_order = await self._order_dal.update(order)
         withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
 

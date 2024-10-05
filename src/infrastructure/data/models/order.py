@@ -5,7 +5,7 @@ from sqlalchemy import Integer, String, BigInteger, ForeignKey, Enum, func, TIME
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
-from src.domain.value_objects.order import OrderStatus
+from src.domain.value_objects.order import OrderStatusEnum
 
 if TYPE_CHECKING:
     from src.infrastructure.data.models import (
@@ -31,9 +31,9 @@ class OrderModel(Base):
         server_default=func.now(),
         default=datetime.now(UTC),
     )
-    status: Mapped[OrderStatus] = mapped_column(
-        Enum("NEW", "PROCESSING", "COMPLETE", "CANCEL", "DELAY", name="order_status"),
-        default=OrderStatus.NEW,
+    status: Mapped[OrderStatusEnum] = mapped_column(
+        Enum("NEW", "PROCESSING", "COMPLETE", "WAIT", "CANCEL", "DELAY", name="order_status"),
+        default=OrderStatusEnum.NEW,
     )
     telegram_message_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 

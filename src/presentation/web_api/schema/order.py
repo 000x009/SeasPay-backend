@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
-from src.domain.value_objects.order import OrderStatus
+from src.domain.value_objects.order import OrderStatusEnum
 from src.domain.value_objects.withdraw_method import MethodEnum
 
 
@@ -17,7 +17,7 @@ class WithdrawMethodSchema(BaseModel):
 
 class CreateOrderSchema(BaseModel):
     created_at: datetime = Field(default=datetime.now(UTC))
-    status: OrderStatus = Field(default=OrderStatus.NEW)
+    status: OrderStatusEnum = Field(default=OrderStatusEnum.NEW)
     withdraw_method: WithdrawMethodSchema
 
     @model_validator(mode='before')

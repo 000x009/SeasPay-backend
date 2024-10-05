@@ -13,7 +13,7 @@ class WithdrawMethodDTO:
     card_number: Optional[str] = field(default=None)
     card_holder_name: Optional[str] = field(default=None)
     crypto_address: Optional[str] = field(default=None)
-    network: Optional[str] = field(default=None)
+    crypto_network: Optional[str] = field(default=None)
 
 
 @dataclass(frozen=True)
@@ -23,7 +23,7 @@ class AddWithdrawMethodDTO:
     card_number: Optional[str] = field(default=None)
     card_holder_name: Optional[str] = field(default=None)
     crypto_address: Optional[str] = field(default=None)
-    network: Optional[str] = field(default=None)
+    crypto_network: Optional[str] = field(default=None)
 
 
 @dataclass(frozen=True)

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from typing import Optional
 
-from src.domain.entity.order import OrderStatus
+from src.domain.entity.order import OrderStatusEnum
 from src.application.common.dto import Pagination, FileDTO
 from src.application.dto.withdraw_method import WithdrawMethodDTO, AddWithdrawMethodDTO
 
@@ -14,7 +14,7 @@ class OrderDTO:
     payment_receipt: str
     withdraw_method: WithdrawMethodDTO
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
-    status: Optional[OrderStatus] = field(default=OrderStatus.NEW)
+    status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
 
 
@@ -36,7 +36,7 @@ class CreateOrderDTO:
     withdraw_method: AddWithdrawMethodDTO
     receipt_photo: FileDTO = field(default=None)
     created_at: datetime = field(default=datetime.now(UTC))
-    status: OrderStatus = field(default=OrderStatus.NEW)
+    status: OrderStatusEnum = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
 
 
