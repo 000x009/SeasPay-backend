@@ -1,4 +1,4 @@
-from src.infrastructure.telegram import TelegramTopicManager
+from src.infrastructure.telegram import TelegramClient
 
 
-__all__ = ['TelegramTopicManager']
+__all__ = ['TelegramClient']
