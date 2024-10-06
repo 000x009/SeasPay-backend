@@ -7,7 +7,7 @@ from src.domain.value_objects.order import OrderStatusEnum
 
 
 def get_text_by_key(key: str) -> str:
-    with open(os.path.normpath(Path("src/files/json/texts.json")), encoding="utf-8") as f:
+    with open(os.path.normpath(Path("files/json/texts.json")), encoding="utf-8") as f:
         data = json.load(f)
 
         return data[key]
