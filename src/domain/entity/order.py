@@ -3,7 +3,14 @@ from datetime import datetime, UTC
 from typing import Union, Any, Optional
 
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.order import PaymentReceipt, CreatedAt, OrderStatus, OrderID, OrderStatusEnum
+from src.domain.value_objects.order import (
+    PaymentReceipt,
+    CreatedAt,
+    OrderStatus,
+    OrderID,
+    OrderStatusEnum,
+    Commission,
+)
 from src.domain.value_objects.order_message import MessageID
 
 
@@ -16,20 +23,23 @@ class Order:
         'status',
         'message_id',
         'telegram_message_id',
+        'commission',
     )
 
     def __init__(
         self,
         user_id: UserID,
         payment_receipt: PaymentReceipt,
+        commission: Commission,
         id: Optional[OrderID] = None,
         created_at: Optional[CreatedAt] = None,
         status: Optional[OrderStatus] = None,
         telegram_message_id: Optional[MessageID] = None,
-    ):
+    ) -> None:
         self.id = id
         self.user_id = user_id
         self.payment_receipt = payment_receipt
+        self.commission = commission
         self.created_at = created_at
         self.status = status
         self.telegram_message_id = telegram_message_id

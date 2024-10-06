@@ -12,6 +12,7 @@ class OrderDTO:
     id: int
     user_id: int
     payment_receipt: str
+    commission: int
     withdraw_method: WithdrawMethodDTO
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)

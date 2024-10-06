@@ -36,6 +36,7 @@ class OrderModel(Base):
         default=OrderStatusEnum.NEW,
     )
     telegram_message_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    commission: Mapped[int] = mapped_column(Integer, nullable=False)
 
     user: Mapped['UserModel'] = relationship(back_populates='orders', uselist=False)
     completed_order: Mapped[Optional['CompletedOrderModel']] = relationship(back_populates='order', uselist=False)

@@ -10,7 +10,14 @@ from src.application.dto.order import (
     AddTelegramMessageIdDTO,
 )
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.order import OrderID, CreatedAt, PaymentReceipt, OrderStatus, OrderStatusEnum
+from src.domain.value_objects.order import (
+    OrderID,
+    CreatedAt,
+    PaymentReceipt,
+    OrderStatus,
+    OrderStatusEnum,
+    Commission as OrderCommission,
+)
 from src.domain.entity.order import Order
 from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenError
 from src.domain.value_objects.order_message import MessageID
@@ -59,12 +66,14 @@ class OrderService:
         )
 
     async def create(self, data: CreateOrderDTO) -> OrderDTO:
+        user = await self._user_service.get_user(GetUserDTO(user_id=12823))
         order = await self._order_dal.insert(
             Order(
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt),
                 created_at=CreatedAt(data.created_at),
                 status=OrderStatus(data.status),
+                commission=OrderCommission(user.commission),
             )
         )
         withdraw_method = await self._withdraw_service.add_method(
@@ -77,7 +86,6 @@ class OrderService:
                 crypto_network=data.withdraw_method.crypto_network,
             )
         )
-        user = await self._user_service.get_user(GetUserDTO(user_id=12823))
 
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
@@ -88,7 +96,7 @@ class OrderService:
                     user_id=order.user_id.value,
                     created_at=order.created_at.value,
                     status=order.status.value,
-                    commission=user.commission,
+                    commission=order.commission.value,
                 ),
                 username="some username",
                 photo=data.receipt_photo,
@@ -101,6 +109,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
+            commission=updated_order.commission.value,
             withdraw_method=withdraw_method,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
@@ -126,4 +135,5 @@ class OrderService:
             withdraw_method=withdraw_method,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
+            commission=updated_order.commission.value,
         )
