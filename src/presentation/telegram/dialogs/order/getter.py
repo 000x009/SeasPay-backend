@@ -74,3 +74,12 @@ async def order_getter(
         "withdraw_method_text": withdraw_method_text,
         "payment_receipt": payment_receipt if payment_receipt else None,
     }
+
+
+async def order_cancel_getter(
+    dialog_manager: DialogManager,
+    **kwargs
+) -> Mapping[str, str]:
+    return {
+        "reason": dialog_manager.dialog_data.get("reason"),
+    }

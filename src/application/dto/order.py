@@ -69,3 +69,8 @@ class CommissionDTO:
 class FulfillOrderDTO:
     order_id: int
     paypal_received_amount: Decimal
+
+
+@dataclass(frozen=True)
+class CancelOrderDTO:
+    order_id: int

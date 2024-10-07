@@ -4,16 +4,17 @@ from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.kbd import Button, Back, SwitchTo
 from aiogram_dialog.widgets.media import DynamicMedia
 
-from src.presentation.telegram.dialogs.order.getter import order_getter
+from src.presentation.telegram.dialogs.order.getter import order_getter, order_cancel_getter
 from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
 from src.presentation.telegram.dialogs.order.handlers import (
     on_wrote_paypal_received_amount,
     calculate_commission,
     attach_receipt,
-    back_to_order_info,
     on_attach_receipt,
     pre_confirm_fulfillment,
     confirm_fulfillment,
+    cancel_order_handler,
+    on_reason_cancel_order,
 )
 from src.presentation.telegram.dialogs.order.predicate import new_confirm_fulfillment, new_when_no_payment_receipt
 
@@ -47,6 +48,11 @@ order_dialog = Dialog(
             id="pre_confirm_fulfillment",
             on_click=pre_confirm_fulfillment,
             when=new_confirm_fulfillment(),
+        ),
+        SwitchTo(
+            text=Const("❌ Отменить заказ"),
+            id='cancel_order',
+            state=OrderFulfillmentSG.PRE_CONFIRM_CANCEL,
         ),
         getter=order_getter,
         state=OrderFulfillmentSG.ORDER_INFO,
@@ -86,5 +92,32 @@ order_dialog = Dialog(
             state=OrderFulfillmentSG.ORDER_INFO,
         ),
         state=OrderFulfillmentSG.PRE_CONFIRM,
+    ),
+    Window(
+        Const('Напишите причину отмены заказа:'),
+        MessageInput(
+            func=on_reason_cancel_order,
+        ),
+        SwitchTo(
+            id='back_to_order_info_',
+            text=Const('◀️ Назад'),
+            state=OrderFulfillmentSG.ORDER_INFO,
+        ),
+        state=OrderFulfillmentSG.PRE_CONFIRM_CANCEL,
+    ),
+    Window(
+        Format('Вы уверены что хотите отменить данный заказ с данной причиной?\n\n <blockquote>{reason}</blockquote>'),
+        Button(
+            text=Const('✅ Да'),
+            id="confirm_fulfillment",
+            on_click=cancel_order_handler,
+        ),
+        SwitchTo(
+            id='back_to_pre_confirm_cancel',
+            text=Const('◀️ Назад'),
+            state=OrderFulfillmentSG.PRE_CONFIRM_CANCEL,
+        ),
+        getter=order_cancel_getter,
+        state=OrderFulfillmentSG.CANCEL_ORDER,
     )
 )

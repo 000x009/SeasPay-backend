@@ -10,6 +10,7 @@ from src.application.dto.order import (
     CalculateCommissionDTO,
     CommissionDTO,
     FulfillOrderDTO,
+    CancelOrderDTO,
 )
 from src.application.dto.user import UpdateUserDTO
 from src.domain.value_objects.user import UserID
@@ -180,6 +181,25 @@ class OrderService:
             commission=user.commission.value,
             total_withdrawn=user.total_withdrawn.value,
         ))
+
+        return OrderDTO(
+            id=updated_order.id.value,
+            user_id=updated_order.user_id.value,
+            payment_receipt=updated_order.payment_receipt.value,
+            withdraw_method=withdraw_method,
+            created_at=updated_order.created_at.value,
+            status=updated_order.status.value,
+            commission=updated_order.commission.value,
+        )
+
+    async def cancel_order(self, data: CancelOrderDTO) -> OrderDTO:
+        order = await self._order_dal.get(OrderID(data.order_id))
+        if not order:
+            raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
+        
+        order.status = OrderStatus(OrderStatusEnum.CANCEL)
+        updated_order = await self._order_dal.update(order)
+        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
 
         return OrderDTO(
             id=updated_order.id.value,

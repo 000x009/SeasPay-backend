@@ -3,13 +3,13 @@ import logging
 
 from aiogram.types import CallbackQuery, Message
 
-from aiogram_dialog import DialogManager, ShowMode
-from aiogram_dialog.widgets.kbd import Button, Back
+from aiogram_dialog import DialogManager
+from aiogram_dialog.widgets.kbd import Button
 from aiogram_dialog.widgets.input import ManagedTextInput
 from dishka.integrations.aiogram import FromDishka
 
 from src.application.services.order import OrderService
-from src.application.dto.order import CalculateCommissionDTO, FulfillOrderDTO, GetOrderDTO
+from src.application.dto.order import CalculateCommissionDTO, FulfillOrderDTO, GetOrderDTO, CancelOrderDTO
 from src.presentation.telegram.dialogs.common.injection import inject_on_click
 from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
 
@@ -20,14 +20,6 @@ async def calculate_commission(
     dialog_manager: DialogManager,
 ) -> None:
     await dialog_manager.switch_to(OrderFulfillmentSG.CALCULATE_COMMISSION)
-
-
-async def back_to_order_info(
-    callback_query: CallbackQuery,
-    widget: Back,
-    dialog_manager: DialogManager,
-) -> None:
-    await dialog_manager.switch_to(OrderFulfillmentSG.ORDER_INFO)
 
 
 @inject_on_click
@@ -113,3 +105,40 @@ async def confirm_fulfillment(
         await dialog_manager.done()
 
 
+@inject_on_click
+async def cancel_order_handler(
+    callback_query: CallbackQuery,
+    widget: Button,
+    dialog_manager: DialogManager,
+    order_service: FromDishka[OrderService],
+) -> None:
+    bot = dialog_manager.middleware_data.get("bot")
+    order_id = dialog_manager.start_data.get("order_id")
+
+    try:
+        order = await order_service.cancel_order(CancelOrderDTO(order_id=order_id))
+        await bot.send_message(
+            chat_id=callback_query.from_user.id,
+            text="✅ Заказ был успешно отменен!"
+        )
+        await bot.delete_message(
+            chat_id=callback_query.from_user.id,
+            message_id=callback_query.message.message_id
+        )
+        await bot.send_message(
+            chat_id=order.user_id,
+            text=f"Здравствуйте, к сожалению ваш запрос на вывод средств <code>№{order.id}</code> был отменен по причине\n: <blockquote>{dialog_manager.dialog_data.get('reason')}</blockquote>"
+        )
+    except Exception as e:
+        logging.error(f"Error canceling order: {e}")
+    finally:
+        await dialog_manager.done()
+
+
+async def on_reason_cancel_order(
+    message: Message,
+    widget: ManagedTextInput[str],
+    dialog_manager: DialogManager,
+) -> None:
+    dialog_manager.dialog_data["reason"] = message.text
+    await dialog_manager.switch_to(OrderFulfillmentSG.CANCEL_ORDER)

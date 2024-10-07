@@ -6,3 +6,5 @@ class OrderFulfillmentSG(StatesGroup):
     CALCULATE_COMMISSION = State()
     ATTACH_RECEIPT = State()
     PRE_CONFIRM = State()
+    PRE_CONFIRM_CANCEL = State()
+    CANCEL_ORDER = State()
