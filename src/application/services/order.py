@@ -53,12 +53,24 @@ class OrderService:
         self._user_service = user_service
         self._completed_order_service = completed_order_service
 
-    async def list_(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
-        return await self._order_dal.list_(
+    async def list_orders(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
+        orders = await self._order_dal.list_(
             user_id=UserID(data.user_id),
-            limit=data.pagination.limit,
-            offset=data.pagination.offset,
+            limit=data.pagination.limit if data.pagination else None,
+            offset=data.pagination.offset if data.pagination else None,
         )
+        if not orders:
+            return None
+        
+        return [OrderDTO(
+            id=order.id.value,
+            user_id=order.user_id.value,
+            payment_receipt=order.payment_receipt.value,
+            withdraw_method=None,
+            created_at=order.created_at.value,
+            status=order.status,
+            commission=order.commission.value,
+        ) for order in orders]
 
     async def get(self, data: GetOrderDTO) -> Optional[OrderDTO]:
         order = await self._order_dal.get(OrderID(data.order_id))

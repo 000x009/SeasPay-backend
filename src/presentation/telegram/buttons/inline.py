@@ -62,3 +62,34 @@ def get_sent_money_kb_markup() -> InlineKeyboardMarkup:
         ]
     )
 
+
+def get_admin_panel_kb_markup() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text='🔍 Поиск пользователя', callback_data="admin_search_user"),
+            ],
+            [
+                InlineKeyboardButton(text='📜 Просмотр заказов', callback_data="admin_orders"),
+            ],
+            [
+                InlineKeyboardButton(text='📊 Статистика сервиса', callback_data="admin_service_statistics"),
+            ],
+            [
+                InlineKeyboardButton(text='📨 Рассылка', callback_data="admin_mailing"),
+            ]
+        ]
+    )
+
+
+def get_user_profile_kb_markup(user_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text='📲 Написать пользователю', callback_data=f"admin_write_user:{user_id}"),
+            ],
+            [
+                InlineKeyboardButton(text='🛒 Заказы пользователя', callback_data=f"admin_user_orders:{user_id}"),
+            ]
+        ]
+    )

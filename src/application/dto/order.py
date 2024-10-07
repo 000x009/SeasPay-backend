@@ -23,7 +23,7 @@ class OrderDTO:
 @dataclass(frozen=True)
 class ListOrderDTO:
     user_id: int
-    pagination: Pagination
+    pagination: Optional[Pagination] = field(default=None)
 
 
 @dataclass(frozen=True)

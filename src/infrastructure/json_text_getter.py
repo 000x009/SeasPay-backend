@@ -87,3 +87,62 @@ def get_withdraw_crypto_text(
         commission=commission,
         profit=profit,
     )
+
+
+def get_user_profile_text(
+    user_id: int,
+    commission: float,
+    total_withdrawn: float,
+) -> str:
+    return get_text_by_key("user_profile_text").format(
+        user_id=user_id,
+        commission=commission,
+        total_withdrawn=total_withdrawn,
+    )
+
+
+def get_order_info_card_text(
+    order_id: int,
+    user_id: int,
+    commission: float,
+    created_at: datetime,
+    status: OrderStatusEnum,
+    card_number: str,
+    card_holder: str,
+) -> str:
+    return get_text_by_key("order_info_card_text").format(
+        id=order_id,
+        user_id=user_id,
+        commission=commission,
+        created_at=created_at.strftime("%d.%m.%Y %H:%M"),
+        status=status.value,
+        card_number=card_number,
+        card_holder=card_holder,
+    )
+
+
+def get_order_info_crypto_text(
+    order_id: int,
+    user_id: int,
+    commission: float,
+    created_at: datetime,
+    status: OrderStatusEnum,
+    address: str,
+    network: str,
+) -> str:
+    status_text = {
+        OrderStatusEnum.NEW: "⌛ Ожидание обработки",
+        OrderStatusEnum.PROCESSING: "🔄 На обработке у администратора",
+        OrderStatusEnum.COMPLETE: "✅ Выполнен",
+        OrderStatusEnum.CANCEL: "❌ Отменен",
+        OrderStatusEnum.DELAY: "🕒 Отложен по техническим причинам",
+    }
+    return get_text_by_key("order_info_crypto_text").format(
+        id=order_id,
+        user_id=user_id,
+        commission=commission,
+        created_at=created_at.strftime("%d.%m.%Y %H:%M"),
+        status=status_text.get(status, ""),
+        address=address,
+        network=network,
+    )

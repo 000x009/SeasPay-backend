@@ -16,17 +16,26 @@ class OrderDAL(BaseOrderDAL):
         self._session = session
 
     async def list_(
-        self, user_id: UserID, limit: int, offset: int
+        self, user_id: UserID, limit: Optional[int] = None, offset: Optional[int] = None
     ) -> Optional[List[Order]]:
-        query = (
-            select(OrderModel)
-            .filter_by(
-                user_id=user_id.value,
+        if limit is not None and offset is not None:
+            query = (
+                select(OrderModel)
+                .filter_by(
+                    user_id=user_id.value,
+                )
+                .limit(limit + 1)
+                .offset(offset)
+                .order_by(OrderModel.time)
             )
-            .limit(limit + 1)
-            .offset(offset)
-            .order_by(OrderModel.time)
-        )
+        else:
+            query = (
+                select(OrderModel)
+                .filter_by(
+                    user_id=user_id.value,
+                )
+                .order_by(OrderModel.created_at)
+            )
 
         result = await self._session.execute(query)
         orders = result.scalars().all()
