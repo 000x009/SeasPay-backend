@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from typing import Optional
+from decimal import Decimal
 
 from src.domain.entity.order import OrderStatusEnum
 from src.application.common.dto import Pagination, FileDTO
@@ -50,4 +51,21 @@ class TakeOrderDTO:
 class AddTelegramMessageIdDTO:
     order_id: int
     telegram_message_id: int
-    
+
+
+@dataclass(frozen=True)
+class CalculateCommissionDTO:
+    order_id: int
+    paypal_received_amount: Decimal
+
+
+@dataclass(frozen=True)
+class CommissionDTO:
+    commission: int
+    user_must_receive: Decimal
+
+
+@dataclass(frozen=True)
+class FulfillOrderDTO:
+    order_id: int
+    paypal_received_amount: Decimal

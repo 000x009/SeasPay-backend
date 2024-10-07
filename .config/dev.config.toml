@@ -1,0 +1,8 @@
+[commission]
+    [commission.paypal]
+        min_percentage_to_withdraw=7
+        max_percentage_to_withdraw=15
+        min_amount_to_withdraw=10
+        max_amount_to_withdraw="UNLIMITED"
+        max_amount_to_transfer=3000
+        commission_to_transfer=5

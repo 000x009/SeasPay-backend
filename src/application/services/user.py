@@ -5,8 +5,7 @@ from src.application.dto.user import (
     CreateUserDTO,
     GetUserDTO,
     UserDTO,
-    UpdateUserCommissionDTO,
-    UpdateUserTotalWithdrawnDTO,
+    UpdateUserDTO,
     CalculateCommissionDTO,
     CommissionDTO,
 )
@@ -57,7 +56,7 @@ class UserService:
             total_withdrawn=user.total_withdrawn.value
         ) for user in users]
     
-    async def update_commission(self, data: UpdateUserCommissionDTO) -> None:
+    async def update_user(self, data: UpdateUserDTO) -> None:
         user = await self._user_dal.get_one(UserID(data.user_id))
         if user is None:
             raise UserNotFoundError(f"User with id {data.user_id} not found.")
@@ -66,19 +65,9 @@ class UserService:
             user_id=UserID(data.user_id),
             joined_at=JoinedAt(user.joined_at.value),
             commission=Commission(data.commission),
-            total_withdrawn=TotalWithdrawn(user.total_withdrawn.value)
+            total_withdrawn=TotalWithdrawn(data.total_withdrawn)
         ))
-    
-    async def update_total_withdrawn(self, data: UpdateUserTotalWithdrawnDTO) -> None:
-        user = await self._user_dal.get_one(UserID(data.user_id))
-        if user is None:
-            raise UserNotFoundError(f"User with id {data.user_id} not found.")
-
-        await self._user_dal.update(UserID(data.user_id), User(
-            user_id=UserID(data.user_id),
-            joined_at=JoinedAt(user.joined_at.value),
-            commission=Commission(user.commission.value),
-            total_withdrawn=TotalWithdrawn(data.total_withdrawn)))
+ 
     
     async def calculate_commission(self, data: CalculateCommissionDTO) -> CommissionDTO:
         user = await self._user_dal.get_one(UserID(data.user_id))

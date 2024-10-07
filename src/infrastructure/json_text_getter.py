@@ -27,12 +27,24 @@ def get_paypal_withdraw_order_text(
         OrderStatusEnum.CANCEL: "❌ Отменен",
         OrderStatusEnum.DELAY: "🕒 Отложен по техническим причинам",
     }
-
     return get_text_by_key("paypal_withdraw_order_text").format(
         id=order_id,
         user_id=user_id,
         created_at=created_at.strftime("%d.%m.%Y %H:%M"),
-        status=status_text[status],
+        status=status_text.get(status, ""),
+        commission=commission,
+    )
+
+def get_paypal_withdraw_order_preview_text(
+    order_id: int,
+    user_id: int,
+    created_at: datetime,
+    commission: int,
+) -> str:
+    return get_text_by_key("paypal_withdraw_order_preview_text").format(
+        id=order_id,
+        user_id=user_id,
+        created_at=created_at.strftime("%d.%m.%Y %H:%M"),
         commission=commission,
     )
 

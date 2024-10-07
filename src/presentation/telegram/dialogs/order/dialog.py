@@ -1,0 +1,90 @@
+from aiogram_dialog import Dialog, Window
+from aiogram_dialog.widgets.text import Format, Const, Multi
+from aiogram_dialog.widgets.input import TextInput, MessageInput
+from aiogram_dialog.widgets.kbd import Button, Back, SwitchTo
+from aiogram_dialog.widgets.media import DynamicMedia
+
+from src.presentation.telegram.dialogs.order.getter import order_getter
+from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
+from src.presentation.telegram.dialogs.order.handlers import (
+    on_wrote_paypal_received_amount,
+    calculate_commission,
+    attach_receipt,
+    back_to_order_info,
+    on_attach_receipt,
+    pre_confirm_fulfillment,
+    confirm_fulfillment,
+)
+from src.presentation.telegram.dialogs.order.predicate import new_confirm_fulfillment, new_when_no_payment_receipt
+
+
+order_dialog = Dialog(
+    Window(
+        DynamicMedia("payment_receipt", when="payment_receipt"),
+        Multi(
+            Format("{order_text}\n"),
+            Format("{withdraw_method_text}"),
+        ),
+        Button(
+            text=Const("🧮 Рассчитать комиссию"),
+            id="calculate_commission",
+            on_click=calculate_commission,
+        ),
+        Button(
+            text=Const("🖇️ Прикрепить фото чека"),
+            id="attach_receipt",
+            on_click=attach_receipt,
+            when=new_when_no_payment_receipt(),
+        ),
+        Button(
+            text=Const("🖇️ Поменять фото чека"),
+            id="attach_receipt",
+            on_click=attach_receipt,
+            when="payment_receipt",
+        ),
+        Button(
+            text=Const("✅ Подтвердить выполнение"),
+            id="pre_confirm_fulfillment",
+            on_click=pre_confirm_fulfillment,
+            when=new_confirm_fulfillment(),
+        ),
+        getter=order_getter,
+        state=OrderFulfillmentSG.ORDER_INFO,
+    ),
+    Window(
+        Const('🖊️ Напишите полученную сумму на PayPal (USD):'),
+        TextInput(
+            id='write_answer',
+            on_success=on_wrote_paypal_received_amount,
+        ),
+        Back(Format('◀️ Назад')),
+        state=OrderFulfillmentSG.CALCULATE_COMMISSION,
+    ),
+    Window(
+        Const('Отправьте фото чека, полученной суммы'),
+        MessageInput(
+            func=on_attach_receipt,
+            content_types=["photo"],
+        ),
+        SwitchTo(
+            id='back_to_order_info',
+            text=Const('◀️ Назад'),
+            state=OrderFulfillmentSG.ORDER_INFO,
+        ),
+        state=OrderFulfillmentSG.ATTACH_RECEIPT,
+    ),
+    Window(
+        Const('Вы уверены что хотите подтвердить выполнение заказа?'),
+        Button(
+            text=Const('✅ Да'),
+            id="confirm_fulfillment",
+            on_click=confirm_fulfillment,
+        ),
+        SwitchTo(
+            id='back_to_order_info_',
+            text=Const('◀️ Назад'),
+            state=OrderFulfillmentSG.ORDER_INFO,
+        ),
+        state=OrderFulfillmentSG.PRE_CONFIRM,
+    )
+)

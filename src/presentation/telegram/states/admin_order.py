@@ -1,0 +1,8 @@
+from aiogram.fsm.state import State, StatesGroup
+
+
+class OrderFulfillmentSG(StatesGroup):
+    ORDER_INFO = State()
+    CALCULATE_COMMISSION = State()
+    ATTACH_RECEIPT = State()
+    PRE_CONFIRM = State()

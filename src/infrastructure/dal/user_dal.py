@@ -31,7 +31,7 @@ class UserDAL(BaseUserDAL):
         db_user = result.scalar()
         if not db_user:
             return None
-        print(db_user.commission)
+
         return User(
             user_id=UserID(db_user.user_id),
             joined_at=JoinedAt(db_user.joined_at),
@@ -43,10 +43,9 @@ class UserDAL(BaseUserDAL):
         query = select(UserModel)
         result = await self._session.execute(query)
         db_users = result.scalars().all()
-
         if not db_users:
             return None
-        
+
         return [
             User(
                 user_id=UserID(db_user.user_id),

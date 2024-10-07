@@ -5,7 +5,7 @@ from aiogram.types import ForumTopic, Message, BufferedInputFile
 
 from src.application.common.telegram import TelegramClientInterface
 from src.infrastructure.config import BotSettings
-from src.presentation.telegram.buttons.inline import get_order_fulfillment_kb_markup
+from src.presentation.telegram.buttons.inline import get_take_order_kb_markup
 
 
 class TelegramClient(TelegramClientInterface):
@@ -24,7 +24,7 @@ class TelegramClient(TelegramClientInterface):
             chat_id=self.config.orders_group_id,
             text=message,
             message_thread_id=thread_id,
-            reply_markup=get_order_fulfillment_kb_markup(order_id=order_id),
+            reply_markup=get_take_order_kb_markup(order_id=order_id),
         )
     
     async def send_message_photo(
@@ -41,5 +41,5 @@ class TelegramClient(TelegramClientInterface):
             photo=buffered_photo,
             message_thread_id=thread_id,
             caption=caption,
-            reply_markup=get_order_fulfillment_kb_markup(order_id=order_id),
+            reply_markup=get_take_order_kb_markup(order_id=order_id),
         )

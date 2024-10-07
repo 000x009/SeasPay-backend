@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator, List, AsyncIterable
 from contextlib import asynccontextmanager
 
 from dishka import Provider, provide, Scope, AsyncContainer, make_async_container
@@ -31,16 +31,18 @@ from src.application.common.telegram import TelegramClientInterface
 
 class DatabaseProvider(Provider):
     @provide(scope=Scope.APP, provides=AsyncEngine)
-    def get_engine(self) -> AsyncEngine:
+    async def get_engine(self) -> AsyncGenerator[AsyncEngine, None]:
         settings = load_settings()
-        return create_async_engine(url=settings.db.connection_url)
+        engine = create_async_engine(url=settings.db.connection_url, pool_pre_ping=True)
+        yield engine
+        await engine.dispose()
 
-    @provide(scope=Scope.APP, provides=async_sessionmaker[AsyncSession])
+    @provide(scope=Scope.APP)
     def get_async_sessionmaker(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
-        return async_sessionmaker(bind=engine)
+        return async_sessionmaker(bind=engine, expire_on_commit=False)
 
-    @provide(scope=Scope.REQUEST, provides=AsyncSession)
-    async def get_async_session(self, sessionmaker: async_sessionmaker[AsyncSession]) -> AsyncGenerator[AsyncSession, None]:
+    @provide(scope=Scope.REQUEST)
+    async def get_async_session(self, sessionmaker: async_sessionmaker[AsyncSession]) -> AsyncIterable[AsyncSession]:
         async with sessionmaker() as session:
             yield session
 

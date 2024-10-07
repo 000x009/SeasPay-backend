@@ -95,7 +95,7 @@ class OrderDAL(BaseOrderDAL):
             status=order.status.value,
             telegram_message_id=order.telegram_message_id.value,
         )
-        await self._session.flush(objects=[order_model])
+        await self._session.merge(order_model)
         await self._session.commit()
 
         return order

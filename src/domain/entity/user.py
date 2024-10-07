@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Union, Any
+from decimal import Decimal
 
 from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn, Commission
 from src.domain.value_objects.completed_order import PaypalReceivedAmount
@@ -35,7 +36,7 @@ class User:
             return True
         return False
 
-    def update_commission(self, paypal_received_amount: PaypalReceivedAmount) -> MustReceiveAmount:
+    def update_commission(self, paypal_received_amount: PaypalReceivedAmount) -> None:
         total_withdrawn = TotalWithdrawn(self.total_withdrawn.value + paypal_received_amount.value)
 
         if self.commission.value == load_settings().commission.paypal.min_percentage_to_withdraw:
@@ -46,8 +47,3 @@ class User:
             self.commission = Commission(10)
         elif total_withdrawn.value >= 100 and total_withdrawn.value < 200:
             self.commission = Commission(7)
-
-        commission_percentage = self.commission.value / 100
-        user_amount = paypal_received_amount.value * commission_percentage
-        return MustReceiveAmount(user_amount)
-    

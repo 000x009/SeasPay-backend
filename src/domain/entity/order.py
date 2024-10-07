@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import datetime, UTC
 from typing import Union, Any, Optional
+from decimal import Decimal
 
 from src.domain.value_objects.user import UserID
 from src.domain.value_objects.order import (
@@ -12,6 +13,8 @@ from src.domain.value_objects.order import (
     Commission,
 )
 from src.domain.value_objects.order_message import MessageID
+from src.domain.value_objects.completed_order import PaypalReceivedAmount
+from src.domain.value_objects.order import MustReceiveAmount
 
 
 class Order:
@@ -56,3 +59,10 @@ class Order:
         if isinstance(other, Order) and other.id == self.id:
             return True
         return False
+
+    def calculate_commission(self, paypal_received_amount: PaypalReceivedAmount) -> MustReceiveAmount:
+        commission_percentage = Decimal(self.commission.value / 100)
+        commission_amount = paypal_received_amount.value * commission_percentage
+        user_amount = paypal_received_amount.value - commission_amount
+
+        return MustReceiveAmount(user_amount)

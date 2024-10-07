@@ -21,6 +21,13 @@ class CreateUserDTO:
 
 
 @dataclass(frozen=True)
+class UpdateUserDTO:
+    user_id: int
+    commission: int
+    total_withdrawn: Decimal
+
+
+@dataclass(frozen=True)
 class UpdateUserCommissionDTO:
     user_id: int
     commission: int

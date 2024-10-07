@@ -3,7 +3,7 @@ from aiogram.types import Message
 
 
 class AdminFilter(BaseFilter):
-    async def __init__(self) -> None:
+    def __init__(self) -> None:
         self._admins = (5297779345,)
 
     async def __call__(self, message: Message) -> bool:

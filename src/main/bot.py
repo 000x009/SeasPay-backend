@@ -1,8 +1,12 @@
 import logging
 import asyncio
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
+from dishka import Scope
 from dishka.integrations.aiogram import setup_dishka
+
+from aiogram_dialog import setup_dialogs
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -11,6 +15,7 @@ from aiogram.enums import ParseMode
 from src.infrastructure.config import load_bot_settings
 from src.main.di import get_di_container
 from src.presentation.telegram.handlers import all_handlers
+from src.presentation.telegram.dialogs import dialogs
 from src.presentation.telegram.middlewares import LoginMiddleware
 
 
@@ -18,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def setup_bot_dishka(dispatcher: Dispatcher):
+async def setup_bot_dishka(dispatcher: Dispatcher) -> AsyncGenerator[None, None]:
     container = get_di_container()
     setup_dishka(container=container, router=dispatcher, auto_inject=True)
     yield
@@ -28,8 +33,11 @@ async def setup_bot_dishka(dispatcher: Dispatcher):
 def get_dispatcher() -> Dispatcher:
     dispatcher = Dispatcher()
     dispatcher.include_routers(*all_handlers)
+    dispatcher.include_routers(*dialogs)
     LoginMiddleware(dishka_container=get_di_container(), router=dispatcher)
-    setup_bot_dishka(dispatcher)
+
+    # dispatcher = setup_bot_dishka(dispatcher)
+    setup_dialogs(dispatcher)
 
     return dispatcher
 
@@ -42,11 +50,15 @@ async def main() -> None:
     dispatcher = get_dispatcher()
     config = load_bot_settings()
     bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    container = get_di_container()
+    setup_dishka(container=container, router=dispatcher, auto_inject=True)
 
     try:
         await dispatcher.start_polling(bot, skip_updates=True)
     finally:
         await bot.session.close()
+        async with container(scope=Scope.REQUEST) as container:
+            await container.close()
 
 
 if __name__ == "__main__":
@@ -54,4 +66,3 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logger.error("Bot stopped!")
-    

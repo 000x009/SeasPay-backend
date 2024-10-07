@@ -53,7 +53,7 @@ class WithdrawMethodDAL(BaseWithdrawMethodDAL):
         return DBWithdrawMethod(
             id=WithdrawMethodID(db_withdraw_method.id),
             order_id=OrderID(db_withdraw_method.order_id),
-            method=Method(MethodEnum.CARD),
+            method=Method(db_withdraw_method.method),
             card_number=CardNumber(db_withdraw_method.card_number),
             card_holder_name=CardHolderName(db_withdraw_method.card_holder_name),
             crypto_address=CryptoAddress(db_withdraw_method.crypto_address),
