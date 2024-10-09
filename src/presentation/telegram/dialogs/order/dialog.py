@@ -1,11 +1,22 @@
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Format, Const, Multi
 from aiogram_dialog.widgets.input import TextInput, MessageInput
-from aiogram_dialog.widgets.kbd import Button, Back, SwitchTo
 from aiogram_dialog.widgets.media import DynamicMedia
+from aiogram_dialog.widgets.kbd import (
+    Row,
+    ScrollingGroup,
+    Select,
+    PrevPage,
+    CurrentPage,
+    NextPage,
+    Back,
+    Button,
+    SwitchTo,
+)
+from aiogram_dialog.widgets.text import Format, Const
 
 from src.presentation.telegram.dialogs.order.getter import order_getter, order_cancel_getter
-from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
+from src.presentation.telegram.states import OrderFulfillmentSG
 from src.presentation.telegram.dialogs.order.handlers import (
     on_wrote_paypal_received_amount,
     calculate_commission,

@@ -93,3 +93,22 @@ def get_user_profile_kb_markup(user_id: int) -> InlineKeyboardMarkup:
             ]
         ]
     )
+
+
+back_to_apanel_kb_markup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="◀️ Вернуться назад", callback_data="back_apanel"),
+        ],
+    ]
+)
+
+
+mailing_choice_kb_markup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="✅ Да", callback_data="confirm_mailing"),
+            InlineKeyboardButton(text="❌ Нет", callback_data="cancel_mailing"),
+        ],
+    ]
+)

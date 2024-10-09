@@ -1,8 +1,8 @@
-from src.presentation.telegram.handlers import start, admin_order
+from src.presentation.telegram.handlers import admin, start
 
 all_handlers = [
     start.router,
-    admin_order.router,
+    admin.router,
 ]
 
 __all__ = ['handlers']

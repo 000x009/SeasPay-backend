@@ -8,6 +8,8 @@ from dishka.integrations.aiogram import setup_dishka
 
 from aiogram_dialog import setup_dialogs
 
+from aiogram_album.ttl_cache_middleware import TTLCacheAlbumMiddleware
+
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -35,8 +37,8 @@ def get_dispatcher() -> Dispatcher:
     dispatcher.include_routers(*all_handlers)
     dispatcher.include_routers(*dialogs)
     LoginMiddleware(dishka_container=get_di_container(), router=dispatcher)
+    TTLCacheAlbumMiddleware(router=dispatcher)
 
-    # dispatcher = setup_bot_dishka(dispatcher)
     setup_dialogs(dispatcher)
 
     return dispatcher

@@ -60,3 +60,63 @@ async def one_order_getter(
         "order": order,
         "order_text": order_text,
     }
+
+
+@inject_getter
+async def all_orders_getter(
+    dialog_manager: DialogManager,
+    order_service: FromDishka[OrderService],
+    **kwargs
+) -> Mapping[str, str]:
+    orders = await order_service.get_all_orders()
+    
+    return {
+        "count": len(orders) if orders else 0,
+        "orders": orders,
+        "is_empty": orders is None or len(orders) == 0,
+    }
+
+
+@inject_getter
+async def processing_orders_getter(
+    dialog_manager: DialogManager,
+    order_service: FromDishka[OrderService],
+    **kwargs
+) -> Mapping[str, str]:
+    orders = await order_service.get_processing_orders()
+    
+    return {
+        "count": len(orders) if orders else 0,
+        "orders": orders,
+        "is_empty": orders is None or len(orders) == 0,
+    }
+
+
+@inject_getter
+async def completed_orders_getter(
+    dialog_manager: DialogManager,
+    order_service: FromDishka[OrderService],
+    **kwargs
+) -> Mapping[str, str]:
+    orders = await order_service.get_completed_orders()
+    
+    return {
+        "count": len(orders) if orders else 0,
+        "orders": orders,
+        "is_empty": orders is None or len(orders) == 0,
+    }
+
+
+@inject_getter
+async def cancelled_orders_getter(
+    dialog_manager: DialogManager,
+    order_service: FromDishka[OrderService],
+    **kwargs
+) -> Mapping[str, str]:
+    orders = await order_service.get_cancelled_orders()
+    
+    return {
+        "count": len(orders) if orders else 0,
+        "orders": orders,
+        "is_empty": orders is None or len(orders) == 0,
+    }

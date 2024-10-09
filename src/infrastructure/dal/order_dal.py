@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseOrderDAL
 from src.domain.entity.order import Order
-from src.domain.value_objects.order import OrderID, PaymentReceipt, CreatedAt, OrderStatus, Commission
+from src.domain.value_objects.order import OrderID, PaymentReceipt, CreatedAt, OrderStatus, Commission, OrderStatusEnum
 from src.domain.value_objects.order_message import MessageID
 from src.domain.value_objects.user import UserID
 from src.infrastructure.data.models import OrderModel
@@ -108,3 +108,71 @@ class OrderDAL(BaseOrderDAL):
         await self._session.commit()
 
         return order
+    
+    async def list_all(self) -> Optional[List[Order]]:
+        query = select(OrderModel).order_by(OrderModel.created_at.desc())
+        result = await self._session.execute(query)
+        orders = result.unique().scalars().all()
+        if not orders:
+            return None
+        
+        return [Order(
+            id=OrderID(order.id),
+            user_id=UserID(order.user_id),
+            payment_receipt=PaymentReceipt(order.payment_receipt),
+            commission=Commission(order.commission),
+            created_at=CreatedAt(order.created_at),
+            status=OrderStatus(order.status),
+            telegram_message_id=MessageID(order.telegram_message_id),
+        ) for order in orders]
+    
+    async def list_processing(self) -> Optional[List[Order]]:
+        query = select(OrderModel).filter_by(status=OrderStatusEnum.PROCESSING.value).order_by(OrderModel.created_at.desc())
+        result = await self._session.execute(query)
+        orders = result.unique().scalars().all()
+        if not orders:
+            return None
+        
+        return [Order(
+            id=OrderID(order.id),
+            user_id=UserID(order.user_id),
+            payment_receipt=PaymentReceipt(order.payment_receipt),
+            commission=Commission(order.commission),
+            created_at=CreatedAt(order.created_at),
+            status=OrderStatus(order.status),
+            telegram_message_id=MessageID(order.telegram_message_id),
+        ) for order in orders]
+    
+    async def list_completed(self) -> Optional[List[Order]]:
+        query = select(OrderModel).filter_by(status=OrderStatusEnum.COMPLETE.value).order_by(OrderModel.created_at.desc())
+        result = await self._session.execute(query)
+        orders = result.unique().scalars().all()
+        if not orders:
+            return None
+        
+        return [Order(
+            id=OrderID(order.id),
+            user_id=UserID(order.user_id),
+            payment_receipt=PaymentReceipt(order.payment_receipt),
+            commission=Commission(order.commission),
+            created_at=CreatedAt(order.created_at),
+            status=OrderStatus(order.status),
+            telegram_message_id=MessageID(order.telegram_message_id),
+        ) for order in orders]
+
+    async def list_cancelled(self) -> Optional[List[Order]]:
+        query = select(OrderModel).filter_by(status=OrderStatusEnum.CANCEL.value).order_by(OrderModel.created_at.desc())
+        result = await self._session.execute(query)
+        orders = result.unique().scalars().all()
+        if not orders:
+            return None
+        
+        return [Order(
+            id=OrderID(order.id),
+            user_id=UserID(order.user_id),
+            payment_receipt=PaymentReceipt(order.payment_receipt),
+            commission=Commission(order.commission),
+            created_at=CreatedAt(order.created_at),
+            status=OrderStatus(order.status),
+            telegram_message_id=MessageID(order.telegram_message_id),
+        ) for order in orders]

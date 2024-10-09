@@ -3,10 +3,13 @@ from aiogram.enums import ChatType
 from aiogram.types import CallbackQuery, Chat, Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
+from aiogram.utils.media_group import MediaGroupBuilder
+
+from aiogram_album.album_message import AlbumMessage
 
 from dishka import FromDishka
 
-from aiogram_dialog import DialogManager, StartMode
+from aiogram_dialog import DialogManager, StartMode, ShowMode
 
 from src.presentation.telegram.filters import AdminFilter, ChatFilter
 from src.infrastructure.json_text_getter import (
@@ -24,6 +27,8 @@ from src.presentation.telegram.states import (
     AdminSearchUserSG,
     AdminWriteUserSG,
     AdminUserOrdersSG,
+    MailingSG,
+    AdminOrderLookUpSG,
 )
 
 
@@ -97,6 +102,24 @@ async def admin_panel_handler(
 ) -> None:
     await bot.send_message(
         chat_id=event_chat.id,
+        text='👮‍♂️ Выберите действия ниже в админ-панели:',
+        reply_markup=inline.get_admin_panel_kb_markup(),
+    )
+
+
+@router.callback_query(
+    F.data.startswith('back_apanel'),
+    AdminFilter(),
+    ChatFilter(chat_type=ChatType.PRIVATE),
+)
+async def back_apanel_handler(
+    callback: CallbackQuery,
+    bot: Bot,
+    event_chat: Chat,
+) -> None:
+    await bot.edit_message_text(
+        chat_id=event_chat.id,
+        message_id=callback.message.message_id,
         text='👮‍♂️ Выберите действия ниже в админ-панели:',
         reply_markup=inline.get_admin_panel_kb_markup(),
     )
@@ -193,7 +216,6 @@ async def admin_write_user_handler(
     await state.clear()
 
 
-#TODO:
 @router.callback_query(
     F.data.startswith('admin_user_orders'),
     AdminFilter(),
@@ -208,4 +230,119 @@ async def admin_user_orders_handler(
         AdminUserOrdersSG.USER_ORDERS,
         mode=StartMode.RESET_STACK,
         data=dict(user_id=user_id),
+    )
+
+
+@router.callback_query(
+    F.data.startswith('admin_mailing'),
+    AdminFilter(),
+    ChatFilter(chat_type=ChatType.PRIVATE),
+)
+async def admin_service_statistics_handler(
+    callback: CallbackQuery,
+    bot: Bot,
+    event_chat: Chat,
+    state: FSMContext,
+) -> None:
+    await bot.edit_message_text(
+        chat_id=event_chat.id,
+        message_id=callback.message.message_id,
+        text='💬 Отправьте сообщение для рассылки:',
+        reply_markup=inline.back_to_apanel_kb_markup,
+    )
+    await state.set_state(MailingSG.MESSAGE)
+
+
+@router.message(MailingSG.MESSAGE, F.media_group_id)
+async def mailing_message_handler(
+    album_message: AlbumMessage,
+    state: FSMContext,
+    bot: Bot,
+    event_chat: Chat,
+) -> None:
+    album_photo = [message.photo[-1].file_id for message in album_message]
+    media_group = MediaGroupBuilder(caption=album_message.caption)
+
+    for photo in album_photo:
+        media_group.add_photo(media=photo)
+
+    await state.update_data(media_group=media_group)
+    await bot.send_message(
+        chat_id=event_chat.id,
+        text="Вы уверены, что хотите разослать это сообщение всем?",
+        reply_markup=inline.mailing_choice_kb_markup,
+    )
+    await state.set_state(MailingSG.CHECKOUT)
+
+
+@router.message(MailingSG.MESSAGE)
+async def mailing_message_handler(
+    message: Message,
+    state: FSMContext,
+    bot: Bot,
+    event_chat: Chat,
+) -> None:
+    await state.update_data(message_id=message.message_id)
+    await bot.send_message(
+        chat_id=event_chat.id,
+        text="Вы уверены, что хотите разослать это сообщение всем?",
+        reply_markup=inline.mailing_choice_kb_markup,
+    )
+    await state.set_state(MailingSG.CHECKOUT)
+
+
+@router.callback_query(F.data == 'confirm_mailing')
+async def mailing_sender_handler(
+    query: CallbackQuery,
+    state: FSMContext,
+    bot: Bot,
+    event_chat: Chat,
+    user_service: FromDishka[UserService],
+) -> None:
+    state_data = await state.get_data()
+    media_group = state_data.get("media_group")
+    message_id = state_data.get("message_id")
+
+    users = await user_service.get_all_users()
+    for user in users:
+        try:
+            if media_group:
+                await bot.send_media_group(chat_id=user.user_id, media=media_group.build())
+            elif message_id:
+                await bot.copy_message(
+                    chat_id=user.user_id,
+                    message_id=message_id,
+                    from_chat_id=event_chat.id,
+                )
+        except Exception as ex:
+            continue
+    await bot.send_message(chat_id=event_chat.id, text="Сообщение успешно разослано пользователям!")
+    await bot.delete_message(
+        chat_id=event_chat.id,
+        message_id=query.message.message_id,
+    )
+    await state.clear()
+
+
+@router.callback_query(F.data == 'cancel_mailing')
+async def mailing_sender_handler(
+    query: CallbackQuery,
+    state: FSMContext,
+    bot: Bot,
+    event_chat: Chat,
+) -> None:
+    await state.clear()
+    await bot.delete_message(chat_id=event_chat.id, message_id=query.message.message_id)
+    await bot.send_message(chat_id=event_chat.id, text="Рассылка успешно отменена")
+
+
+@router.callback_query(F.data == 'admin_orders')
+async def admin_orders_handler(
+    callback: CallbackQuery,
+    dialog_manager: DialogManager,
+) -> None:
+    await dialog_manager.start(
+        state=AdminOrderLookUpSG.START,
+        mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.EDIT,
     )

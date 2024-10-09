@@ -222,3 +222,63 @@ class OrderService:
             status=updated_order.status.value,
             commission=updated_order.commission.value,
         )
+
+    async def get_all_orders(self) -> Optional[List[OrderDTO]]:
+        orders = await self._order_dal.list_all()
+        if not orders:
+            return None
+        
+        return [OrderDTO(
+            id=order.id.value,
+            user_id=order.user_id.value,
+            payment_receipt=order.payment_receipt.value,
+            withdraw_method=None,
+            created_at=order.created_at.value,
+            status=order.status.value,
+            commission=order.commission.value,
+        ) for order in orders]
+
+    async def get_processing_orders(self) -> Optional[List[OrderDTO]]:
+        orders = await self._order_dal.list_processing()
+        if not orders:
+            return None
+        
+        return [OrderDTO(
+            id=order.id.value,
+            user_id=order.user_id.value,
+            payment_receipt=order.payment_receipt.value,
+            withdraw_method=None,
+            created_at=order.created_at.value,
+            status=order.status.value,
+            commission=order.commission.value,
+        ) for order in orders]
+
+    async def get_completed_orders(self) -> Optional[List[OrderDTO]]:
+        orders = await self._order_dal.list_completed()
+        if not orders:
+            return None
+        
+        return [OrderDTO(
+            id=order.id.value,
+            user_id=order.user_id.value,
+            payment_receipt=order.payment_receipt.value,
+            withdraw_method=None,
+            created_at=order.created_at.value,
+            status=order.status.value,
+            commission=order.commission.value,
+        ) for order in orders]
+
+    async def get_cancelled_orders(self) -> Optional[List[OrderDTO]]:
+        orders = await self._order_dal.list_cancelled()
+        if not orders:
+            return None
+        
+        return [OrderDTO(
+            id=order.id.value,
+            user_id=order.user_id.value,
+            payment_receipt=order.payment_receipt.value,
+            withdraw_method=None,
+            created_at=order.created_at.value,
+            status=order.status.value,
+            commission=order.commission.value,
+        ) for order in orders]

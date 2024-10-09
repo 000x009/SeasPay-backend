@@ -42,7 +42,7 @@ class UserDAL(BaseUserDAL):
     async def get_all_users(self) -> Optional[List[User]]:
         query = select(UserModel)
         result = await self._session.execute(query)
-        db_users = result.scalars().all()
+        db_users = result.unique().scalars().all()
         if not db_users:
             return None
 
@@ -53,7 +53,7 @@ class UserDAL(BaseUserDAL):
                 commission=Commission(db_user.commission),
                 total_withdrawn=TotalWithdrawn(db_user.total_withdrawn)
             )
-                for db_user in db_users
+            for db_user in db_users
         ]
 
     async def update(self, user_id: UserID, user: User) -> None:
