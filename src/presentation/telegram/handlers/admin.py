@@ -20,6 +20,7 @@ from src.infrastructure.json_text_getter import (
 from src.presentation.telegram.buttons import inline
 from src.application.services.order import OrderService
 from src.application.services.user import UserService
+from src.application.services.completed_order import CompletedOrderService
 from src.application.dto.order import GetOrderDTO, TakeOrderDTO
 from src.application.dto.user import GetUserDTO
 from src.domain.exceptions.order import OrderAlreadyTakenError, OrderNotFoundError
@@ -366,14 +367,21 @@ async def admin_service_statistics_handler(
     event_chat: Chat,
     user_service: FromDishka[UserService],
     order_service: FromDishka[OrderService],
+    completed_order_service: FromDishka[CompletedOrderService],
 ) -> None:
     users = await user_service.get_all_users()
     orders = await order_service.get_all_orders()
-    await bot.send_message(
+    total_withdraw = await completed_order_service.count_total_withdraw()
+    profit = await completed_order_service.count_profit()
+
+    await bot.edit_message_text(
         chat_id=event_chat.id,
+        message_id=callback.message.message_id,
         text=get_admin_service_statistics_text(
             total_users=len(users),
             total_orders=len(orders),
-            total_withdrawn=sum(order.amount for order in orders),
+            total_withdrawn=total_withdraw.total_withdraw,
+            profit=profit.profit,
         ),
+        reply_markup=inline.back_to_apanel_kb_markup,
     )

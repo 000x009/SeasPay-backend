@@ -22,3 +22,13 @@ class AddCompletedOrderDTO:
 @dataclass(frozen=True)
 class GetCompletedOrderDTO:
     id: int
+
+
+@dataclass(frozen=True)
+class TotalWithdrawDTO:
+    total_withdraw: Decimal
+
+
+@dataclass(frozen=True)
+class ProfitDTO:
+    profit: Decimal

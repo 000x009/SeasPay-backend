@@ -1,6 +1,7 @@
 from typing import Optional
+from decimal import Decimal
 
-from sqlalchemy import insert,  select
+from sqlalchemy import insert, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseCompletedOrderDAL
@@ -40,3 +41,17 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
             user_received_amount=UserReceivedAmount(completed_order.user_received_amount),
             completed_at=CompletedAt(completed_order.completed_at),
         )
+
+    async def count_total_withdraw(self) -> Decimal:
+        query = select(func.sum(CompletedOrderModel.paypal_received_amount))
+        result = await self._session.execute(query)
+        total_user_received = result.scalar_one_or_none()
+
+        return Decimal(total_user_received or 0)
+
+    async def count_profit(self) -> Decimal:
+        query = select(func.sum(CompletedOrderModel.paypal_received_amount - CompletedOrderModel.user_received_amount))
+        result = await self._session.execute(query)
+        total_profit = result.scalar_one_or_none()
+
+        return Decimal(total_profit or 0)

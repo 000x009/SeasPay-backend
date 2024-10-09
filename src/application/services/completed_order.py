@@ -1,7 +1,13 @@
 from typing import Optional
 
 from src.infrastructure.dal import CompletedOrderDAL
-from src.application.dto.completed_order import CompletedOrderDTO, AddCompletedOrderDTO, GetCompletedOrderDTO
+from src.application.dto.completed_order import (
+    CompletedOrderDTO,
+    AddCompletedOrderDTO,
+    GetCompletedOrderDTO,
+    TotalWithdrawDTO,
+    ProfitDTO,
+)
 from src.domain.entity.completed_order import CompletedOrder
 from src.domain.value_objects.completed_order import (
     CompletedOrderID,
@@ -35,3 +41,18 @@ class CompletedOrderService:
             user_received_amount=completed_order.user_received_amount.value,
             completed_at=completed_order.completed_at.value,
         )
+
+    async def count_total_withdraw(self) -> TotalWithdrawDTO:
+        total_withdraw = await self._dal.count_total_withdraw()
+
+        return TotalWithdrawDTO(
+            total_withdraw=total_withdraw,
+        )
+
+    async def count_profit(self) -> ProfitDTO:
+        profit = await self._dal.count_profit()
+
+        return ProfitDTO(
+            profit=profit,
+        )
+
