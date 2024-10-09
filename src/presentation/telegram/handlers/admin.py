@@ -15,6 +15,7 @@ from src.presentation.telegram.filters import AdminFilter, ChatFilter
 from src.infrastructure.json_text_getter import (
     get_paypal_withdraw_order_text,
     get_user_profile_text,
+    get_admin_service_statistics_text,
 )
 from src.presentation.telegram.buttons import inline
 from src.application.services.order import OrderService
@@ -345,4 +346,28 @@ async def admin_orders_handler(
         state=AdminOrderLookUpSG.START,
         mode=StartMode.RESET_STACK,
         show_mode=ShowMode.EDIT,
+    )
+
+
+@router.callback_query(
+    F.data == 'admin_service_statistics',
+    AdminFilter(),
+    ChatFilter(chat_type=ChatType.PRIVATE),
+)
+async def admin_service_statistics_handler(
+    callback: CallbackQuery,
+    bot: Bot,
+    event_chat: Chat,
+    user_service: FromDishka[UserService],
+    order_service: FromDishka[OrderService],
+) -> None:
+    users = await user_service.get_all_users()
+    orders = await order_service.get_all_orders()
+    await bot.send_message(
+        chat_id=event_chat.id,
+        text=get_admin_service_statistics_text(
+            total_users=len(users),
+            total_orders=len(orders),
+            total_withdrawn=sum(order.amount for order in orders),
+        ),
     )

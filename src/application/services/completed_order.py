@@ -7,8 +7,7 @@ from src.domain.value_objects.completed_order import (
     CompletedOrderID,
     PaypalReceivedAmount,
     UserReceivedAmount,
-    ReceivedAt,
-    TakenCommission,
+    CompletedAt,
 )
 from src.domain.value_objects.order import OrderID
 
@@ -22,8 +21,7 @@ class CompletedOrderService:
             order_id=OrderID(data.order_id),
             paypal_received_amount=PaypalReceivedAmount(data.paypal_received_amount),
             user_received_amount=UserReceivedAmount(data.user_received_amount),
-            received_at=ReceivedAt(data.received_at),
-            taken_commission=TakenCommission(data.taken_commission),
+            completed_at=CompletedAt(data.completed_at),
         ))
 
     async def get(self, data: GetCompletedOrderDTO) -> Optional[CompletedOrderDTO]:
@@ -35,6 +33,5 @@ class CompletedOrderService:
             order_id=completed_order.order_id.value,
             paypal_received_amount=completed_order.paypal_received_amount.value,
             user_received_amount=completed_order.user_received_amount.value,
-            received_at=completed_order.received_at.value,
-            taken_commission=completed_order.taken_commission.value,
+            completed_at=completed_order.completed_at.value,
         )

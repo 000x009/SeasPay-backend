@@ -8,8 +8,7 @@ class CompletedOrderDTO:
     order_id: int
     paypal_received_amount: Decimal
     user_received_amount: Decimal
-    taken_commission: int
-    received_at: datetime = field(default=datetime.now(UTC))
+    completed_at: datetime = field(default=datetime.now(UTC))
 
 
 @dataclass(frozen=True)
@@ -17,8 +16,7 @@ class AddCompletedOrderDTO:
     order_id: int
     paypal_received_amount: Decimal
     user_received_amount: Decimal
-    taken_commission: int
-    received_at: datetime = field(default=datetime.now(UTC))
+    completed_at: datetime = field(default=datetime.now(UTC))
 
 
 @dataclass(frozen=True)

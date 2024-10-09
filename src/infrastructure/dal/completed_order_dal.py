@@ -10,8 +10,7 @@ from src.domain.value_objects.completed_order import (
     CompletedOrderID,
     PaypalReceivedAmount,
     UserReceivedAmount,
-    ReceivedAt,
-    TakenCommission,
+    CompletedAt,
 )
 from src.infrastructure.data.models import CompletedOrderModel
 
@@ -25,8 +24,7 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
             order_id=completed_order.order_id.value,
             paypal_received_amount=completed_order.paypal_received_amount.value,
             user_received_amount=completed_order.user_received_amount.value,
-            received_at=completed_order.received_at.value,
-            taken_commission=completed_order.taken_commission.value,
+            completed_at=completed_order.completed_at.value,
         )
         await self._session.execute(query)
         await self._session.commit()
@@ -40,6 +38,5 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
             order_id=OrderID(completed_order.order_id),
             paypal_received_amount=PaypalReceivedAmount(completed_order.paypal_received_amount),
             user_received_amount=UserReceivedAmount(completed_order.user_received_amount),
-            received_at=ReceivedAt(completed_order.received_at),
-            taken_commission=TakenCommission(completed_order.taken_commission),
+            completed_at=CompletedAt(completed_order.completed_at),
         )

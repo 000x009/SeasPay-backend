@@ -146,3 +146,16 @@ def get_order_info_crypto_text(
         address=address,
         network=network,
     )
+
+
+def get_admin_service_statistics_text(
+    total_users: int,
+    total_orders: int,
+    total_withdrawn: float,
+    total_profit: float,
+) -> str:
+    return get_text_by_key("admin_service_statistics_text").format(
+        total_users=total_users,
+        total_orders=total_orders,
+        total_withdrawn=total_withdrawn,
+    )

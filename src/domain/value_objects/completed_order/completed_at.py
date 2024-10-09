@@ -5,5 +5,5 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class ReceivedAt(ValueObject[datetime]):
+class CompletedAt(ValueObject[datetime]):
     value: datetime

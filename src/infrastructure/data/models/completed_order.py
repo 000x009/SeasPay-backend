@@ -22,12 +22,11 @@ class CompletedOrderModel(Base):
     )
     paypal_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
     user_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
-    received_at: Mapped[datetime] = mapped_column(
+    completed_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,
         server_default=func.now(),
         default=datetime.now(UTC),
     )
-    taken_commission: Mapped[int] = mapped_column(Integer, nullable=False)
 
     order: Mapped['OrderModel'] = relationship(back_populates='completed_order', uselist=False)
