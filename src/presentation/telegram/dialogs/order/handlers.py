@@ -80,10 +80,13 @@ async def confirm_fulfillment(
 ) -> None:
     bot = dialog_manager.middleware_data.get("bot")
     order_id = dialog_manager.start_data.get("order_id")
+    user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
+
     try:
         await order_service.fulfill_order(FulfillOrderDTO(
             order_id=order_id,
-            paypal_received_amount=Decimal(dialog_manager.dialog_data.get("received_amount"))
+            paypal_received_amount=Decimal(dialog_manager.dialog_data.get("received_amount")),
+            user_received_amount=Decimal(user_received_amount)
         ))
         await bot.send_message(
             chat_id=callback_query.from_user.id,
@@ -142,3 +145,16 @@ async def on_reason_cancel_order(
 ) -> None:
     dialog_manager.dialog_data["reason"] = message.text
     await dialog_manager.switch_to(OrderFulfillmentSG.CANCEL_ORDER)
+
+
+async def on_user_received_amount(
+    message: Message,
+    widget: ManagedTextInput[str],
+    dialog_manager: DialogManager,
+) -> None:
+    if message.text.isdigit():
+        dialog_manager.dialog_data["user_received_amount"] = message.text
+        await dialog_manager.switch_to(OrderFulfillmentSG.ORDER_INFO)
+        await message.answer("Сумма была успешно установлена!")
+    else:
+        await message.answer("Пожалуйста, введите число")

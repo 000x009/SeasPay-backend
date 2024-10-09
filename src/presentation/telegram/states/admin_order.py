@@ -8,3 +8,4 @@ class OrderFulfillmentSG(StatesGroup):
     PRE_CONFIRM = State()
     PRE_CONFIRM_CANCEL = State()
     CANCEL_ORDER = State()
+    USER_RECEIVED_AMOUNT = State()

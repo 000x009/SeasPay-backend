@@ -81,8 +81,10 @@ async def take_order_handler(
 async def order_fulfillment_handler(
     callback: CallbackQuery,
     dialog_manager: DialogManager,
+    state: FSMContext,
 ) -> None:
     order_id = callback.data.split(':')[1]
+    await state.clear()
     await dialog_manager.start(
         OrderFulfillmentSG.ORDER_INFO,
         mode=StartMode.RESET_STACK,
@@ -225,8 +227,10 @@ async def admin_write_user_handler(
 async def admin_user_orders_handler(
     callback: CallbackQuery,
     dialog_manager: DialogManager,
+    state: FSMContext,
 ) -> None:
     user_id = int(callback.data.split(':')[1])
+    await state.clear()
     await dialog_manager.start(
         AdminUserOrdersSG.USER_ORDERS,
         mode=StartMode.RESET_STACK,
@@ -341,7 +345,9 @@ async def mailing_sender_handler(
 async def admin_orders_handler(
     callback: CallbackQuery,
     dialog_manager: DialogManager,
+    state: FSMContext,
 ) -> None:
+    await state.clear()
     await dialog_manager.start(
         state=AdminOrderLookUpSG.START,
         mode=StartMode.RESET_STACK,

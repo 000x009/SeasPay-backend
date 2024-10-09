@@ -13,8 +13,9 @@ def new_confirm_fulfillment() -> Predicate:
         payment_receipt = manager.dialog_data.get("payment_receipt_id")
         received_amount = manager.dialog_data.get("received_amount")
         user_must_receive = manager.dialog_data.get("user_must_receive")
+        user_received_amount = manager.dialog_data.get("user_received_amount")
 
-        if payment_receipt and received_amount and user_must_receive:
+        if payment_receipt and received_amount and user_must_receive and user_received_amount:
             return True
         return False
 

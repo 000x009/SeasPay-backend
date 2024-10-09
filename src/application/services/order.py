@@ -30,6 +30,7 @@ from src.application.dto.withdraw_method import AddWithdrawMethodDTO, GetWithdra
 from src.application.services.telegram_service import TelegramService
 from src.application.dto.telegram import SendMessageDTO
 from src.application.services.user import UserService
+from src.application.dto.completed_order import AddCompletedOrderDTO
 from src.application.dto.user import GetUserDTO
 from src.infrastructure.json_text_getter import get_paypal_withdraw_order_preview_text
 from src.domain.value_objects.completed_order import PaypalReceivedAmount
@@ -192,6 +193,11 @@ class OrderService:
             user_id=user.user_id.value,
             commission=user.commission.value,
             total_withdrawn=user.total_withdrawn.value,
+        ))
+        await self._completed_order_service.add(AddCompletedOrderDTO(
+            order_id=updated_order.id.value,
+            paypal_received_amount=data.paypal_received_amount,
+            user_received_amount=data.user_received_amount,
         ))
 
         return OrderDTO(

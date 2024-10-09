@@ -3,12 +3,6 @@ from aiogram_dialog.widgets.text import Format, Const, Multi
 from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.kbd import (
-    Row,
-    ScrollingGroup,
-    Select,
-    PrevPage,
-    CurrentPage,
-    NextPage,
     Back,
     Button,
     SwitchTo,
@@ -26,6 +20,7 @@ from src.presentation.telegram.dialogs.order.handlers import (
     confirm_fulfillment,
     cancel_order_handler,
     on_reason_cancel_order,
+    on_user_received_amount
 )
 from src.presentation.telegram.dialogs.order.predicate import new_confirm_fulfillment, new_when_no_payment_receipt
 
@@ -41,6 +36,11 @@ order_dialog = Dialog(
             text=Const("🧮 Рассчитать комиссию"),
             id="calculate_commission",
             on_click=calculate_commission,
+        ),
+        SwitchTo(
+            text=Const("🪙 Полученная сумма пользователем"),
+            id="user_received_amount",
+            state=OrderFulfillmentSG.USER_RECEIVED_AMOUNT,
         ),
         Button(
             text=Const("🖇️ Прикрепить фото чека"),
@@ -130,5 +130,17 @@ order_dialog = Dialog(
         ),
         getter=order_cancel_getter,
         state=OrderFulfillmentSG.CANCEL_ORDER,
+    ),
+    Window(
+        Const('Если вы сделали все операции и пользователь получил свои деньги, то отправьте данную сумму в USD:'),
+        MessageInput(
+            func=on_user_received_amount,
+        ),
+        SwitchTo(
+            id='back_to_order_info_',
+            text=Const('◀️ Назад'),
+            state=OrderFulfillmentSG.ORDER_INFO,
+        ),
+        state=OrderFulfillmentSG.USER_RECEIVED_AMOUNT,
     )
 )

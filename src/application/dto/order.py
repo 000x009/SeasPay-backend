@@ -69,6 +69,7 @@ class CommissionDTO:
 class FulfillOrderDTO:
     order_id: int
     paypal_received_amount: Decimal
+    user_received_amount: Decimal
 
 
 @dataclass(frozen=True)

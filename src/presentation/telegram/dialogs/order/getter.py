@@ -29,6 +29,7 @@ async def order_getter(
     **kwargs
 ) -> Mapping[str, OrderDTO]:
     order_id = dialog_manager.start_data.get("order_id")
+    user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
     order = await order_service.get(GetOrderDTO(order_id=order_id))
     customer = await user_service.get_user(GetUserDTO(user_id=order.user_id))
 
@@ -73,6 +74,7 @@ async def order_getter(
         ),
         "withdraw_method_text": withdraw_method_text,
         "payment_receipt": payment_receipt if payment_receipt else None,
+        "user_received_amount": user_received_amount,
     }
 
 
