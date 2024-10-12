@@ -61,7 +61,6 @@ async def get_order(
 
 
 @router.post('/', response_model=OrderDTO)
-@cache(expire=60 * 60 * 24)
 async def create_order(
     order_service: FromDishka[OrderService],
     data: CreateOrderSchema = Body(),
@@ -69,7 +68,7 @@ async def create_order(
 ) -> OrderDTO:
     response = await order_service.create(
         CreateOrderDTO(
-            user_id=12823,
+            user_id=5297779345,
             payment_receipt="string",
             created_at=data.created_at,
             status=data.status,

@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import os
 from pathlib import Path
+from decimal import Decimal
 
 from src.domain.value_objects.order import OrderStatusEnum
 
@@ -34,6 +35,7 @@ def get_paypal_withdraw_order_text(
         status=status_text.get(status, ""),
         commission=commission,
     )
+
 
 def get_paypal_withdraw_order_preview_text(
     order_id: int,
@@ -91,8 +93,8 @@ def get_withdraw_crypto_text(
 
 def get_user_profile_text(
     user_id: int,
-    commission: float,
-    total_withdrawn: float,
+    commission: int,
+    total_withdrawn: Decimal,
 ) -> str:
     return get_text_by_key("user_profile_text").format(
         user_id=user_id,

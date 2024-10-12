@@ -31,6 +31,7 @@ from src.presentation.telegram.states import (
     AdminUserOrdersSG,
     MailingSG,
     AdminOrderLookUpSG,
+    AdminSearchSG,
 )
 
 
@@ -93,7 +94,7 @@ async def order_fulfillment_handler(
     )
 
 
-#ADMIN PANEL
+# ADMIN PANEL
 @router.message(
     Command('admin'),
     AdminFilter(),
@@ -136,49 +137,13 @@ async def back_apanel_handler(
 )
 async def admin_search_user_handler(
     callback: CallbackQuery,
-    bot: Bot,
-    state: FSMContext,
-    event_chat: Chat,
+    dialog_manager: DialogManager,
 ) -> None:
-    await bot.edit_message_text(
-        chat_id=event_chat.id,
-        message_id=callback.message.message_id,
-        text='🔍 Введите ID пользователя для просмотра его профиля:',
+    await dialog_manager.start(
+        state=AdminSearchSG.START,
+        mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.EDIT,
     )
-    await state.set_state(AdminSearchUserSG.SEARCH_USER)
-
-
-@router.message(
-    AdminSearchUserSG.SEARCH_USER,
-    AdminFilter(),
-    ChatFilter(chat_type=ChatType.PRIVATE),
-)
-async def admin_search_user_handler(
-    message: Message,
-    bot: Bot,
-    user_service: FromDishka[UserService],
-    state: FSMContext,
-) -> None:
-    user_id = int(message.text)
-    try:
-        user = await user_service.get_user(GetUserDTO(user_id=user_id))
-        if user:
-            await bot.send_message(
-                chat_id=message.from_user.id,
-                text=get_user_profile_text(
-                    user_id=user.user_id,
-                    commission=user.commission,
-                    total_withdrawn=user.total_withdrawn,
-                ),
-                reply_markup=inline.get_user_profile_kb_markup(user_id=user_id),
-            )
-        else:
-            await bot.send_message(
-                chat_id=message.from_user.id,
-                text='❌ Пользователь с таким ID не был найден!',
-            )
-    finally:
-        await state.clear()
 
 
 @router.callback_query(

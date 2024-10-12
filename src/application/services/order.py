@@ -90,7 +90,7 @@ class OrderService:
         )
 
     async def create(self, data: CreateOrderDTO) -> OrderDTO:
-        user = await self._user_service.get_user(GetUserDTO(user_id=12823))
+        user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
         order = await self._order_dal.insert(
             Order(
                 user_id=UserID(data.user_id),
@@ -113,7 +113,7 @@ class OrderService:
 
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
-                user_id=12823,
+                user_id=data.user_id,
                 order_id=order.id.value,
                 text=get_paypal_withdraw_order_preview_text(
                     order_id=order.id.value,

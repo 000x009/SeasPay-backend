@@ -32,7 +32,6 @@ def get_order_fulfillment_kb_markup(order_id: int) -> InlineKeyboardMarkup:
     )
 
 
-
 def get_admin_order_confirmation_kb_markup(order_id: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
@@ -67,7 +66,7 @@ def get_admin_panel_kb_markup() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text='🔍 Поиск пользователя', callback_data="admin_search_user"),
+                InlineKeyboardButton(text='🔍 Поиск', callback_data="admin_search_user"),
             ],
             [
                 InlineKeyboardButton(text='📜 Просмотр заказов', callback_data="admin_orders"),

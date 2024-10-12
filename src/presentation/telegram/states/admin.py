@@ -26,3 +26,15 @@ class AdminOrderLookUpSG(StatesGroup):
     COMPLETED_ORDERS = State()
     CANCELLED_ORDERS = State()
     ORDER_INFO = State()
+
+
+class AdminSearchSG(StatesGroup):
+    START = State()
+    USER_SEARCH = State()
+    ORDER_SEARCH = State()
+    USER = State()
+    ORDER = State()
+    WRITE_TO_USER = State()
+    PRE_CONFIRM_MESSAGE = State()
+    USER_ORDERS = State()
+    USER_ORDER = State()

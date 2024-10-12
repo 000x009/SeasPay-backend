@@ -33,7 +33,7 @@ def upgrade() -> None:
     sa.Column('final_amount', sa.DECIMAL(), nullable=False),
     sa.Column('time', sa.DateTime(timezone=True), nullable=False),
     sa.Column('withdrawal_detail', sa.JSON(), nullable=False),
-    sa.Column('status', sa.Enum('COMPLETE', 'CANCEL', 'WAIT', 'DELAY', 'PROCESSING', name='order_status'), nullable=False),
+    sa.Column('status', sa.Enum('NEW', 'COMPLETE', 'CANCEL', 'WAIT', 'DELAY', 'PROCESSING', name='order_status'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.user_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
