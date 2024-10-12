@@ -23,6 +23,7 @@ from src.application.services.feedback import FeedbackService
 from src.application.services.user_topic import UserTopicService
 from src.application.services.completed_order import CompletedOrderService
 from src.application.services.withdraw_service import WithdrawService
+from src.application.services.statistics import StatisticsService
 from src.infrastructure.config import load_settings, load_bot_settings, BotSettings
 from src.infrastructure.telegram import TelegramClient
 from src.application.services.telegram_service import TelegramService
@@ -64,6 +65,8 @@ class ServiceProvider(Provider):
     completed_order_service = provide(CompletedOrderService, scope=Scope.REQUEST, provides=CompletedOrderService)
     withdraw_service = provide(WithdrawService, scope=Scope.REQUEST, provides=WithdrawService)
     telegram_service = provide(TelegramService, scope=Scope.REQUEST, provides=TelegramService)
+    statistics_service = provide(StatisticsService, scope=Scope.REQUEST, provides=StatisticsService)
+
 
 class TelegramProvider(Provider):
     @asynccontextmanager

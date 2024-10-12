@@ -7,6 +7,7 @@ from src.application.dto.completed_order import (
     GetCompletedOrderDTO,
     TotalWithdrawDTO,
     ProfitDTO,
+    GetProfitDTO,
 )
 from src.domain.entity.completed_order import CompletedOrder
 from src.domain.value_objects.completed_order import (
@@ -16,6 +17,7 @@ from src.domain.value_objects.completed_order import (
     CompletedAt,
 )
 from src.domain.value_objects.order import OrderID
+from src.domain.value_objects.statistics import TimeSpan
 
 
 class CompletedOrderService:
@@ -49,10 +51,13 @@ class CompletedOrderService:
             total_withdraw=total_withdraw,
         )
 
-    async def count_profit(self) -> ProfitDTO:
-        profit = await self._dal.count_profit()
+    async def count_statistics_profit(self) -> ProfitDTO:
+        all_time_profit = await self._dal.count_profit()
+        month_profit = await self._dal.count_profit(TimeSpan(30))
+        week_profit = await self._dal.count_profit(TimeSpan(7))
 
         return ProfitDTO(
-            profit=profit,
+            all_time=all_time_profit,
+            month=month_profit,
+            week=week_profit,
         )
-

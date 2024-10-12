@@ -54,3 +54,11 @@ class CalculateCommissionDTO:
 class CommissionDTO:
     commission: int
     user_must_receive: Decimal
+
+
+@dataclass(frozen=True)
+class NewUsersDTO:
+    all: int
+    month: int
+    week: int
+    day: int

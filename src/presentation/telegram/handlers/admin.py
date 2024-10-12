@@ -20,13 +20,12 @@ from src.infrastructure.json_text_getter import (
 from src.presentation.telegram.buttons import inline
 from src.application.services.order import OrderService
 from src.application.services.user import UserService
-from src.application.services.completed_order import CompletedOrderService
 from src.application.dto.order import GetOrderDTO, TakeOrderDTO
 from src.application.dto.user import GetUserDTO
 from src.domain.exceptions.order import OrderAlreadyTakenError, OrderNotFoundError
+from src.application.services.statistics import StatisticsService
 from src.presentation.telegram.states import (
     OrderFulfillmentSG,
-    AdminSearchUserSG,
     AdminWriteUserSG,
     AdminUserOrdersSG,
     MailingSG,
@@ -36,6 +35,7 @@ from src.presentation.telegram.states import (
 
 
 router = Router()
+
 
 @router.callback_query(
     F.data.startswith('take_order'),
@@ -330,23 +330,22 @@ async def admin_service_statistics_handler(
     callback: CallbackQuery,
     bot: Bot,
     event_chat: Chat,
-    user_service: FromDishka[UserService],
-    order_service: FromDishka[OrderService],
-    completed_order_service: FromDishka[CompletedOrderService],
+    statistics_service: FromDishka[StatisticsService]
 ) -> None:
-    users = await user_service.get_all_users()
-    orders = await order_service.get_all_orders()
-    total_withdraw = await completed_order_service.count_total_withdraw()
-    profit = await completed_order_service.count_profit()
+    statistics = await statistics_service.get_statistics()
 
     await bot.edit_message_text(
         chat_id=event_chat.id,
         message_id=callback.message.message_id,
         text=get_admin_service_statistics_text(
-            total_users=len(users),
-            total_orders=len(orders),
-            total_withdrawn=total_withdraw.total_withdraw,
-            profit=profit.profit,
+            all_time_profit=statistics.profit.all_time,
+            month_profit=statistics.profit.month,
+            week_profit=statistics.profit.week,
+            all_users_amount=statistics.new_users.all,
+            new_month_users=statistics.new_users.month,
+            new_week_users=statistics.new_users.week,
+            new_day_users=statistics.new_users.day,
+            total_withdrawn=statistics.total_withdrawn,
         ),
         reply_markup=inline.back_to_apanel_kb_markup,
     )

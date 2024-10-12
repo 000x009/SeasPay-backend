@@ -1,5 +1,6 @@
 from typing import Optional
 from decimal import Decimal
+from datetime import timedelta
 
 from sqlalchemy import insert, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +15,7 @@ from src.domain.value_objects.completed_order import (
     CompletedAt,
 )
 from src.infrastructure.data.models import CompletedOrderModel
+from src.domain.value_objects.statistics import TimeSpan
 
 
 class CompletedOrderDAL(BaseCompletedOrderDAL):
@@ -49,8 +51,18 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
 
         return Decimal(total_user_received or 0)
 
-    async def count_profit(self) -> Decimal:
-        query = select(func.sum(CompletedOrderModel.paypal_received_amount - CompletedOrderModel.user_received_amount))
+    async def count_profit(self, timespan: Optional[TimeSpan] = None) -> Decimal:
+        if timespan is None:
+            query = (
+                select(func.sum(CompletedOrderModel.paypal_received_amount - CompletedOrderModel.user_received_amount))
+            )
+        else:
+            query = (
+                select(
+                    func.sum(CompletedOrderModel.paypal_received_amount - CompletedOrderModel.user_received_amount)
+                )
+                .filter(CompletedOrderModel.completed_at > func.now() - timedelta(days=timespan.value))
+            )
         result = await self._session.execute(query)
         total_profit = result.scalar_one_or_none()
 

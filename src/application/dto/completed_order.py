@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from decimal import Decimal
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -31,4 +32,11 @@ class TotalWithdrawDTO:
 
 @dataclass(frozen=True)
 class ProfitDTO:
-    profit: Decimal
+    all_time: Decimal
+    month: Decimal
+    week: Decimal
+
+
+@dataclass(frozen=True)
+class GetProfitDTO:
+    timespan: Optional[float] = field(default=None)

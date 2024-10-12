@@ -1,12 +1,14 @@
 from typing import Optional, List
+from datetime import timedelta
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseUserDAL
 from src.domain.entity.user import User
 from src.domain.value_objects.user import UserID, JoinedAt, Commission, TotalWithdrawn
 from src.infrastructure.data.models import UserModel
+from src.domain.value_objects.statistics import TimeSpan
 
 
 class UserDAL(BaseUserDAL):
@@ -63,3 +65,15 @@ class UserDAL(BaseUserDAL):
         )
         await self._session.execute(query)
         await self._session.commit()
+
+    async def get_new_users_amount(self, timespan: Optional[TimeSpan] = None) -> int:
+        if timespan is not None:
+            query = (
+                select(func.count()).select_from(UserModel)
+                .filter(UserModel.joined_at > func.now() - timedelta(days=timespan.value))
+            )
+        else:
+            query = select(func.count()).select_from(UserModel)
+        result = await self._session.execute(query)
+
+        return result.scalar_one_or_none() or 0

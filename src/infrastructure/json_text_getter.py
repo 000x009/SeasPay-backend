@@ -151,14 +151,22 @@ def get_order_info_crypto_text(
 
 
 def get_admin_service_statistics_text(
-    total_users: int,
-    total_orders: int,
-    total_withdrawn: float,
-    profit: float,
+    all_time_profit: Decimal,
+    month_profit: Decimal,
+    week_profit: Decimal,
+    all_users_amount: int,
+    new_month_users: int,
+    new_week_users: int,
+    new_day_users: int,
+    total_withdrawn: Decimal,
 ) -> str:
     return get_text_by_key("admin_service_statistics_text").format(
-        total_users=total_users,
-        total_orders=total_orders,
+        all_time_profit=all_time_profit,
+        month_profit=month_profit,
+        week_profit=week_profit,
+        all_users_amount=all_users_amount,
+        new_month_users=new_month_users,
+        new_week_users=new_week_users,
+        new_day_users=new_day_users,
         total_withdrawn=total_withdrawn,
-        profit=profit,
     )

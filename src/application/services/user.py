@@ -6,13 +6,12 @@ from src.application.dto.user import (
     GetUserDTO,
     UserDTO,
     UpdateUserDTO,
-    CalculateCommissionDTO,
-    CommissionDTO,
+    NewUsersDTO,
 )
 from src.domain.entity.user import User
 from src.domain.value_objects.user import UserID, JoinedAt, Commission, TotalWithdrawn
-from src.domain.value_objects.completed_order import PaypalReceivedAmount
 from src.domain.exceptions.user import UserNotFoundError
+from src.domain.value_objects.statistics import TimeSpan
 
 
 class UserService:
@@ -67,15 +66,16 @@ class UserService:
             commission=Commission(data.commission),
             total_withdrawn=TotalWithdrawn(data.total_withdrawn)
         ))
- 
-    
-    async def calculate_commission(self, data: CalculateCommissionDTO) -> CommissionDTO:
-        user = await self._user_dal.get_one(UserID(data.user_id))
-        if user is None:
-            raise UserNotFoundError(f"User with id {data.user_id} not found.")
 
-        user_must_receive = user.update_commission(PaypalReceivedAmount(data.paypal_received_amount))
-        return CommissionDTO(
-            commission=user.commission.value,
-            user_must_receive=user_must_receive.value
+    async def get_new_users_statistics(self) -> NewUsersDTO:
+        all_users = await self._user_dal.get_new_users_amount()
+        month_users = await self._user_dal.get_new_users_amount(TimeSpan(30))
+        week_users = await self._user_dal.get_new_users_amount(TimeSpan(7))
+        day_users = await self._user_dal.get_new_users_amount(TimeSpan(1))
+
+        return NewUsersDTO(
+            all=all_users,
+            month=month_users,
+            week=week_users,
+            day=day_users,
         )
