@@ -1,0 +1,63 @@
+services:
+  paradox_db:
+    image: postgres:15.8-alpine
+    container_name: paradox_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: on-failure
+    networks:
+      - default
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: on-failure
+    networks:
+      - default
+  
+  paradox_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - TOML_CONFIG_PATH=${TOML_CONFIG_PATH}
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
+      - PAYPAL_BASE_URL=${PAYPAL_BASE_URL}
+      - ORDERS_GROUP_ID=${ORDERS_GROUP_ID}
+      - TECHNICAL_SUPPORT_URL=${TECHNICAL_SUPPORT_URL}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - WEB_APP_URL=${WEB_APP_URL}
+      - TELEGRAPH_TERMS_OF_USE_URL=${TELEGRAPH_TERMS_OF_USE_URL}
+    restart: on-failure
+    container_name: paradox_backend
+    ports:
+      - 8000:8000
+    depends_on:
+      - paradox_db
+      - redis
+    command: sh -c "alembic upgrade head && uvicorn src.main.web:app --host 0.0.0.0 --port 8000 --reload & python -m src.main.bot"
+    networks:
+      - default
+
+volumes:
+  postgres_data:
+  
+networks:
+  default:
+    name: paradox_network
+    driver: bridge
