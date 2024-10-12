@@ -30,11 +30,14 @@ class LoginMiddleware(BaseMiddleware):
         async with self._dishka_container(scope=Scope.REQUEST) as request_container:
             user_service = await request_container.get(UserService)
 
-        user_id = event.from_user.id
-        user = await user_service.get_user(GetUserDTO(user_id=user_id))
-        if not user:
-            user = await user_service.add(CreateUserDTO(user_id=user_id))
-
-        data["user"] = user
+            user_id = event.from_user.id
+            try:
+                user = await user_service.get_user(GetUserDTO(user_id=user_id))
+                if not user:
+                    await user_service.add(CreateUserDTO(user_id=user_id))
+            except Exception as e:
+                print(e)
+            finally:
+                await request_container.close()
 
         return await handler(event, data)
