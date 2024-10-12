@@ -5,4 +5,4 @@ all_handlers = [
     admin.router,
 ]
 
-__all__ = ['handlers']
+__all__ = ['all_handlers']

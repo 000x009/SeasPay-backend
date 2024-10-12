@@ -41,7 +41,6 @@ async def get_invoice(
 async def update_invoice_status(
     data: UpdateInvoiceStatusSchema,
     invoice_service: FromDishka[InvoiceService],
-    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> JSONResponse:
     await invoice_service.update(UpdateInvoiceDTO(
         id=data.id,

@@ -13,6 +13,8 @@ from aiogram_album.ttl_cache_middleware import TTLCacheAlbumMiddleware
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.fsm.storage.base import DefaultKeyBuilder
 
 from src.infrastructure.config import load_bot_settings
 from src.main.di import get_di_container
@@ -33,7 +35,11 @@ async def setup_bot_dishka(dispatcher: Dispatcher) -> AsyncGenerator[None, None]
 
 
 def get_dispatcher() -> Dispatcher:
-    dispatcher = Dispatcher()
+    storage = RedisStorage.from_url(
+        'redis://redis:6379/0',
+        key_builder=DefaultKeyBuilder(with_destiny=True),
+    )
+    dispatcher = Dispatcher(storage=storage)
     dispatcher.include_routers(*all_handlers)
     dispatcher.include_routers(*dialogs)
     LoginMiddleware(dishka_container=get_di_container(), router=dispatcher)

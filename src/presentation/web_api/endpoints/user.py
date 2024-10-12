@@ -8,9 +8,9 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from aiogram.utils.web_app import WebAppInitData
 
 from src.application.services.user import UserService
-from src.application.dto.user import CreateUserDTO, GetUserDTO, UserDTO, UpdateUserCommissionDTO, UpdateUserTotalWithdrawnDTO
+from src.application.dto.user import CreateUserDTO, GetUserDTO, UserDTO
 from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
-from src.presentation.web_api.schema.user import CreateUserSchema, UpdateUserTotalWithdrawnSchema, UpdateUserCommissionSchema
+from src.presentation.web_api.schema.user import CreateUserSchema
 
 
 router = APIRouter(
