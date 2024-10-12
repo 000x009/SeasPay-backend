@@ -3,6 +3,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
+from  fastapi_redis_cache import  cache
+
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from aiogram.utils.web_app import WebAppInitData
@@ -21,6 +23,7 @@ router = APIRouter(
 
 
 @router.get('/', response_model=List[FeedbackDTO])
+@cache(expire=60 * 60 * 24)
 async def get_feedback_list(
     limit: int,
     offset: int,
@@ -38,6 +41,7 @@ async def get_feedback_list(
 
 
 @router.get('/{feedback_id}')
+@cache(expire=60 * 60 * 24)
 async def get_feedback(
     feedback_id: int,
     feedback_service: FromDishka[FeedbackService],
@@ -51,6 +55,7 @@ async def get_feedback(
 
 
 @router.post('/', response_class=JSONResponse)
+@cache(expire=60 * 60 * 24)
 async def post_feedback(
     data: CreateFeedback,
     feedback_service: FromDishka[FeedbackService],

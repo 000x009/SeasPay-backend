@@ -3,6 +3,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
+from  fastapi_redis_cache import  cache
+
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from aiogram.utils.web_app import WebAppInitData
@@ -20,6 +22,7 @@ router = APIRouter(
 
 
 @router.get('/{invoice_id}')
+@cache(expire=60 * 60 * 24)
 async def get_invoice(
     invoice_id: str,
     invoice_service: FromDishka[InvoiceService],
@@ -34,6 +37,7 @@ async def get_invoice(
 
 
 @router.put('/')
+@cache(expire=60 * 60 * 24)
 async def update_invoice_status(
     data: UpdateInvoiceStatusSchema,
     invoice_service: FromDishka[InvoiceService],

@@ -1,7 +1,8 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, UploadFile, Body
-from fastapi.responses import JSONResponse
+
+from  fastapi_redis_cache import  cache
 
 from aiogram.utils.web_app import WebAppInitData
 
@@ -22,6 +23,7 @@ router = APIRouter(
 
 
 @router.get('/')
+@cache(expire=60 * 60 * 24)
 async def get_order_list(
     limit: int,
     offset: int,
@@ -42,6 +44,7 @@ async def get_order_list(
 
 
 @router.get('/{order_id}')
+@cache(expire=60 * 60 * 24)
 async def get_order(
     order_id: int,
     order_service: FromDishka[OrderService],
@@ -58,6 +61,7 @@ async def get_order(
 
 
 @router.post('/', response_model=OrderDTO)
+@cache(expire=60 * 60 * 24)
 async def create_order(
     order_service: FromDishka[OrderService],
     data: CreateOrderSchema = Body(),

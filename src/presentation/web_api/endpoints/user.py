@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
+from fastapi_redis_cache import cache
+
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from aiogram.utils.web_app import WebAppInitData
@@ -19,6 +21,7 @@ router = APIRouter(
 
 
 @router.post('/')
+@cache(expire=60 * 60 * 24)
 async def register_user(
     data: CreateUserSchema,
     user_service: FromDishka[UserService],
@@ -37,6 +40,7 @@ async def register_user(
 
 
 @router.get('/{user_id}')
+@cache(expire=60 * 60 * 24)
 async def get_user(
     user_id: int,
     user_service: FromDishka[UserService],
@@ -45,31 +49,3 @@ async def get_user(
     response = await user_service.get_user(GetUserDTO(user_id=user_id))
 
     return response
-
-
-@router.patch('/{user_id}/total-withdrawn')
-async def update_total_withdrawn(
-    data: UpdateUserTotalWithdrawnSchema,
-    user_service: FromDishka[UserService],
-    user_data: WebAppInitData = Depends(user_init_data_provider),
-) -> JSONResponse:
-    await user_service.update_total_withdrawn(UpdateUserTotalWithdrawnDTO(
-        user_id=user_data.user.id,
-        total_withdrawn=data.total_withdrawn
-    ))
-
-    return JSONResponse(content={"message": "success"}, status_code=200)
-
-
-@router.patch('/{user_id}/commission')
-async def update_commission(
-    data: UpdateUserCommissionSchema,
-    user_service: FromDishka[UserService],
-    user_data: WebAppInitData = Depends(user_init_data_provider),
-) -> JSONResponse:
-    await user_service.update_commission(UpdateUserCommissionDTO(
-        user_id=user_data.user.id,
-        commission=data.commission
-    ))
-
-    return JSONResponse(content={"message": "success"}, status_code=200)

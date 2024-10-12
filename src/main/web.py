@@ -1,7 +1,9 @@
 import logging
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_redis_cache import FastApiRedisCache
 
 from dishka.integrations.fastapi import setup_dishka
 
@@ -16,8 +18,22 @@ logging.basicConfig(
 )
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    redis_cache = FastApiRedisCache()
+    redis_cache.init(
+        host_url="redis://localhost:6379",
+        prefix="myapi-cache",
+        response_header="X-MyAPI-Cache",
+        ignore_arg_types=[Request, Response]
+    )
+    # redis = aioredis.from_url("redis://redis", encoding="utf8", decode_responses=True)
+    # FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+
+
 def create_app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(lifespan=lifespan)
     origins = ["*"]
     app.add_middleware(
         CORSMiddleware,
@@ -28,8 +44,6 @@ def create_app() -> FastAPI:
     )
     include_all_routers(app)
     setup_dishka(get_di_container(), app)
-
-    logging.info('App successfully created.')
 
     return app
 
