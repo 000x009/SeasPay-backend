@@ -33,14 +33,14 @@ async def on_wrote_paypal_received_amount(
     order_service: FromDishka[OrderService]
 ) -> None:
     order_id = dialog_manager.start_data.get("order_id")
-    user_must_receive = await order_service.calculate_commission(
+    commission = await order_service.calculate_commission(
         CalculateCommissionDTO(
             order_id=order_id,
             paypal_received_amount=Decimal(value),
         )
     )
     dialog_manager.dialog_data["received_amount"] = float(value)
-    dialog_manager.dialog_data["user_must_receive"] = user_must_receive
+    dialog_manager.dialog_data["user_must_receive"] = float(commission.user_must_receive)
     await dialog_manager.switch_to(OrderFulfillmentSG.ORDER_INFO)
 
 
