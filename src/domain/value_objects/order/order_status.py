@@ -10,7 +10,6 @@ class OrderStatusEnum(StrEnum):
     PROCESSING = "PROCESSING"
     NEW = "NEW"
     DELAY = "DELAY"
-    WAIT = "WAIT"
 
 
 @dataclass(frozen=True)

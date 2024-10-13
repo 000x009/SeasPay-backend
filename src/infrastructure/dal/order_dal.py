@@ -74,6 +74,7 @@ class OrderDAL(BaseOrderDAL):
 
     async def insert(self, order: Order) -> Order:
         order_model = OrderModel(
+            id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
             created_at=order.created_at.value,

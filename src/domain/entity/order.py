@@ -31,10 +31,10 @@ class Order:
 
     def __init__(
         self,
+        id: OrderID,
         user_id: UserID,
         payment_receipt: PaymentReceipt,
         commission: Commission,
-        id: Optional[OrderID] = None,
         created_at: Optional[CreatedAt] = None,
         status: Optional[OrderStatus] = None,
         telegram_message_id: Optional[MessageID] = None,

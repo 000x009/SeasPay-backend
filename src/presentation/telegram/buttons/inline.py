@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.infrastructure.config import BotSettings
@@ -22,7 +24,7 @@ def get_start_kb_markup(config: BotSettings) -> InlineKeyboardMarkup:
     )
 
 
-def get_order_fulfillment_kb_markup(order_id: int) -> InlineKeyboardMarkup:
+def get_order_fulfillment_kb_markup(order_id: UUID) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -32,7 +34,7 @@ def get_order_fulfillment_kb_markup(order_id: int) -> InlineKeyboardMarkup:
     )
 
 
-def get_admin_order_confirmation_kb_markup(order_id: int) -> InlineKeyboardMarkup:
+def get_admin_order_confirmation_kb_markup(order_id: UUID) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -42,7 +44,7 @@ def get_admin_order_confirmation_kb_markup(order_id: int) -> InlineKeyboardMarku
     )
 
 
-def get_take_order_kb_markup(order_id: int) -> InlineKeyboardMarkup:
+def get_take_order_kb_markup(order_id: UUID) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [

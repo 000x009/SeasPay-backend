@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from aiogram import Router, Bot, F
 from aiogram.enums import ChatType
 from aiogram.types import CallbackQuery, Chat, Message
@@ -49,7 +51,7 @@ async def take_order_handler(
     order_service: FromDishka[OrderService],
     user_service: FromDishka[UserService],
 ) -> None:
-    order_id = int(callback.data.split(':')[1])
+    order_id = UUID(callback.data.split(':')[1])
     order = await order_service.get(GetOrderDTO(order_id=order_id))
     customer = await user_service.get_user(GetUserDTO(user_id=order.user_id))
     bot_settings = load_bot_settings()
@@ -103,7 +105,7 @@ async def order_fulfillment_handler(
     await dialog_manager.start(
         OrderFulfillmentSG.ORDER_INFO,
         mode=StartMode.RESET_STACK,
-        data=dict(order_id=int(order_id)),
+        data=dict(order_id=order_id),
     )
 
 

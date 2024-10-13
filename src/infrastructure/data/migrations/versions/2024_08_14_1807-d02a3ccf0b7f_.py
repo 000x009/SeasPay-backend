@@ -27,13 +27,13 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('user_id')
     )
     op.create_table('order',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('id', sa.UUID(), autoincrement=False, nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
     sa.Column('payment_receipt', sa.String(), nullable=False),
     sa.Column('final_amount', sa.DECIMAL(), nullable=False),
     sa.Column('time', sa.DateTime(timezone=True), nullable=False),
     sa.Column('withdrawal_detail', sa.JSON(), nullable=False),
-    sa.Column('status', sa.Enum('NEW', 'COMPLETE', 'CANCEL', 'WAIT', 'DELAY', 'PROCESSING', name='order_status'), nullable=False),
+    sa.Column('status', sa.Enum('NEW', 'COMPLETE', 'CANCEL', 'DELAY', 'PROCESSING', name='order_status'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.user_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

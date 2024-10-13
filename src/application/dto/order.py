@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from typing import Optional
 from decimal import Decimal
+from uuid import UUID
 
 from src.domain.entity.order import OrderStatusEnum
 from src.application.common.dto import Pagination, FileDTO
@@ -10,7 +11,7 @@ from src.application.dto.withdraw_method import WithdrawMethodDTO, AddWithdrawMe
 
 @dataclass(frozen=True)
 class OrderDTO:
-    id: int
+    id: UUID
     user_id: int
     payment_receipt: str
     commission: int
@@ -28,7 +29,7 @@ class ListOrderDTO:
 
 @dataclass(frozen=True)
 class GetOrderDTO:
-    order_id: int
+    order_id: UUID
 
 
 @dataclass(frozen=True)
@@ -44,18 +45,18 @@ class CreateOrderDTO:
 
 @dataclass(frozen=True)
 class TakeOrderDTO:
-    order_id: int
+    order_id: UUID
 
 
 @dataclass(frozen=True)
 class AddTelegramMessageIdDTO:
-    order_id: int
+    order_id: UUID
     telegram_message_id: int
 
 
 @dataclass(frozen=True)
 class CalculateCommissionDTO:
-    order_id: int
+    order_id: UUID
     paypal_received_amount: Decimal
 
 
@@ -67,11 +68,11 @@ class CommissionDTO:
 
 @dataclass(frozen=True)
 class FulfillOrderDTO:
-    order_id: int
+    order_id: UUID
     paypal_received_amount: Decimal
     user_received_amount: Decimal
 
 
 @dataclass(frozen=True)
 class CancelOrderDTO:
-    order_id: int
+    order_id: UUID

@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 from decimal import Decimal
+from uuid import UUID
 
 from src.domain.value_objects.order import OrderStatusEnum
 
@@ -15,7 +16,7 @@ def get_text_by_key(key: str) -> str:
 
 
 def get_paypal_withdraw_order_text(
-    order_id: int,
+    order_id: UUID,
     user_id: int,
     created_at: datetime,
     status: OrderStatusEnum,
@@ -38,7 +39,7 @@ def get_paypal_withdraw_order_text(
 
 
 def get_paypal_withdraw_order_preview_text(
-    order_id: int,
+    order_id: UUID,
     user_id: int,
     created_at: datetime,
     commission: int,
@@ -104,7 +105,7 @@ def get_user_profile_text(
 
 
 def get_order_info_card_text(
-    order_id: int,
+    order_id: UUID,
     user_id: int,
     commission: float,
     created_at: datetime,
@@ -124,7 +125,7 @@ def get_order_info_card_text(
 
 
 def get_order_info_crypto_text(
-    order_id: int,
+    order_id: UUID,
     user_id: int,
     commission: float,
     created_at: datetime,

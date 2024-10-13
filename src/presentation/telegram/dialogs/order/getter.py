@@ -1,3 +1,4 @@
+import uuid
 from typing import Mapping
 from decimal import Decimal
 
@@ -28,7 +29,7 @@ async def order_getter(
     user_service: FromDishka[UserService],
     **kwargs
 ) -> Mapping[str, OrderDTO]:
-    order_id = dialog_manager.start_data.get("order_id")
+    order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
     user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
     order = await order_service.get(GetOrderDTO(order_id=order_id))
     customer = await user_service.get_user(GetUserDTO(user_id=order.user_id))

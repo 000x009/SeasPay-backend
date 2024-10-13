@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from uuid import UUID
 
 from src.application.common.dto import FileDTO
 
@@ -8,6 +9,6 @@ from src.application.common.dto import FileDTO
 class SendMessageDTO:
     user_id: int
     username: str
-    order_id: int
+    order_id: UUID
     text: str
     photo: Optional[FileDTO] = field(default=None)

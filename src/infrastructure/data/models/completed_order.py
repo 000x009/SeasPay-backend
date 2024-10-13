@@ -1,8 +1,9 @@
+import uuid
 from datetime import datetime, UTC
 from typing import TYPE_CHECKING
 from decimal import Decimal
 
-from sqlalchemy import Integer, DECIMAL, func, TIMESTAMP, ForeignKey
+from sqlalchemy import Integer, DECIMAL, func, TIMESTAMP, ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
@@ -16,7 +17,7 @@ class CompletedOrderModel(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     order_id: Mapped[int] = mapped_column(
-        Integer,
+        UUID,
         ForeignKey('order.id', ondelete='CASCADE'),
         nullable=False,
     )

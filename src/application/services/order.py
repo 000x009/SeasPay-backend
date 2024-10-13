@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional, List
 
 from src.infrastructure.dal import OrderDAL
@@ -96,6 +97,7 @@ class OrderService:
         user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
         order = await self._order_dal.insert(
             Order(
+                id=OrderID(uuid.uuid4()),
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt),
                 created_at=CreatedAt(data.created_at),

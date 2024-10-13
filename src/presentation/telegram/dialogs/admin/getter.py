@@ -1,3 +1,4 @@
+import uuid
 from typing import Mapping, Dict
 
 from aiogram_dialog import DialogManager
@@ -36,7 +37,7 @@ async def one_order_getter(
     order_service: FromDishka[OrderService],
     **kwargs
 ) -> Mapping[str, OrderDTO]:
-    order = await order_service.get(GetOrderDTO(order_id=int(dialog_manager.dialog_data.get("order_id"))))
+    order = await order_service.get(GetOrderDTO(order_id=uuid.UUID(dialog_manager.dialog_data.get("order_id"))))
     order_text = ""
     if order and order.withdraw_method.method == MethodEnum.CARD:
         order_text = get_order_info_card_text(

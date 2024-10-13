@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime, UTC
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Integer, String, BigInteger, ForeignKey, Enum, func, TIMESTAMP
+from sqlalchemy import Integer, String, BigInteger, ForeignKey, Enum, func, TIMESTAMP, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 class OrderModel(Base):
     __tablename__ = 'order'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, autoincrement=False)
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey('user.user_id', ondelete='CASCADE'),
@@ -32,7 +33,7 @@ class OrderModel(Base):
         default=datetime.now(UTC),
     )
     status: Mapped[OrderStatusEnum] = mapped_column(
-        Enum("NEW", "PROCESSING", "COMPLETE", "WAIT", "CANCEL", "DELAY", name="order_status"),
+        Enum("NEW", "PROCESSING", "COMPLETE", "CANCEL", "DELAY", name="order_status"),
         default=OrderStatusEnum.NEW,
     )
     telegram_message_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
