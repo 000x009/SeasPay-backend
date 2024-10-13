@@ -27,5 +27,6 @@ class FeedbackModel(Base):
         default=datetime.now(UTC),
         nullable=False,
     )
+    photo_url: Mapped[str] = mapped_column(String, nullable=True)
 
     user: Mapped['UserModel'] = relationship(back_populates='feedbacks')

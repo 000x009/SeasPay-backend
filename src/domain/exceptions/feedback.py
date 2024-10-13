@@ -7,3 +7,7 @@ class InvalidFeedbackCommentError(DomainError):
 
 class InvalidFeedbackStarsError(DomainError):
     pass
+
+
+class FeedbackNotFoundError(DomainError):
+    pass

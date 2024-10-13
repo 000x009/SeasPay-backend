@@ -27,7 +27,7 @@ class StorageObject:
             self.name = self._generate_object_name()
 
     def get_object_url(self, base_storage_url: str) -> ObjectURL:
-        return ObjectURL(f'{base_storage_url}/{self.bucket}/{self.name}')
+        return ObjectURL(f'{base_storage_url}/{self.bucket.value}/{self.name.value}')
 
     def _generate_object_name(self) -> ObjectName:
         return ObjectName(uuid.uuid4().hex)

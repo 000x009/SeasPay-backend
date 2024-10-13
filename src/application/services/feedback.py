@@ -2,10 +2,15 @@ from typing import List, Optional
 
 from src.infrastructure.dal import FeedbackDAL
 from src.application.dto.feedback import FeedbackDTO, ListInputDTO, GetFeedbackDTO, CreateFeedbackDTO
-from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt
+from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt, PhotoURL
 from src.domain.value_objects.user import UserID
 from src.domain.entity.feedback import Feedback
 from src.application.common.uow import UoW
+from src.application.common.cloud_storage import CloudStorage
+from src.domain.entity.yandex_cloud import StorageObject
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, File
+from src.infrastructure.config import load_settings
+from src.domain.exceptions.feedback import FeedbackNotFoundError
 
 
 class FeedbackService:
@@ -13,12 +18,16 @@ class FeedbackService:
         self,
         feedback_dal: FeedbackDAL,
         uow: UoW,
+        cloud_storage: CloudStorage
     ):
         self._feedback_dal = feedback_dal
         self.uow = uow
+        self.cloud_storage = cloud_storage
 
     async def list_(self, data: ListInputDTO) -> List[FeedbackDTO]:
         feedbacks = await self._feedback_dal.list_(limit=data.limit, offset=data.offset)
+        if not feedbacks:
+            raise FeedbackNotFoundError('Feedbacks not found')
 
         return [
             FeedbackDTO(
@@ -27,14 +36,15 @@ class FeedbackService:
                 stars=feedback.stars.value,
                 comment=feedback.comment.value,
                 created_at=feedback.created_at,
+                photo_url=feedback.photo_url.value if feedback.photo_url else None,
             )
             for feedback in feedbacks
         ]
 
-    async def get(self, data: GetFeedbackDTO) -> Optional[FeedbackDTO]:
+    async def get(self, data: GetFeedbackDTO) -> FeedbackDTO:
         feedback = await self._feedback_dal.get(feedback_id=FeedbackID(data.feedback_id))
         if feedback is None:
-            return None
+            raise FeedbackNotFoundError(f'Feedback with ID {data.feedback_id} not found')
 
         return FeedbackDTO(
             id=feedback.id.value,
@@ -42,14 +52,28 @@ class FeedbackService:
             stars=feedback.stars.value,
             comment=feedback.comment.value,
             created_at=feedback.created_at.value,
+            photo_url=feedback.photo_url.value,
         )
     
     async def create(self, data: CreateFeedbackDTO) -> FeedbackDTO:
+        settings = load_settings()
+        photo = None
+        if data.photo:
+            photo = self.cloud_storage.upload_object(
+                StorageObject(
+                    bucket=Bucket(settings.cloud_settings.feedbacks_bucket_name),
+                    name=ObjectName(data.photo.filename),
+                    file=File(data.photo.input_file)
+                )
+            )
         feedback = await self._feedback_dal.insert(Feedback(
             user_id=UserID(data.user_id),
             stars=Stars(data.stars),
             comment=Comment(data.comment),
             created_at=CreatedAt(data.created_at),
+            photo_url=PhotoURL(
+                photo.get_object_url(settings.cloud_settings.base_storage_url).value if photo else None
+            )
         ))
         await self.uow.commit()
 
@@ -59,4 +83,5 @@ class FeedbackService:
             stars=feedback.stars.value,
             comment=feedback.comment.value,
             created_at=feedback.created_at.value,
+            photo_url=feedback.photo_url.value,
         )
