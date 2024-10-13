@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, UploadFile, Body
 
-from  fastapi_redis_cache import  cache
+from fastapi_redis_cache import cache
 
 from aiogram.utils.web_app import WebAppInitData
 
@@ -69,12 +69,11 @@ async def create_order(
     response = await order_service.create(
         CreateOrderDTO(
             user_id=5297779345,
-            payment_receipt="string",
             created_at=data.created_at,
             status=data.status,
             withdraw_method=data.withdraw_method,
             receipt_photo=FileDTO(
-                input_file=payment_receipt.file.read(),
+                input_file=payment_receipt.file,
                 filename=payment_receipt.filename,
             ),
         )

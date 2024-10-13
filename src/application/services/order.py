@@ -12,6 +12,7 @@ from src.application.dto.order import (
     CommissionDTO,
     FulfillOrderDTO,
     CancelOrderDTO,
+    FileDTO,
 )
 from src.application.dto.user import UpdateUserDTO
 from src.domain.value_objects.user import UserID
@@ -39,6 +40,10 @@ from src.application.services.completed_order import CompletedOrderService
 from src.domain.entity.user import User
 from src.domain.value_objects.user import JoinedAt, Commission as UserCommission, TotalWithdrawn
 from src.application.common.uow import UoW
+from src.application.common.cloud_storage import CloudStorage
+from src.domain.entity.yandex_cloud import StorageObject
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, File
+from src.infrastructure.config import load_settings
 
 
 class OrderService:
@@ -50,6 +55,7 @@ class OrderService:
         user_service: UserService,
         completed_order_service: CompletedOrderService,
         uow: UoW,
+        cloud_storage: CloudStorage,
     ) -> None:
         self._order_dal = order_dal
         self._withdraw_service = withdraw_service
@@ -57,6 +63,7 @@ class OrderService:
         self._user_service = user_service
         self._completed_order_service = completed_order_service
         self.uow = uow
+        self.cloud_storage = cloud_storage
 
     async def list_orders(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
         orders = await self._order_dal.list_(
@@ -94,12 +101,20 @@ class OrderService:
         )
 
     async def create(self, data: CreateOrderDTO) -> OrderDTO:
+        settings = load_settings()
         user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
+        payment_receipt = self.cloud_storage.upload_object(StorageObject(
+            bucket=Bucket(settings.cloud_settings.receipts_bucket_name),
+            name=ObjectName(data.receipt_photo.filename),
+            file=File(data.receipt_photo.input_file)
+        ))
         order = await self._order_dal.insert(
             Order(
                 id=OrderID(uuid.uuid4()),
                 user_id=UserID(data.user_id),
-                payment_receipt=PaymentReceipt(data.payment_receipt),
+                payment_receipt=PaymentReceipt(
+                    payment_receipt.get_object_url(settings.cloud_settings.base_storage_url).value
+                ),
                 created_at=CreatedAt(data.created_at),
                 status=OrderStatus(data.status),
                 commission=OrderCommission(user.commission),
@@ -115,6 +130,10 @@ class OrderService:
                 crypto_network=data.withdraw_method.crypto_network,
             )
         )
+        payment_receipt_object = self.cloud_storage.get_object_file(
+            Bucket(settings.cloud_settings.receipts_bucket_name),
+            ObjectName(payment_receipt.name.value)
+        )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
                 user_id=data.user_id,
@@ -127,7 +146,10 @@ class OrderService:
                     commission=order.commission.value,
                 ),
                 username="some username",
-                photo=data.receipt_photo,
+                photo=FileDTO(
+                    filename=data.receipt_photo.filename,
+                    input_file=payment_receipt_object.file.value,
+                )
             )
         )
         order.telegram_message_id = MessageID(telegram_message.message_id)

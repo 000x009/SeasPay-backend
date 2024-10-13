@@ -31,7 +31,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=paradox_db
       - DB_NAME=${DB_NAME}
       - BOT_TOKEN=${BOT_TOKEN}
       - TOML_CONFIG_PATH=${TOML_CONFIG_PATH}

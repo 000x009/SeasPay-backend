@@ -81,6 +81,15 @@ class Commission:
 
 
 @dataclass
+class YandexCloudSettings:
+    base_storage_url: str
+    receipts_bucket_name: str
+    feedbacks_bucket_name: str
+    access_key_id: str
+    access_secret_key: str
+
+
+@dataclass
 class Settings:
     """App settings"""
 
@@ -88,6 +97,7 @@ class Settings:
     paypal: PayPal
     bot: BotSettings
     commission: Commission
+    cloud_settings: YandexCloudSettings
 
 
 def load_settings() -> Settings:
@@ -127,12 +137,20 @@ def load_settings() -> Settings:
             commission_to_transfer=toml_cfg['commission']['paypal']['commission_to_transfer'],
         )
     )
+    cloud_settings = YandexCloudSettings(
+        access_key_id=toml_cfg['yandex-cloud']['yandex-access-key-id'],
+        access_secret_key=toml_cfg['yandex-cloud']['yandex-access-secret-key'],
+        base_storage_url=toml_cfg['yandex-cloud']['base-storage-url'],
+        receipts_bucket_name=toml_cfg['yandex-cloud']['receipts-bucket-name'],
+        feedbacks_bucket_name=toml_cfg['yandex-cloud']['feedbacks-bucket-name'],
+    )
 
     return Settings(
         db=db,
         paypal=paypal,
         bot=bot,
         commission=commission,
+        cloud_settings=cloud_settings,
     )
 
 

@@ -35,7 +35,6 @@ class GetOrderDTO:
 @dataclass(frozen=True)
 class CreateOrderDTO:
     user_id: int
-    payment_receipt: str
     withdraw_method: AddWithdrawMethodDTO
     receipt_photo: FileDTO = field(default=None)
     created_at: datetime = field(default=datetime.now(UTC))

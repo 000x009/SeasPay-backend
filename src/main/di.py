@@ -1,6 +1,8 @@
 from typing import AsyncGenerator, List, AsyncIterable
 from contextlib import asynccontextmanager
 
+import boto3
+
 from dishka import Provider, provide, Scope, AsyncContainer, make_async_container
 
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker, AsyncSession
@@ -30,6 +32,8 @@ from src.application.services.telegram_service import TelegramService
 from src.application.common.telegram import TelegramClientInterface
 from src.application.common.uow import UoW
 from src.infrastructure.data.uow import SAUoW
+from src.application.common.cloud_storage import CloudStorage
+from src.infrastructure.cloud_storage import YandexCloudStorage
 
 
 class DatabaseProvider(Provider):
@@ -88,12 +92,28 @@ class TelegramProvider(Provider):
             yield TelegramClient(bot=bot, config=config)
 
 
+class APIClientProvider(Provider):
+    @provide(scope=Scope.REQUEST, provides=CloudStorage)
+    async def get_yandex_cloud_client(self) -> YandexCloudStorage:
+        settings = load_settings()
+        session = boto3.session.Session()
+        s3_client = session.client(
+            service_name='s3',
+            endpoint_url='https://storage.yandexcloud.net',
+            aws_access_key_id=settings.cloud_settings.access_key_id,
+            aws_secret_access_key=settings.cloud_settings.access_secret_key,
+        )
+
+        return YandexCloudStorage(client=s3_client)
+
+
 def setup_providers() -> List[Provider]:
     return [
         DatabaseProvider(),
         DALProvider(),
         ServiceProvider(),
         TelegramProvider(),
+        APIClientProvider(),
     ]
 
 
