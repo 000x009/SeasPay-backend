@@ -30,7 +30,6 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
             completed_at=completed_order.completed_at.value,
         )
         await self._session.execute(query)
-        await self._session.commit()
 
     async def get(self, completed_order_id: CompletedOrderID) -> Optional[CompletedOrder]:
         query = select(CompletedOrderModel).where(CompletedOrderModel.id == completed_order_id.value)

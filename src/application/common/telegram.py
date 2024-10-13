@@ -19,6 +19,7 @@ class TelegramClientInterface(Protocol):
         thread_id: int,
         photo: bytes,
         order_id: int,
+        caption: str,
         filename: Optional[str] = None,
     ) -> Message:
         raise NotImplementedError

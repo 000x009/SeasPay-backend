@@ -14,7 +14,6 @@ class UserTopic:
         'supergroup_chat_id',
     )
 
-
     def __init__(
         self,
         user_id: UserID,

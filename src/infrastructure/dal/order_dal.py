@@ -105,7 +105,6 @@ class OrderDAL(BaseOrderDAL):
             telegram_message_id=order.telegram_message_id.value,
         )
         await self._session.merge(order_model)
-        await self._session.commit()
 
         return order
     

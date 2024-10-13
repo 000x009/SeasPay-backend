@@ -12,11 +12,17 @@ from src.domain.entity.user import User
 from src.domain.value_objects.user import UserID, JoinedAt, Commission, TotalWithdrawn
 from src.domain.exceptions.user import UserNotFoundError
 from src.domain.value_objects.statistics import TimeSpan
+from src.application.common.uow import UoW
 
 
 class UserService:
-    def __init__(self, user_dal: UserDAL) -> None:
+    def __init__(
+        self,
+        user_dal: UserDAL,
+        uow: UoW
+    ) -> None:
         self._user_dal = user_dal
+        self.uow = uow
 
     async def add(self, data: CreateUserDTO) -> UserDTO:
         user = await self._user_dal.insert(User(
@@ -25,6 +31,7 @@ class UserService:
             commission=Commission(data.commission),
             total_withdrawn=TotalWithdrawn(data.total_withdrawn)
         ))
+        await self.uow.commit()
 
         return UserDTO(
             user_id=user.user_id.value,
@@ -66,6 +73,7 @@ class UserService:
             commission=Commission(data.commission),
             total_withdrawn=TotalWithdrawn(data.total_withdrawn)
         ))
+        await self.uow.commit()
 
     async def get_new_users_statistics(self) -> NewUsersDTO:
         all_users = await self._user_dal.get_new_users_amount()

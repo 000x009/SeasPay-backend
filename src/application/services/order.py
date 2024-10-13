@@ -113,7 +113,6 @@ class OrderService:
                 crypto_network=data.withdraw_method.crypto_network,
             )
         )
-
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
                 user_id=data.user_id,
@@ -131,6 +130,7 @@ class OrderService:
         )
         order.telegram_message_id = MessageID(telegram_message.message_id)
         updated_order = await self._order_dal.update(order)
+        await self.uow.commit()
 
         return OrderDTO(
             id=updated_order.id.value,
@@ -153,6 +153,7 @@ class OrderService:
         order.status = OrderStatus(OrderStatusEnum.PROCESSING)
         updated_order = await self._order_dal.update(order)
         withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
+        await self.uow.commit()
 
         return OrderDTO(
             id=updated_order.id.value,
@@ -204,6 +205,7 @@ class OrderService:
             paypal_received_amount=data.paypal_received_amount,
             user_received_amount=data.user_received_amount,
         ))
+        await self.uow.commit()
 
         return OrderDTO(
             id=updated_order.id.value,
@@ -224,6 +226,7 @@ class OrderService:
         order.status = OrderStatus(OrderStatusEnum.CANCEL)
         updated_order = await self._order_dal.update(order)
         withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
+        await self.uow.commit()
 
         return OrderDTO(
             id=updated_order.id.value,

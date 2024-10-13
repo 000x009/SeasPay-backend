@@ -35,7 +35,6 @@ class UserTopicDAL(BaseUserTopicDAL):
         query = select(UserTopicModel).where(UserTopicModel.user_id == user_id.value)
         result = await self.session.execute(query)
         user_topic_db = result.scalar_one_or_none()
-
         if user_topic_db is None:
             return None
 
@@ -45,13 +44,11 @@ class UserTopicDAL(BaseUserTopicDAL):
             thread_id=ThreadId(user_topic_db.thread_id),
             created_at=CreatedAt(user_topic_db.created_at),
         )
-        
 
     async def get(self, thread_id: ThreadId) -> Optional[UserTopic]:
         query = select(UserTopicModel).where(UserTopicModel.thread_id == thread_id.value)
         result = await self.session.execute(query)
         user_topic_db = result.scalar_one_or_none()
-
         if user_topic_db is None:
             return None
 

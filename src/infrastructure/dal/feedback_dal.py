@@ -1,13 +1,12 @@
 from typing import Optional, List
 
-from sqlalchemy import insert, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.dto.feedback import FeedbackDTO
 from src.infrastructure.data.models import FeedbackModel
 from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt
 from src.domain.value_objects.user import UserID
-from src.domain.entity.feedback import Feedback
+from src.domain.entity.feedback import Feedback, FeedbackDB
 from src.application.common.dal.feedback import BaseFeedbackDAL
 
 
@@ -15,19 +14,17 @@ class FeedbackDAL(BaseFeedbackDAL):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def insert(self, feedback: Feedback) -> Feedback:
-        query = insert(FeedbackModel).values(
-            id=feedback.id.value,
+    async def insert(self, feedback: Feedback) -> FeedbackDB:
+        db_feedback = FeedbackModel(
             user_id=feedback.user_id.value,
             stars=feedback.stars.value,
             comment=feedback.comment.value,
             created_at=feedback.created_at.value,
-        ).returning(FeedbackModel)
-        result = await self._session.execute(query)
-        db_feedback = result.scalar_one()
-        await self._session.commit()
+        )
+        self._session.add(db_feedback)
+        await self._session.flush(objects=[db_feedback])
 
-        return Feedback(
+        return FeedbackDB(
             id=FeedbackID(db_feedback.id),
             user_id=UserID(db_feedback.user_id),
             stars=Stars(db_feedback.stars),
@@ -35,7 +32,7 @@ class FeedbackDAL(BaseFeedbackDAL):
             created_at=CreatedAt(db_feedback.created_at),
         )
 
-    async def get(self, feedback_id: FeedbackID) -> Optional[Feedback]:
+    async def get(self, feedback_id: FeedbackID) -> Optional[FeedbackDB]:
         query = select(FeedbackModel).filter_by(id=feedback_id.value)
         result = await self._session.execute(query)
         db_feedback = result.scalar_one_or_none()
@@ -43,7 +40,7 @@ class FeedbackDAL(BaseFeedbackDAL):
         if not db_feedback:
             return None
 
-        return Feedback(
+        return FeedbackDB(
             id=FeedbackID(db_feedback.id),
             user_id=UserID(db_feedback.user_id),
             stars=Stars(db_feedback.stars),
@@ -55,7 +52,7 @@ class FeedbackDAL(BaseFeedbackDAL):
         self,
         limit: int,
         offset: int,
-    ) -> Optional[List[Feedback]]:
+    ) -> Optional[List[FeedbackDB]]:
         query = (
             select(FeedbackModel)
             .limit(limit + 1)
@@ -67,7 +64,7 @@ class FeedbackDAL(BaseFeedbackDAL):
         if result:
             db_feedbacks = result.scalars().all()
             return [
-                Feedback(   
+                FeedbackDB(
                     id=FeedbackID(db_feedback.id),
                     user_id=UserID(db_feedback.user_id),        
                     stars=Stars(db_feedback.stars),

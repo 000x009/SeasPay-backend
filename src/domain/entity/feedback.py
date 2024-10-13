@@ -7,7 +7,6 @@ from src.domain.value_objects.feedback import FeedbackID, Comment, CreatedAt, St
 
 class Feedback:
     __slots__ = (
-        'id',
         'user_id',
         'stars',
         'comment',
@@ -16,13 +15,11 @@ class Feedback:
 
     def __init__(
         self,
-        id: FeedbackID,
         user_id: UserID,
         stars: Stars,
         comment: Optional[Comment] = None,
         created_at: Optional[CreatedAt] = None,
-    ):
-        self.id = id
+    ) -> None:
         self.user_id = user_id
         self.stars = stars
         self.comment = comment
@@ -30,3 +27,20 @@ class Feedback:
 
         if self.created_at is None:
             self.created_at = datetime.now(UTC)
+
+
+class FeedbackDB(Feedback):
+    __slots__ = ('id',)
+
+    def __init__(
+        self,
+        id: FeedbackID,
+        user_id: UserID,
+        stars: Stars,
+        comment: Optional[Comment] = None,
+        created_at: Optional[CreatedAt] = None,
+    ) -> None:
+        self.id = id
+        super().__init__(
+            user_id, stars, comment, created_at
+        )

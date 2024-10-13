@@ -28,6 +28,8 @@ from src.infrastructure.config import load_settings, load_bot_settings, BotSetti
 from src.infrastructure.telegram import TelegramClient
 from src.application.services.telegram_service import TelegramService
 from src.application.common.telegram import TelegramClientInterface
+from src.application.common.uow import UoW
+from src.infrastructure.data.uow import SAUoW
 
 
 class DatabaseProvider(Provider):
@@ -55,6 +57,7 @@ class DALProvider(Provider):
     user_topic_dal = provide(UserTopicDAL, scope=Scope.REQUEST, provides=UserTopicDAL)
     completed_order_dal = provide(CompletedOrderDAL, scope=Scope.REQUEST, provides=CompletedOrderDAL)
     withdraw_method_dal = provide(WithdrawMethodDAL, scope=Scope.REQUEST, provides=WithdrawMethodDAL)
+    uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
 
 
 class ServiceProvider(Provider):

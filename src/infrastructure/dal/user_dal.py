@@ -24,7 +24,6 @@ class UserDAL(BaseUserDAL):
         )
         self._session.add(user_model)
         await self._session.flush(objects=[user_model])
-        await self._session.commit()
         return user
 
     async def get_one(self, user_id: UserID) -> Optional[User]:
@@ -64,7 +63,6 @@ class UserDAL(BaseUserDAL):
             total_withdrawn=user.total_withdrawn.value
         )
         await self._session.execute(query)
-        await self._session.commit()
 
     async def get_new_users_amount(self, timespan: Optional[TimeSpan] = None) -> int:
         if timespan is not None:

@@ -6,11 +6,17 @@ from src.domain.entity.user_topic import UserTopic
 from src.domain.value_objects.user_topic import ThreadId, SupergroupChatId, CreatedAt
 from src.domain.value_objects.user import UserID
 from src.domain.exceptions.user_topic import TopicNotFoundError
+from src.application.common.uow import UoW
 
 
 class UserTopicService:
-    def __init__(self, user_topic_dal: UserTopicDAL):
+    def __init__(
+        self,
+        user_topic_dal: UserTopicDAL,
+        uow: UoW,
+    ):
         self.user_topic_dal = user_topic_dal
+        self.uow = uow
 
     async def create_user_topic(self, data: CreateUserTopicDTO) -> UserTopicDTO:
         topic = await self.user_topic_dal.insert(
@@ -21,6 +27,7 @@ class UserTopicService:
                 created_at=CreatedAt(data.created_at),
             )
         )
+        await self.uow.commit()
 
         return UserTopicDTO(
             user_id=topic.user_id.value,

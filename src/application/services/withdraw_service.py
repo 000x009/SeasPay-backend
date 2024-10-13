@@ -1,24 +1,26 @@
-from typing import Optional, Union
-
 from src.infrastructure.dal.withdraw_method_dal import WithdrawMethodDAL
 from src.application.dto.withdraw_method import AddWithdrawMethodDTO, GetWithdrawMethodDTO, WithdrawMethodDTO
 from src.domain.value_objects.withdraw_method import (
-    MethodEnum,
     Method,
     CardNumber,
     CardHolderName,
     CryptoAddress,
     CryptoNetwork,
-    WithdrawMethodID,
 )
 from src.domain.entity.withdraw_method import WithdrawMethod
 from src.domain.value_objects.order import OrderID
 from src.domain.exceptions.withdraw_method import WithdrawMethodNotFound
+from src.application.common.uow import UoW
 
 
 class WithdrawService:
-    def __init__(self, dal: WithdrawMethodDAL):
+    def __init__(
+        self,
+        dal: WithdrawMethodDAL,
+        uow: UoW,
+    ):
         self.dal = dal
+        self.uow = uow
 
     async def add_method(self, data: AddWithdrawMethodDTO) -> WithdrawMethodDTO:
         method = WithdrawMethod(
@@ -30,6 +32,7 @@ class WithdrawService:
             crypto_network=CryptoNetwork(data.crypto_network),
         )
         withdraw_method = await self.dal.insert(method)
+        await self.uow.flush()
 
         return WithdrawMethodDTO(
             id=withdraw_method.id.value,

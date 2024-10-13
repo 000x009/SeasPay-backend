@@ -31,7 +31,6 @@ class WithdrawMethodDAL(BaseWithdrawMethodDAL):
             crypto_network=withdraw_method.crypto_network.value,
         )
         self.session.add(model)
-        await self.session.flush()
 
         return DBWithdrawMethod(
             id=WithdrawMethodID(model.id),
