@@ -32,6 +32,7 @@ from src.presentation.telegram.states import (
     AdminOrderLookUpSG,
     AdminSearchSG,
 )
+from src.infrastructure.config import load_bot_settings
 
 
 router = Router()
@@ -51,6 +52,7 @@ async def take_order_handler(
     order_id = int(callback.data.split(':')[1])
     order = await order_service.get(GetOrderDTO(order_id=order_id))
     customer = await user_service.get_user(GetUserDTO(user_id=order.user_id))
+    bot_settings = load_bot_settings()
 
     try:
         updated_order = await order_service.take_order(TakeOrderDTO(order_id=order_id))
@@ -64,6 +66,17 @@ async def take_order_handler(
                 commission=customer.commission,
             ),
             reply_markup=inline.get_order_fulfillment_kb_markup(order_id=order_id),
+        )
+        await bot.edit_message_caption(
+            chat_id=bot_settings.orders_group_id,
+            message_id=updated_order.telegram_message_id,
+            caption=get_paypal_withdraw_order_text(
+                order_id=updated_order.id,
+                user_id=updated_order.user_id,
+                created_at=updated_order.created_at,
+                status=updated_order.status.value,
+                commission=customer.commission,
+            ),
         )
         await callback.answer(
             'Вы успешно взялись за заказ! Вам было отправлено сообщение с информацией о заказе в личный чат с ботом.',

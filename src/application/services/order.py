@@ -32,11 +32,12 @@ from src.application.dto.telegram import SendMessageDTO
 from src.application.services.user import UserService
 from src.application.dto.completed_order import AddCompletedOrderDTO
 from src.application.dto.user import GetUserDTO
-from src.infrastructure.json_text_getter import get_paypal_withdraw_order_preview_text
+from src.infrastructure.json_text_getter import get_paypal_withdraw_order_text
 from src.domain.value_objects.completed_order import PaypalReceivedAmount
 from src.application.services.completed_order import CompletedOrderService
 from src.domain.entity.user import User
 from src.domain.value_objects.user import JoinedAt, Commission as UserCommission, TotalWithdrawn
+from src.application.common.uow import UoW
 
 
 class OrderService:
@@ -47,12 +48,14 @@ class OrderService:
         telegram_service: TelegramService,
         user_service: UserService,
         completed_order_service: CompletedOrderService,
+        uow: UoW,
     ) -> None:
         self._order_dal = order_dal
         self._withdraw_service = withdraw_service
         self._telegram_service = telegram_service
         self._user_service = user_service
         self._completed_order_service = completed_order_service
+        self.uow = uow
 
     async def list_orders(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
         orders = await self._order_dal.list_(
@@ -115,10 +118,11 @@ class OrderService:
             SendMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
-                text=get_paypal_withdraw_order_preview_text(
+                text=get_paypal_withdraw_order_text(
                     order_id=order.id.value,
                     user_id=order.user_id.value,
                     created_at=order.created_at.value,
+                    status=order.status.value,
                     commission=order.commission.value,
                 ),
                 username="some username",
@@ -158,6 +162,7 @@ class OrderService:
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             commission=updated_order.commission.value,
+            telegram_message_id=updated_order.telegram_message_id.value,
         )
     
     async def calculate_commission(self, data: CalculateCommissionDTO) -> CommissionDTO:
@@ -208,6 +213,7 @@ class OrderService:
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             commission=updated_order.commission.value,
+            telegram_message_id=updated_order.telegram_message_id.value,
         )
 
     async def cancel_order(self, data: CancelOrderDTO) -> OrderDTO:
@@ -227,6 +233,7 @@ class OrderService:
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             commission=updated_order.commission.value,
+            telegram_message_id=updated_order.telegram_message_id.value,
         )
 
     async def get_all_orders(self) -> Optional[List[OrderDTO]]:
@@ -242,6 +249,7 @@ class OrderService:
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
+            telegram_message_id=order.telegram_message_id.value,
         ) for order in orders]
 
     async def get_processing_orders(self) -> Optional[List[OrderDTO]]:
@@ -257,6 +265,7 @@ class OrderService:
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
+            telegram_message_id=order.telegram_message_id.value
         ) for order in orders]
 
     async def get_completed_orders(self) -> Optional[List[OrderDTO]]:
@@ -272,6 +281,7 @@ class OrderService:
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
+            telegram_message_id=order.telegram_message_id.value
         ) for order in orders]
 
     async def get_cancelled_orders(self) -> Optional[List[OrderDTO]]:
@@ -287,4 +297,5 @@ class OrderService:
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
+            telegram_message_id=order.telegram_message_id.value
         ) for order in orders]

@@ -12,6 +12,8 @@ from src.application.services.order import OrderService
 from src.application.dto.order import CalculateCommissionDTO, FulfillOrderDTO, GetOrderDTO, CancelOrderDTO
 from src.presentation.telegram.dialogs.common.injection import inject_on_click
 from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
+from src.infrastructure.config import load_bot_settings
+from src.infrastructure.json_text_getter import get_paypal_withdraw_order_text
 
 
 async def calculate_commission(
@@ -81,13 +83,25 @@ async def confirm_fulfillment(
     bot = dialog_manager.middleware_data.get("bot")
     order_id = dialog_manager.start_data.get("order_id")
     user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
+    bot_settings = load_bot_settings()
 
     try:
-        await order_service.fulfill_order(FulfillOrderDTO(
+        order = await order_service.fulfill_order(FulfillOrderDTO(
             order_id=order_id,
             paypal_received_amount=Decimal(dialog_manager.dialog_data.get("received_amount")),
             user_received_amount=Decimal(user_received_amount)
         ))
+        await bot.edit_message_caption(
+            chat_id=bot_settings.orders_group_id,
+            message_id=order.telegram_message_id,
+            caption=get_paypal_withdraw_order_text(
+                order_id=order.id,
+                user_id=order.user_id,
+                created_at=order.created_at,
+                status=order.status.value,
+                commission=order.commission,
+            ),
+        )
         await bot.send_message(
             chat_id=callback_query.from_user.id,
             text="✅ Заказ был успешно выполнен!"
@@ -117,9 +131,21 @@ async def cancel_order_handler(
 ) -> None:
     bot = dialog_manager.middleware_data.get("bot")
     order_id = dialog_manager.start_data.get("order_id")
+    bot_settings = load_bot_settings()
 
     try:
         order = await order_service.cancel_order(CancelOrderDTO(order_id=order_id))
+        await bot.edit_message_caption(
+            chat_id=bot_settings.orders_group_id,
+            message_id=order.telegram_message_id,
+            caption=get_paypal_withdraw_order_text(
+                order_id=order.id,
+                user_id=order.user_id,
+                created_at=order.created_at,
+                status=order.status.value,
+                commission=order.commission,
+            ),
+        )
         await bot.send_message(
             chat_id=callback_query.from_user.id,
             text="✅ Заказ был успешно отменен!"
