@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.domain.common.value_objects import ValueObject
-from src.domain.exceptions.withdraw_method import CardNumberError
+from src.domain.exceptions.withdraw_details import CardNumberError
 
 
 @dataclass(frozen=True)

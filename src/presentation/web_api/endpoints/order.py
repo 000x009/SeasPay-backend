@@ -60,8 +60,8 @@ async def get_order(
     return response
 
 
-@router.post('/', response_model=OrderDTO)
-async def create_order(
+@router.post('/withdraw', response_model=OrderDTO)
+async def create_withdraw_order(
     order_service: FromDishka[OrderService],
     data: CreateOrderSchema = Body(),
     payment_receipt: UploadFile = File(),
@@ -80,3 +80,4 @@ async def create_order(
     )
 
     return response
+

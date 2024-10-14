@@ -6,7 +6,7 @@ from uuid import UUID
 
 from src.domain.entity.order import OrderStatusEnum
 from src.application.common.dto import Pagination, FileDTO
-from src.application.dto.withdraw_method import WithdrawMethodDTO, AddWithdrawMethodDTO
+from src.application.dto.withdraw_details import WithdrawDetailsDTO, AddWithdrawDetailsDTO
 
 
 @dataclass(frozen=True)
@@ -15,7 +15,7 @@ class OrderDTO:
     user_id: int
     payment_receipt: str
     commission: int
-    withdraw_method: WithdrawMethodDTO
+    withdraw_method: WithdrawDetailsDTO
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
@@ -35,7 +35,7 @@ class GetOrderDTO:
 @dataclass(frozen=True)
 class CreateOrderDTO:
     user_id: int
-    withdraw_method: AddWithdrawMethodDTO
+    withdraw_method: AddWithdrawDetailsDTO
     receipt_photo: FileDTO = field(default=None)
     created_at: datetime = field(default=datetime.now(UTC))
     status: OrderStatusEnum = field(default=OrderStatusEnum.NEW)

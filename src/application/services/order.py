@@ -27,8 +27,8 @@ from src.domain.value_objects.order import (
 from src.domain.entity.order import Order
 from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenError
 from src.domain.value_objects.order_message import MessageID
-from src.application.services.withdraw_service import WithdrawService
-from src.application.dto.withdraw_method import AddWithdrawMethodDTO, GetWithdrawMethodDTO
+from src.application.services.withdraw_details import WithdrawService
+from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO
 from src.application.services.telegram_service import TelegramService
 from src.application.dto.telegram import SendMessageDTO
 from src.application.services.user import UserService
@@ -89,7 +89,7 @@ class OrderService:
         if not order:
             return None
         
-        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
+        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
         return OrderDTO(
             id=order.id.value,
             user_id=order.user_id.value,
@@ -121,7 +121,7 @@ class OrderService:
             )
         )
         withdraw_method = await self._withdraw_service.add_method(
-            AddWithdrawMethodDTO(
+            AddWithdrawDetailsDTO(
                 order_id=order.id.value,
                 method=data.withdraw_method.method,
                 card_number=data.withdraw_method.card_number,
@@ -176,7 +176,7 @@ class OrderService:
 
         order.status = OrderStatus(OrderStatusEnum.PROCESSING)
         updated_order = await self._order_dal.update(order)
-        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
+        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
         await self.uow.commit()
 
         return OrderDTO(
@@ -215,7 +215,7 @@ class OrderService:
         
         order.status = OrderStatus(OrderStatusEnum.COMPLETE)
         updated_order = await self._order_dal.update(order)
-        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
+        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
     
         user.total_withdrawn = TotalWithdrawn(user.total_withdrawn.value + data.paypal_received_amount)
         user.update_commission(PaypalReceivedAmount(data.paypal_received_amount))
@@ -249,7 +249,7 @@ class OrderService:
         
         order.status = OrderStatus(OrderStatusEnum.CANCEL)
         updated_order = await self._order_dal.update(order)
-        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawMethodDTO(order_id=data.order_id))
+        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
         await self.uow.commit()
 
         return OrderDTO(

@@ -1,5 +1,5 @@
-from src.infrastructure.dal.withdraw_method_dal import WithdrawMethodDAL
-from src.application.dto.withdraw_method import AddWithdrawMethodDTO, GetWithdrawMethodDTO, WithdrawMethodDTO
+from src.infrastructure.dal.withdraw_method_dal import WithdrawDetailsDAL
+from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO, WithdrawDetailsDTO
 from src.domain.value_objects.withdraw_method import (
     Method,
     CardNumber,
@@ -7,23 +7,23 @@ from src.domain.value_objects.withdraw_method import (
     CryptoAddress,
     CryptoNetwork,
 )
-from src.domain.entity.withdraw_method import WithdrawMethod
+from src.domain.entity.withdraw_details import WithdrawDetails
 from src.domain.value_objects.order import OrderID
-from src.domain.exceptions.withdraw_method import WithdrawMethodNotFound
+from src.domain.exceptions.withdraw_details import WithdrawDetailsNotFound
 from src.application.common.uow import UoW
 
 
 class WithdrawService:
     def __init__(
         self,
-        dal: WithdrawMethodDAL,
+        dal: WithdrawDetailsDAL,
         uow: UoW,
     ):
         self.dal = dal
         self.uow = uow
 
-    async def add_method(self, data: AddWithdrawMethodDTO) -> WithdrawMethodDTO:
-        method = WithdrawMethod(
+    async def add_method(self, data: AddWithdrawDetailsDTO) -> WithdrawDetailsDTO:
+        method = WithdrawDetails(
             order_id=OrderID(data.order_id),
             method=Method(data.method),
             card_number=CardNumber(data.card_number),
@@ -34,7 +34,7 @@ class WithdrawService:
         withdraw_method = await self.dal.insert(method)
         await self.uow.flush()
 
-        return WithdrawMethodDTO(
+        return WithdrawDetailsDTO(
             id=withdraw_method.id.value,
             order_id=withdraw_method.order_id.value,
             method=withdraw_method.method.value,
@@ -44,12 +44,12 @@ class WithdrawService:
             crypto_network=withdraw_method.crypto_network.value,
         )
 
-    async def get_withdraw_method(self, data: GetWithdrawMethodDTO) -> WithdrawMethodDTO:
+    async def get_withdraw_method(self, data: GetWithdrawDetailsDTO) -> WithdrawDetailsDTO:
         method = await self.dal.get(OrderID(data.order_id))
         if method is None:
-            raise WithdrawMethodNotFound(f"Withdraw method not found for order: {data.order_id}")
+            raise WithdrawDetailsNotFound(f"Withdraw method not found for order: {data.order_id}")
         
-        return WithdrawMethodDTO(
+        return WithdrawDetailsDTO(
             id=method.id.value,
             order_id=method.order_id.value,
             method=method.method.value,

@@ -1,15 +1,15 @@
 from typing import Protocol
 from abc import abstractmethod
 
-from src.domain.entity.withdraw_method import WithdrawMethod
+from src.domain.entity.withdraw_details import WithdrawDetails
 from src.domain.value_objects.order import OrderID
 
 
-class BaseWithdrawMethodDAL(Protocol):
+class BaseWithdrawDetailsDAL(Protocol):
     @abstractmethod
-    async def insert(self, withdraw_method: WithdrawMethod) -> None:
+    async def insert(self, withdraw_method: WithdrawDetails) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def get(self, order_id: OrderID) -> WithdrawMethod:
+    async def get(self, order_id: OrderID) -> WithdrawDetails:
         raise NotImplementedError

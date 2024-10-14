@@ -4,5 +4,5 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class WithdrawMethodID(ValueObject[int]):
+class WithdrawDetailsID(ValueObject[int]):
     value: int

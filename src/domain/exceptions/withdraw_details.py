@@ -1,7 +1,7 @@
 from src.domain.exceptions.base import DomainError
 
 
-class WithdrawMethodNotFound(DomainError):
+class WithdrawDetailsNotFound(DomainError):
     pass
 
 

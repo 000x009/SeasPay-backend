@@ -2,17 +2,17 @@ import uuid
 from datetime import datetime, UTC
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Integer, String, BigInteger, ForeignKey, Enum, func, TIMESTAMP, UUID
+from sqlalchemy import Integer, String, BigInteger, ForeignKey, Enum, func, TIMESTAMP, UUID, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
-from src.domain.value_objects.order import OrderStatusEnum
+from src.domain.value_objects.order import OrderStatusEnum, OrderTypeEnum
 
 if TYPE_CHECKING:
     from src.infrastructure.data.models import (
         UserModel,
         CompletedOrderModel,
-        WithdrawMethodModel,
+        WithdrawDetailsModel,
     )
 
 
@@ -32,13 +32,22 @@ class OrderModel(Base):
         server_default=func.now(),
         default=datetime.now(UTC),
     )
+    type: Mapped[OrderTypeEnum] = mapped_column(
+        Enum('WITHDRAW', 'TRANSFER', 'DIGITAL_PRODUCT', name='order_type'),
+        nullable=False,
+    )
     status: Mapped[OrderStatusEnum] = mapped_column(
         Enum("NEW", "PROCESSING", "COMPLETE", "CANCEL", "DELAY", name="order_status"),
         default=OrderStatusEnum.NEW,
+        nullable=False,
     )
     telegram_message_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     commission: Mapped[int] = mapped_column(Integer, nullable=False)
 
+    __table_args__ = (
+        UniqueConstraint('type', 'id', name='uq_type_id')
+    )
+
     user: Mapped['UserModel'] = relationship(back_populates='orders', uselist=False)
     completed_order: Mapped[Optional['CompletedOrderModel']] = relationship(back_populates='order', uselist=False)
-    withdraw_method: Mapped['WithdrawMethodModel'] = relationship(back_populates='order', uselist=False)
+    withdraw_details: Mapped['WithdrawDetailsModel'] = relationship(back_populates='order', uselist=False)

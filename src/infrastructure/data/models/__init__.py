@@ -4,7 +4,7 @@ from .order import OrderModel
 from .feedback import FeedbackModel
 from .completed_order import CompletedOrderModel
 from .user_topic import UserTopicModel
-from .withdraw_method import WithdrawMethodModel
+from .withdraw_details import WithdrawDetailsModel
 
 __all__ = [
     'Base',
@@ -13,5 +13,5 @@ __all__ = [
     'FeedbackModel',
     'CompletedOrderModel',
     'UserTopicModel',
-    'WithdrawMethodModel',
+    'WithdrawDetailsModel',
 ]

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.domain.value_objects.order import OrderID
+from src.domain.value_objects.order import OrderID, OrderType
 from src.domain.value_objects.withdraw_method import (
     Method,
     CardHolderName,
@@ -8,9 +8,9 @@ from src.domain.value_objects.withdraw_method import (
     CryptoAddress,
     CryptoNetwork,
     MethodEnum,
-    WithdrawMethodID,
+    WithdrawDetailsID,
 )
-from src.domain.exceptions.withdraw_method import (
+from src.domain.exceptions.withdraw_details import (
     CardNumberError,
     CardHolderNameError,
     CryptoAddressError,
@@ -18,10 +18,11 @@ from src.domain.exceptions.withdraw_method import (
 )
 
 
-class WithdrawMethod:
+class WithdrawDetails:
     __slots__ = (
         'order_id',
         'method',
+        'type_',
         'card_number',
         'card_holder_name',
         'crypto_address',
@@ -32,6 +33,7 @@ class WithdrawMethod:
         self,
         order_id: OrderID,
         method: Method,
+        type_: OrderType,
         card_number: Optional[CardNumber] = None,
         card_holder_name: Optional[CardHolderName] = None,
         crypto_address: Optional[CryptoAddress] = None,
@@ -43,6 +45,7 @@ class WithdrawMethod:
         self.card_holder_name = card_holder_name
         self.crypto_address = crypto_address
         self.crypto_network = crypto_network
+        self.type_ = type_
 
     def __post_init__(self) -> None:
         if self.method.value == MethodEnum.CARD:
@@ -57,14 +60,14 @@ class WithdrawMethod:
                 raise CryptoNetworkError('Crypto network is required for crypto method')
 
 
-class DBWithdrawMethod(WithdrawMethod):
+class DBWithdrawDetails(WithdrawDetails):
     __slots__ = (
         'id',
     )
 
     def __init__(
         self,
-        id: WithdrawMethodID,
+        id: WithdrawDetailsID,
         order_id: OrderID,
         method: Method,
         card_number: Optional[CardNumber] = None,

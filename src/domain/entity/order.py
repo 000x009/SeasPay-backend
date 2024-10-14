@@ -21,6 +21,7 @@ class Order:
     __slots__ = (
         'id',
         'user_id',
+        'type',
         'payment_receipt',
         'created_at',
         'status',
@@ -53,7 +54,7 @@ class Order:
             self.status = OrderStatus(OrderStatusEnum.NEW)
 
     def __str__(self):
-        return f'Order <{self.id}, {self.user_id}, {self.payment_receipt}, {self.created_at}, {self.status}, {self.telegram_message_id}>'
+        return f'Order <{self.id}>'
 
     def __eq__(self, other: Union[Order, Any]) -> bool:
         if isinstance(other, Order) and other.id == self.id:

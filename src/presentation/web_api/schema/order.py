@@ -8,7 +8,7 @@ from src.domain.value_objects.order import OrderStatusEnum
 from src.domain.value_objects.withdraw_method import MethodEnum
 
 
-class WithdrawMethodSchema(BaseModel):
+class WithdrawDetailsSchema(BaseModel):
     method: MethodEnum
     card_number: Optional[str] = Field(default=None)
     card_holder_name: Optional[str] = Field(default=None)
@@ -18,7 +18,7 @@ class WithdrawMethodSchema(BaseModel):
 class CreateOrderSchema(BaseModel):
     created_at: datetime = Field(default=datetime.now(UTC))
     status: OrderStatusEnum = Field(default=OrderStatusEnum.NEW)
-    withdraw_method: WithdrawMethodSchema
+    withdraw_method: WithdrawDetailsSchema
 
     @model_validator(mode='before')
     @classmethod
