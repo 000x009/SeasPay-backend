@@ -72,6 +72,7 @@ async def order_getter(
             created_at=order.created_at,
             status=order.status.value,
             commission=order.commission,
+            order_type=order.type,
         ),
         "withdraw_method_text": withdraw_method_text,
         "payment_receipt": payment_receipt if payment_receipt else None,

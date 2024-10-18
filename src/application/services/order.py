@@ -3,6 +3,7 @@ from typing import Optional, List
 from decimal import Decimal
 
 from src.infrastructure.dal import OrderDAL
+from src.application.common.dto import FileDTO
 from src.application.dto.order import (
     ListOrderDTO,
     OrderDTO,
@@ -13,7 +14,6 @@ from src.application.dto.order import (
     CommissionDTO,
     FulfillOrderDTO,
     CancelOrderDTO,
-    FileDTO,
     CreateTransferOrderDTO,
 )
 from src.application.dto.user import UpdateUserDTO
@@ -24,7 +24,9 @@ from src.domain.value_objects.order import (
     PaymentReceipt,
     OrderStatus,
     OrderStatusEnum,
+    OrderType,
     Commission as OrderCommission,
+    OrderTypeEnum,
 )
 from src.domain.entity.order import Order
 from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenError
@@ -108,36 +110,31 @@ class OrderService:
     async def create_withdraw_order(self, data: CreateWithdrawOrderDTO) -> OrderDTO:
         settings = load_settings()
         user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
-        payment_receipt = self.cloud_storage.upload_object(StorageObject(
-            bucket=Bucket(settings.cloud_settings.receipts_bucket_name),
-            name=ObjectKey(data.receipt_photo.filename),
-            file=File(data.receipt_photo.input_file)
-        ))
         order = await self._order_dal.insert(
             Order(
                 id=OrderID(uuid.uuid4()),
                 user_id=UserID(data.user_id),
-                payment_receipt=PaymentReceipt(
-                    payment_receipt.get_object_url(settings.cloud_settings.base_storage_url).value
-                ),
+                payment_receipt=PaymentReceipt(data.payment_receipt_url),
                 created_at=CreatedAt(data.created_at),
                 status=OrderStatus(data.status),
-                commission=OrderCommission(user.commission),
+                type_=OrderType(OrderTypeEnum.WITHDRAW),
             )
         )
-        await self._withdraw_service.add_method(
+        withdraw_details = await self._withdraw_service.add_method(
             AddWithdrawDetailsDTO(
                 order_id=order.id.value,
-                method=data.withdraw_method.method,
-                card_number=data.withdraw_method.card_number,
-                card_holder_name=data.withdraw_method.card_holder_name,
-                crypto_address=data.withdraw_method.crypto_address,
-                crypto_network=data.withdraw_method.crypto_network,
+                payment_receipt=data.payment_receipt_url,
+                commission=user.commission,
+                method=data.method,
+                card_number=data.card_number,
+                card_holder_name=data.card_holder_name,
+                crypto_address=data.crypto_address,
+                crypto_network=data.crypto_network,
             )
         )
         payment_receipt_object = self.cloud_storage.get_object_file(
             Bucket(settings.cloud_settings.receipts_bucket_name),
-            ObjectKey(payment_receipt.name.value)
+            ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
@@ -148,11 +145,12 @@ class OrderService:
                     user_id=order.user_id.value,
                     created_at=order.created_at.value,
                     status=order.status.value,
-                    commission=order.commission.value,
+                    commission=withdraw_details.commission,
+                    order_type=order.type_.value,
                 ),
                 username=data.username,
                 photo=FileDTO(
-                    filename=data.receipt_photo.filename,
+                    filename=data.payment_receipt_url.split('/')[-1],
                     input_file=payment_receipt_object.file.value,
                 )
             )
@@ -165,8 +163,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            commission=updated_order.commission.value,
-            type=order.type.value,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
             telegram_message_id=updated_order.telegram_message_id.value if updated_order.telegram_message_id else None,
@@ -187,7 +184,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=order.type.value,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             commission=updated_order.commission.value,
@@ -238,7 +235,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=order.type.value,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             commission=updated_order.commission.value,
@@ -252,14 +249,14 @@ class OrderService:
         
         order.status = OrderStatus(OrderStatusEnum.CANCEL)
         updated_order = await self._order_dal.update(order)
-        withdraw_method = await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
+        await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
         await self.uow.commit()
 
         return OrderDTO(
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=order.type.value,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             commission=updated_order.commission.value,
@@ -275,7 +272,7 @@ class OrderService:
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            type=order.type.value,
+            type=order.type_.value,
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
@@ -291,7 +288,7 @@ class OrderService:
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            type=order.type.value,
+            type=order.type_.value,
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
@@ -309,7 +306,7 @@ class OrderService:
             payment_receipt=order.payment_receipt.value,
             created_at=order.created_at.value,
             status=order.status.value,
-            type=order.type.value,
+            type=order.type_.value,
             commission=order.commission.value,
             telegram_message_id=order.telegram_message_id.value
         ) for order in orders]
@@ -323,7 +320,7 @@ class OrderService:
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            type=order.type.value,
+            type=order.type_.value,
             created_at=order.created_at.value,
             status=order.status.value,
             commission=order.commission.value,
@@ -371,6 +368,7 @@ class OrderService:
                     created_at=order.created_at.value,
                     status=order.status.value,
                     commission=order.commission.value,
+                    order_type=order.type_.value,
                 ),
                 username=data.username,
                 photo=FileDTO(
@@ -388,7 +386,7 @@ class OrderService:
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
             commission=updated_order.commission.value,
-            type=updated_order.type.value,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status,
             telegram_message_id=updated_order.telegram_message_id.value if updated_order.telegram_message_id else None,

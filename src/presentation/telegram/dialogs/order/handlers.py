@@ -100,6 +100,7 @@ async def confirm_fulfillment(
                 created_at=order.created_at,
                 status=order.status.value,
                 commission=order.commission,
+                order_type=order.type,
             ),
         )
         await bot.send_message(
@@ -144,6 +145,7 @@ async def cancel_order_handler(
                 created_at=order.created_at,
                 status=order.status.value,
                 commission=order.commission,
+                order_type=order.type,
             ),
         )
         await bot.send_message(

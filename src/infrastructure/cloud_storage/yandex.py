@@ -35,7 +35,7 @@ class YandexCloudStorage(CloudStorage):
         file_ = response['Body'].read()
 
         return StorageObject(
-            name=name,
+            key=name,
             bucket=bucket,
             file=File(file_)
         )

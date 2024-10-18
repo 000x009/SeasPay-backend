@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime, UTC
-from src.application.dto.order import FileDTO
 
 
 @dataclass(frozen=True)
@@ -31,4 +30,4 @@ class CreateFeedbackDTO:
     stars: int
     comment: Optional[str] = field(default=None)
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
-    photo: Optional[FileDTO] = field(default=None)
+    photo_url: Optional[str] = field(default=None)

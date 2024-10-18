@@ -9,6 +9,8 @@ from src.domain.value_objects.withdraw_method import MethodEnum
 class WithdrawDetailsDTO:
     order_id: UUID
     method: MethodEnum
+    payment_receipt: str
+    commission: int
     card_number: Optional[str] = field(default=None)
     card_holder_name: Optional[str] = field(default=None)
     crypto_address: Optional[str] = field(default=None)
@@ -19,6 +21,8 @@ class WithdrawDetailsDTO:
 class AddWithdrawDetailsDTO:
     order_id: UUID
     method: MethodEnum
+    payment_receipt: str
+    commission: int
     card_number: Optional[str] = field(default=None)
     card_holder_name: Optional[str] = field(default=None)
     crypto_address: Optional[str] = field(default=None)

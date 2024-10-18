@@ -4,8 +4,7 @@ import os
 from pathlib import Path
 from decimal import Decimal
 from uuid import UUID
-
-from src.domain.value_objects.order import OrderStatusEnum
+from src.domain.value_objects.order import OrderStatusEnum, OrderTypeEnum
 
 
 def get_text_by_key(key: str) -> str:
@@ -21,19 +20,26 @@ def get_paypal_withdraw_order_text(
     created_at: datetime,
     status: OrderStatusEnum,
     commission: int,
+    order_type: OrderTypeEnum,
 ) -> str:
-    status_text = {
+    status_mapping = {
         OrderStatusEnum.NEW: "⌛ Ожидание обработки",
         OrderStatusEnum.PROCESSING: "🔄 На обработке у администратора",
         OrderStatusEnum.COMPLETE: "✅ Выполнен",
         OrderStatusEnum.CANCEL: "❌ Отменен",
         OrderStatusEnum.DELAY: "🕒 Отложен по техническим причинам",
     }
+    type_mapping = {
+        OrderTypeEnum.WITHDRAW: "вывод средств",
+        OrderTypeEnum.TRANSFER: "перевод средств",
+        OrderTypeEnum.DIGITAL_PRODUCT: "приобретение продукта",
+    }
     return get_text_by_key("paypal_withdraw_order_text").format(
+        type=type_mapping.get(order_type, ""),
         id=order_id,
         user_id=user_id,
         created_at=created_at.strftime("%d.%m.%Y %H:%M"),
-        status=status_text.get(status, ""),
+        status=status_mapping.get(status, ""),
         commission=commission,
     )
 

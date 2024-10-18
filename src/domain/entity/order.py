@@ -14,20 +14,18 @@ from src.domain.value_objects.order import (
 )
 from src.domain.value_objects.order_message import MessageID
 from src.domain.value_objects.completed_order import PaypalReceivedAmount
-from src.domain.value_objects.order import MustReceiveAmount
-
+from src.domain.value_objects.order import MustReceiveAmount, OrderType
 
 class Order:
     __slots__ = (
         'id',
         'user_id',
-        'type',
+        'type_',
         'payment_receipt',
         'created_at',
         'status',
         'message_id',
         'telegram_message_id',
-        'commission',
     )
 
     def __init__(
@@ -35,7 +33,7 @@ class Order:
         id: OrderID,
         user_id: UserID,
         payment_receipt: PaymentReceipt,
-        commission: Commission,
+        type_: OrderType,
         created_at: Optional[CreatedAt] = None,
         status: Optional[OrderStatus] = None,
         telegram_message_id: Optional[MessageID] = None,
@@ -43,10 +41,10 @@ class Order:
         self.id = id
         self.user_id = user_id
         self.payment_receipt = payment_receipt
-        self.commission = commission
         self.created_at = created_at
         self.status = status
         self.telegram_message_id = telegram_message_id
+        self.type_ = type_
 
         if not created_at:
             self.created_at = CreatedAt(datetime.now(UTC))

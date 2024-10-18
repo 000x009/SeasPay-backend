@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, UploadFile, Body
+from fastapi import APIRouter, Depends
 
 from fastapi_redis_cache import cache
 
@@ -20,7 +20,7 @@ from src.application.dto.order import (
 )
 from src.application.common.dto import Pagination
 from src.presentation.web_api.schema.order import CreateWithdrawOrderSchema, CreateTransferOrderSchema
-from src.application.common.dto import FileDTO
+from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
 
 router = APIRouter(
     prefix='/order',
@@ -69,19 +69,17 @@ async def get_order(
 @router.post('/withdraw', response_model=OrderDTO)
 async def create_withdraw_order(
     order_service: FromDishka[OrderService],
-    data: CreateWithdrawOrderSchema = Body(),
-    payment_receipt: UploadFile = File(),
+    data: CreateWithdrawOrderSchema,
 ) -> OrderDTO:
     response = await order_service.create_withdraw_order(
         CreateWithdrawOrderDTO(
             user_id=5297779345,
-            created_at=data.created_at,
-            status=data.status,
-            withdraw_method=data.withdraw_method,
-            receipt_photo=FileDTO(
-                input_file=payment_receipt.file,
-                filename=payment_receipt.filename,
-            ),
+            method=data.method,
+            card_number=data.card_number,
+            card_holder_name=data.card_holder_name,
+            crypto_address=data.crypto_address,
+            crypto_network=data.crypto_network,
+            payment_receipt_url=data.payment_receipt_url,
             username='username',
         )
     )
@@ -92,8 +90,7 @@ async def create_withdraw_order(
 @router.post('/transfer', response_model=OrderDTO)
 async def create_transfer_order(
     order_service: FromDishka[OrderService],
-    data: CreateTransferOrderSchema = Body(),
-    payment_receipt: UploadFile = File(),
+    data: CreateTransferOrderSchema,
     # user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderDTO:
     response = await order_service.create_transfer_order(
@@ -102,10 +99,7 @@ async def create_transfer_order(
             receiver_email=data.receiver_email,
             username='some username',
             transfer_amount=data.amount,
-            receipt_photo=FileDTO(
-                input_file=payment_receipt.file,
-                filename=payment_receipt.filename,
-            ),
+            payment_receipt_url=data.payment_receipt_url,
         )
     )
 

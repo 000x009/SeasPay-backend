@@ -12,7 +12,8 @@ from src.domain.value_objects.withdraw_method import (
     CardHolderName,
     CryptoAddress,
     CryptoNetwork,
-    WithdrawDetailsID
+    WithdrawCommission,
+    PaymentReceipt,
 )
 from src.infrastructure.data.models import WithdrawDetailsModel
 
@@ -29,6 +30,8 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
             card_holder_name=withdraw_method.card_holder_name.value,
             crypto_address=withdraw_method.crypto_address.value,
             crypto_network=withdraw_method.crypto_network.value,
+            payment_receipt=withdraw_method.payment_receipt.value,
+            commission=withdraw_method.commission.value,
         )
         self.session.add(model)
 
@@ -39,6 +42,8 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
             card_holder_name=CardHolderName(model.card_holder_name),
             crypto_address=CryptoAddress(model.crypto_address),
             crypto_network=CryptoNetwork(model.crypto_network),
+            payment_receipt=PaymentReceipt(model.payment_receipt),
+            commission=WithdrawCommission(model.commission),
         )
 
     async def get(self, order_id: OrderID) -> Optional[WithdrawDetails]:
@@ -55,4 +60,6 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
             card_holder_name=CardHolderName(db_withdraw_method.card_holder_name),
             crypto_address=CryptoAddress(db_withdraw_method.crypto_address),
             crypto_network=CryptoNetwork(db_withdraw_method.crypto_network),
+            payment_receipt=PaymentReceipt(db_withdraw_method.payment_receipt),
+            commission=WithdrawCommission(db_withdraw_method.commission),
         )

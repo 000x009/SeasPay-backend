@@ -6,6 +6,8 @@ from src.domain.value_objects.withdraw_method import (
     CardHolderName,
     CryptoAddress,
     CryptoNetwork,
+    PaymentReceipt,
+    WithdrawCommission,
 )
 from src.domain.entity.withdraw_details import WithdrawDetails
 from src.domain.value_objects.order import OrderID
@@ -30,6 +32,8 @@ class WithdrawService:
             card_holder_name=CardHolderName(data.card_holder_name),
             crypto_address=CryptoAddress(data.crypto_address),
             crypto_network=CryptoNetwork(data.crypto_network),
+            payment_receipt=PaymentReceipt(data.payment_receipt),
+            commission=WithdrawCommission(data.commission),
         )
         withdraw_method = await self.dal.insert(method)
         await self.uow.flush()
@@ -41,6 +45,8 @@ class WithdrawService:
             card_holder_name=withdraw_method.card_holder_name.value,
             crypto_address=withdraw_method.crypto_address.value,
             crypto_network=withdraw_method.crypto_network.value,
+            payment_receipt=withdraw_method.payment_receipt.value,
+            commission=withdraw_method.commission.value,
         )
 
     async def get_withdraw_method(self, data: GetWithdrawDetailsDTO) -> WithdrawDetailsDTO:
@@ -55,4 +61,6 @@ class WithdrawService:
             card_holder_name=method.card_holder_name.value,
             crypto_address=method.crypto_address.value,
             crypto_network=method.crypto_network.value,
+            payment_receipt=method.payment_receipt.value,
+            commission=method.commission.value,
         )

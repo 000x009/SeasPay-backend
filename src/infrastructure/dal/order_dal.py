@@ -5,7 +5,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseOrderDAL
 from src.domain.entity.order import Order
-from src.domain.value_objects.order import OrderID, PaymentReceipt, CreatedAt, OrderStatus, Commission, OrderStatusEnum
+from src.domain.value_objects.order import (
+    OrderID,
+    PaymentReceipt,
+    CreatedAt,
+    OrderStatus,
+    OrderStatusEnum,
+    OrderType,
+)
 from src.domain.value_objects.order_message import MessageID
 from src.domain.value_objects.user import UserID
 from src.infrastructure.data.models import OrderModel
@@ -47,9 +54,9 @@ class OrderDAL(BaseOrderDAL):
                 id=OrderID(order.id),
                 user_id=UserID(order.user_id),
                 payment_receipt=PaymentReceipt(order.payment_receipt),
-                commission=Commission(order.commission),
                 created_at=CreatedAt(order.created_at),
                 status=OrderStatus(order.status),
+                type_=OrderType(order.type),
                 telegram_message_id=MessageID(order.telegram_message_id),
             )
             for order in orders
@@ -66,9 +73,9 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
-            commission=Commission(order.commission),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
+            type_=OrderType(order.type),
             telegram_message_id=MessageID(order.telegram_message_id),
         )
 
@@ -79,7 +86,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=order.payment_receipt.value,
             created_at=order.created_at.value,
             status=order.status.value,
-            commission=order.commission.value,
+            type=order.type_.value,
             telegram_message_id=order.telegram_message_id.value if order.telegram_message_id else None,
         )
         self._session.add(order_model)
@@ -89,10 +96,10 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order_model.id),
             user_id=UserID(order_model.user_id),
             payment_receipt=PaymentReceipt(order_model.payment_receipt),
-            commission=Commission(order_model.commission),
             created_at=CreatedAt(order_model.created_at),
             status=OrderStatus(order_model.status),
             telegram_message_id=MessageID(order_model.telegram_message_id),
+            type_=OrderType(order_model.type),
         )
 
     async def update(self, order: Order) -> Order:
@@ -100,9 +107,9 @@ class OrderDAL(BaseOrderDAL):
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            commission=order.commission.value,
             created_at=order.created_at.value,
             status=order.status.value,
+            type=order.type_.value,
             telegram_message_id=order.telegram_message_id.value,
         )
         await self._session.merge(order_model)
@@ -120,9 +127,9 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
-            commission=Commission(order.commission),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
+            type_=OrderType(order.type),
             telegram_message_id=MessageID(order.telegram_message_id),
         ) for order in orders]
     
@@ -137,9 +144,9 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
-            commission=Commission(order.commission),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
+            type_=OrderType(order.type),
             telegram_message_id=MessageID(order.telegram_message_id),
         ) for order in orders]
     
@@ -154,9 +161,9 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
-            commission=Commission(order.commission),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
+            type_=OrderType(order.type),
             telegram_message_id=MessageID(order.telegram_message_id),
         ) for order in orders]
 
@@ -171,8 +178,8 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
-            commission=Commission(order.commission),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
+            type_=OrderType(order.type),
             telegram_message_id=MessageID(order.telegram_message_id),
         ) for order in orders]

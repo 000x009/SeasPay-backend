@@ -6,8 +6,9 @@ from uuid import UUID
 
 from src.domain.entity.order import OrderStatusEnum
 from src.domain.value_objects.order import OrderType
-from src.application.common.dto import Pagination, FileDTO
+from src.application.common.dto import Pagination
 from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
+from src.domain.value_objects.withdraw_method import MethodEnum
 
 
 @dataclass(frozen=True)
@@ -15,7 +16,6 @@ class OrderDTO:
     id: UUID
     user_id: int
     payment_receipt: str
-    commission: int
     type: OrderType
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)
@@ -36,12 +36,17 @@ class GetOrderDTO:
 @dataclass(frozen=True)
 class CreateWithdrawOrderDTO:
     user_id: int
-    withdraw_method: AddWithdrawDetailsDTO
     username: str
-    receipt_photo: FileDTO = field(default=None)
+    payment_receipt_url: str
+    method: MethodEnum
     created_at: datetime = field(default=datetime.now(UTC))
     status: OrderStatusEnum = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
+    card_number: Optional[str] = field(default=None)
+    card_holder_name: Optional[str] = field(default=None)
+    crypto_address: Optional[str] = field(default=None)
+    crypto_network: Optional[str] = field(default=None)
+
 
 
 @dataclass(frozen=True)
@@ -50,7 +55,7 @@ class CreateTransferOrderDTO:
     receiver_email: str
     username: str
     transfer_amount: Decimal
-    receipt_photo: FileDTO = field(default=None)
+    payment_receipt_url: str
 
 
 @dataclass(frozen=True)

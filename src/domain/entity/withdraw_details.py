@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.domain.value_objects.order import OrderID, OrderType
+from src.domain.value_objects.order import OrderID
 from src.domain.value_objects.withdraw_method import (
     Method,
     CardHolderName,
@@ -8,7 +8,8 @@ from src.domain.value_objects.withdraw_method import (
     CryptoAddress,
     CryptoNetwork,
     MethodEnum,
-    WithdrawDetailsID,
+    PaymentReceipt,
+    WithdrawCommission,
 )
 from src.domain.exceptions.withdraw_details import (
     CardNumberError,
@@ -26,6 +27,8 @@ class WithdrawDetails:
         'card_holder_name',
         'crypto_address',
         'crypto_network',
+        'payment_receipt',
+        'commission',
     )
 
     def __init__(
@@ -36,6 +39,8 @@ class WithdrawDetails:
         card_holder_name: Optional[CardHolderName] = None,
         crypto_address: Optional[CryptoAddress] = None,
         crypto_network: Optional[CryptoNetwork] = None,
+        payment_receipt: Optional[PaymentReceipt] = None,
+        commission: Optional[WithdrawCommission] = None,
     ) -> None:
         self.order_id = order_id
         self.method = method
@@ -43,6 +48,8 @@ class WithdrawDetails:
         self.card_holder_name = card_holder_name
         self.crypto_address = crypto_address
         self.crypto_network = crypto_network
+        self.payment_receipt = payment_receipt
+        self.commission = commission
 
     def __post_init__(self) -> None:
         if self.method.value == MethodEnum.CARD:

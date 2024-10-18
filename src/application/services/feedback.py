@@ -56,24 +56,12 @@ class FeedbackService:
         )
     
     async def create(self, data: CreateFeedbackDTO) -> FeedbackDTO:
-        settings = load_settings()
-        photo = None
-        if data.photo:
-            photo = self.cloud_storage.upload_object(
-                StorageObject(
-                    bucket=Bucket(settings.cloud_settings.feedbacks_bucket_name),
-                    name=ObjectKey(data.photo.filename),
-                    file=File(data.photo.input_file)
-                )
-            )
         feedback = await self._feedback_dal.insert(Feedback(
             user_id=UserID(data.user_id),
             stars=Stars(data.stars),
             comment=Comment(data.comment),
             created_at=CreatedAt(data.created_at),
-            photo_url=PhotoURL(
-                photo.get_object_url(settings.cloud_settings.base_storage_url).value if photo else None
-            )
+            photo_url=PhotoURL(data.photo_url) if data.photo_url else None,
         ))
         await self.uow.commit()
 

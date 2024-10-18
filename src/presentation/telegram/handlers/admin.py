@@ -66,6 +66,7 @@ async def take_order_handler(
                 created_at=updated_order.created_at,
                 status=updated_order.status.value,
                 commission=customer.commission,
+                order_type=updated_order.type.value,
             ),
             reply_markup=inline.get_order_fulfillment_kb_markup(order_id=order_id),
         )
@@ -75,6 +76,7 @@ async def take_order_handler(
             caption=get_paypal_withdraw_order_text(
                 order_id=updated_order.id,
                 user_id=updated_order.user_id,
+                type=updated_order.type.value,
                 created_at=updated_order.created_at,
                 status=updated_order.status.value,
                 commission=customer.commission,

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, UploadFile, Body, File
+from fastapi import APIRouter, Depends, UploadFile, File
 
 from fastapi_redis_cache import cache
 
@@ -10,9 +10,8 @@ from aiogram.utils.web_app import WebAppInitData
 
 from src.application.dto.feedback import FeedbackDTO, ListInputDTO, GetFeedbackDTO, CreateFeedbackDTO
 from src.application.services.feedback import FeedbackService
-from src.presentation.web_api.schema.feedback import CreateFeedback
+from src.presentation.web_api.schema.feedback import CreateFeedbackSchema
 from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
-from src.application.dto.order import FileDTO
 
 
 router = APIRouter(
@@ -55,11 +54,9 @@ async def get_feedback(
 
 
 @router.post('/', response_model=FeedbackDTO)
-@cache(expire=60 * 60 * 24)
 async def post_feedback(
     feedback_service: FromDishka[FeedbackService],
-    data: CreateFeedback = Depends(),
-    input_file: UploadFile = File(...),
+    data: CreateFeedbackSchema,
     # user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> FeedbackDTO:
     response = await feedback_service.create(
@@ -68,10 +65,7 @@ async def post_feedback(
             stars=data.stars,
             comment=data.comment,
             created_at=data.created_at,
-            photo=FileDTO(
-                filename=input_file.filename,
-                input_file=input_file.file,
-            )
+            photo_url=data.photo_url,
         )
     )
 
