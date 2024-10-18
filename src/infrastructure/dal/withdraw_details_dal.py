@@ -2,7 +2,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from src.application.common.dal.withdraw_method_dal import BaseWithdrawDetailsDAL
+from src.application.common.dal.withdraw_details import BaseWithdrawDetailsDAL
 from src.domain.entity.withdraw_details import WithdrawDetails, DBWithdrawDetails
 from src.domain.value_objects.order import OrderID
 from src.domain.value_objects.withdraw_method import (
