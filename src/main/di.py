@@ -25,6 +25,7 @@ from src.application.services.feedback import FeedbackService
 from src.application.services.user_topic import UserTopicService
 from src.application.services.completed_order import CompletedOrderService
 from src.application.services.withdraw_details import WithdrawService
+from src.application.services.cloud import CloudService
 from src.application.services.transfer_details import TransferDetailsService
 from src.infrastructure.dal.tranfer_details import TransferDetailsDAL
 from src.application.services.statistics import StatisticsService
@@ -77,6 +78,7 @@ class ServiceProvider(Provider):
     telegram_service = provide(TelegramService, scope=Scope.REQUEST, provides=TelegramService)
     statistics_service = provide(StatisticsService, scope=Scope.REQUEST, provides=StatisticsService)
     transfer_details_service = provide(TransferDetailsService, scope=Scope.REQUEST, provides=TransferDetailsService)
+    cloud_service = provide(CloudService, scope=Scope.REQUEST, provides=CloudService)
 
 
 class TelegramProvider(Provider):

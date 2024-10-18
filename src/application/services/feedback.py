@@ -8,7 +8,7 @@ from src.domain.entity.feedback import Feedback
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.entity.yandex_cloud import StorageObject
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, File
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey, File
 from src.infrastructure.config import load_settings
 from src.domain.exceptions.feedback import FeedbackNotFoundError
 
@@ -62,7 +62,7 @@ class FeedbackService:
             photo = self.cloud_storage.upload_object(
                 StorageObject(
                     bucket=Bucket(settings.cloud_settings.feedbacks_bucket_name),
-                    name=ObjectName(data.photo.filename),
+                    name=ObjectKey(data.photo.filename),
                     file=File(data.photo.input_file)
                 )
             )

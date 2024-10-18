@@ -1,8 +1,8 @@
 from typing import Protocol
 from abc import abstractmethod
 
-from src.domain.entity.yandex_cloud import StorageObject
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, PresignedURL
+from src.domain.entity.yandex_cloud import StorageObject, PresignedPost
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey
 
 
 class CloudStorage(Protocol):
@@ -11,9 +11,9 @@ class CloudStorage(Protocol):
         raise NotImplementedError
     
     @abstractmethod
-    def get_object_file(self, bucket: Bucket, name: ObjectName) -> StorageObject:
+    def get_object_file(self, bucket: Bucket, name: ObjectKey) -> StorageObject:
         raise NotImplementedError
 
     @abstractmethod
-    def get_presigned_url(self, name: ObjectName) -> PresignedURL:
+    def generate_presigned_post(self, bucket: Bucket, name: ObjectKey) -> PresignedPost:
         raise NotImplementedError

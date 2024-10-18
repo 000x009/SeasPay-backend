@@ -4,5 +4,5 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class ObjectName(ValueObject[str]):
+class PresignedPostSignature(ValueObject[str]):
     value: str

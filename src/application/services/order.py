@@ -46,7 +46,7 @@ from src.domain.value_objects.user import JoinedAt, Commission as UserCommission
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.entity.yandex_cloud import StorageObject
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, File
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey, File
 from src.infrastructure.config import load_settings
 
 
@@ -110,7 +110,7 @@ class OrderService:
         user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
         payment_receipt = self.cloud_storage.upload_object(StorageObject(
             bucket=Bucket(settings.cloud_settings.receipts_bucket_name),
-            name=ObjectName(data.receipt_photo.filename),
+            name=ObjectKey(data.receipt_photo.filename),
             file=File(data.receipt_photo.input_file)
         ))
         order = await self._order_dal.insert(
@@ -137,7 +137,7 @@ class OrderService:
         )
         payment_receipt_object = self.cloud_storage.get_object_file(
             Bucket(settings.cloud_settings.receipts_bucket_name),
-            ObjectName(payment_receipt.name.value)
+            ObjectKey(payment_receipt.name.value)
         )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
@@ -335,7 +335,7 @@ class OrderService:
         user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
         payment_receipt = self.cloud_storage.upload_object(StorageObject(
             bucket=Bucket(settings.cloud_settings.receipts_bucket_name),
-            name=ObjectName(data.receipt_photo.filename),
+            name=ObjectKey(data.receipt_photo.filename),
             file=File(data.receipt_photo.input_file)
         ))
         order = await self._order_dal.insert(
@@ -359,7 +359,7 @@ class OrderService:
         )
         payment_receipt_object = self.cloud_storage.get_object_file(
             Bucket(settings.cloud_settings.receipts_bucket_name),
-            ObjectName(payment_receipt.name.value)
+            ObjectKey(payment_receipt.name.value)
         )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
