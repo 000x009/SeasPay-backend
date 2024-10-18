@@ -3,7 +3,7 @@ from .feedback_dal import FeedbackDAL
 from .order_dal import OrderDAL
 from .completed_order_dal import CompletedOrderDAL
 from .user_topic_dal import UserTopicDAL
-from .withdraw_method_dal import WithdrawDetailsDAL
+from .withdraw_details_dal import WithdrawDetailsDAL
 
 __all__ = [
     'UserDAL',

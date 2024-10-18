@@ -1,6 +1,9 @@
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.entity.yandex_cloud import StorageObject
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, File
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectName, File, PresignedURL
+
+
+EXPIRES_IN = 10
 
 
 class YandexCloudStorage(CloudStorage):
@@ -25,3 +28,12 @@ class YandexCloudStorage(CloudStorage):
             bucket=bucket,
             file=File(file_)
         )
+
+    def generate_presigned_post(self, bucket: Bucket, name: ObjectName) -> PresignedURL:
+        response = self.client.generate_presigned_post(
+            Bucket=bucket.value,
+            Key=name.value,
+            ExpiresIn=EXPIRES_IN,
+        )
+
+        

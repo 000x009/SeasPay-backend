@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from src.application.common.dal.withdraw_details import BaseWithdrawDetailsDAL
-from src.domain.entity.withdraw_details import WithdrawDetails, DBWithdrawDetails
+from src.domain.entity.withdraw_details import WithdrawDetails
 from src.domain.value_objects.order import OrderID
 from src.domain.value_objects.withdraw_method import (
     MethodEnum,
@@ -21,7 +21,7 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def insert(self, withdraw_method: WithdrawDetails) -> DBWithdrawDetails:
+    async def insert(self, withdraw_method: WithdrawDetails) -> WithdrawDetails:
         model = WithdrawDetailsModel(
             order_id=withdraw_method.order_id.value,
             method=withdraw_method.method.value,
@@ -32,8 +32,7 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
         )
         self.session.add(model)
 
-        return DBWithdrawDetails(
-            id=WithdrawDetailsID(model.id),
+        return WithdrawDetails(
             order_id=OrderID(model.order_id),
             method=Method(MethodEnum(model.method)),
             card_number=CardNumber(model.card_number),
@@ -42,15 +41,14 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
             crypto_network=CryptoNetwork(model.crypto_network),
         )
 
-    async def get(self, order_id: OrderID) -> Optional[DBWithdrawDetails]:
+    async def get(self, order_id: OrderID) -> Optional[WithdrawDetails]:
         query = select(WithdrawDetailsModel).filter_by(order_id=order_id.value)
         result = await self.session.execute(query)
         db_withdraw_method = result.scalar_one_or_none()
         if db_withdraw_method is None:
             return None
 
-        return DBWithdrawDetails(
-            id=WithdrawDetailsID(db_withdraw_method.id),
+        return WithdrawDetails(
             order_id=OrderID(db_withdraw_method.order_id),
             method=Method(db_withdraw_method.method),
             card_number=CardNumber(db_withdraw_method.card_number),

@@ -13,6 +13,8 @@ if TYPE_CHECKING:
         UserModel,
         CompletedOrderModel,
         WithdrawDetailsModel,
+        TransferDetailsModel,
+        DigitalProductDetailsModel,
     )
 
 
@@ -42,12 +44,13 @@ class OrderModel(Base):
         nullable=False,
     )
     telegram_message_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    commission: Mapped[int] = mapped_column(Integer, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint('type', 'id', name='uq_type_id')
+        UniqueConstraint('type', 'id', name='uq_type_id'),
     )
 
     user: Mapped['UserModel'] = relationship(back_populates='orders', uselist=False)
     completed_order: Mapped[Optional['CompletedOrderModel']] = relationship(back_populates='order', uselist=False)
     withdraw_details: Mapped['WithdrawDetailsModel'] = relationship(back_populates='order', uselist=False)
+    transfer_details: Mapped['TransferDetailsModel'] = relationship(back_populates='order', uselist=False)
+    digital_product_details: Mapped['DigitalProductDetailsModel'] = relationship(back_populates='order', uselist=False)

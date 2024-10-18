@@ -7,7 +7,6 @@ from src.domain.value_objects.withdraw_method import MethodEnum
 
 @dataclass(frozen=True)
 class WithdrawDetailsDTO:
-    id: int
     order_id: UUID
     method: MethodEnum
     card_number: Optional[str] = field(default=None)

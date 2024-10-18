@@ -1,3 +1,4 @@
+from uuid import UUID
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from decimal import Decimal
@@ -6,7 +7,7 @@ from typing import Optional
 
 @dataclass(frozen=True)
 class CompletedOrderDTO:
-    order_id: int
+    order_id: UUID
     paypal_received_amount: Decimal
     user_received_amount: Decimal
     completed_at: datetime = field(default=datetime.now(UTC))
@@ -14,7 +15,7 @@ class CompletedOrderDTO:
 
 @dataclass(frozen=True)
 class AddCompletedOrderDTO:
-    order_id: int
+    order_id: UUID
     paypal_received_amount: Decimal
     user_received_amount: Decimal
     completed_at: datetime = field(default=datetime.now(UTC))
@@ -22,7 +23,7 @@ class AddCompletedOrderDTO:
 
 @dataclass(frozen=True)
 class GetCompletedOrderDTO:
-    id: int
+    id: UUID
 
 
 @dataclass(frozen=True)

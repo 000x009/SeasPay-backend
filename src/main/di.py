@@ -25,6 +25,8 @@ from src.application.services.feedback import FeedbackService
 from src.application.services.user_topic import UserTopicService
 from src.application.services.completed_order import CompletedOrderService
 from src.application.services.withdraw_details import WithdrawService
+from src.application.services.transfer_details import TransferDetailsService
+from src.infrastructure.dal.tranfer_details import TransferDetailsDAL
 from src.application.services.statistics import StatisticsService
 from src.infrastructure.config import load_settings, load_bot_settings, BotSettings
 from src.infrastructure.telegram import TelegramClient
@@ -61,6 +63,7 @@ class DALProvider(Provider):
     user_topic_dal = provide(UserTopicDAL, scope=Scope.REQUEST, provides=UserTopicDAL)
     completed_order_dal = provide(CompletedOrderDAL, scope=Scope.REQUEST, provides=CompletedOrderDAL)
     withdraw_method_dal = provide(WithdrawDetailsDAL, scope=Scope.REQUEST, provides=WithdrawDetailsDAL)
+    transfer_details_dal = provide(TransferDetailsDAL, scope=Scope.REQUEST, provides=TransferDetailsDAL)
     uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
 
 
@@ -73,6 +76,7 @@ class ServiceProvider(Provider):
     withdraw_service = provide(WithdrawService, scope=Scope.REQUEST, provides=WithdrawService)
     telegram_service = provide(TelegramService, scope=Scope.REQUEST, provides=TelegramService)
     statistics_service = provide(StatisticsService, scope=Scope.REQUEST, provides=StatisticsService)
+    transfer_details_service = provide(TransferDetailsService, scope=Scope.REQUEST, provides=TransferDetailsService)
 
 
 class TelegramProvider(Provider):

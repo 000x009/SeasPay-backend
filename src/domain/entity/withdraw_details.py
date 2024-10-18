@@ -22,7 +22,6 @@ class WithdrawDetails:
     __slots__ = (
         'order_id',
         'method',
-        'type_',
         'card_number',
         'card_holder_name',
         'crypto_address',
@@ -33,7 +32,6 @@ class WithdrawDetails:
         self,
         order_id: OrderID,
         method: Method,
-        type_: OrderType,
         card_number: Optional[CardNumber] = None,
         card_holder_name: Optional[CardHolderName] = None,
         crypto_address: Optional[CryptoAddress] = None,
@@ -45,7 +43,6 @@ class WithdrawDetails:
         self.card_holder_name = card_holder_name
         self.crypto_address = crypto_address
         self.crypto_network = crypto_network
-        self.type_ = type_
 
     def __post_init__(self) -> None:
         if self.method.value == MethodEnum.CARD:
@@ -58,22 +55,3 @@ class WithdrawDetails:
                 raise CryptoAddressError('Crypto address is required for crypto method')
             if self.crypto_network is None:
                 raise CryptoNetworkError('Crypto network is required for crypto method')
-
-
-class DBWithdrawDetails(WithdrawDetails):
-    __slots__ = (
-        'id',
-    )
-
-    def __init__(
-        self,
-        id: WithdrawDetailsID,
-        order_id: OrderID,
-        method: Method,
-        card_number: Optional[CardNumber] = None,
-        card_holder_name: Optional[CardHolderName] = None,
-        crypto_address: Optional[CryptoAddress] = None,
-        crypto_network: Optional[CryptoNetwork] = None,
-    ) -> None:
-        super().__init__(order_id, method, card_number, card_holder_name, crypto_address, crypto_network)
-        self.id = id

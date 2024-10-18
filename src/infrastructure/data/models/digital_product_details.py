@@ -1,0 +1,25 @@
+import uuid
+from typing import TYPE_CHECKING
+
+from sqlalchemy import String, ForeignKey, Enum, UUID, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.infrastructure.data.models import Base
+from src.domain.value_objects.order import OrderTypeEnum
+
+if TYPE_CHECKING:
+    from src.infrastructure.data.models import OrderModel
+
+
+class DigitalProductDetailsModel(Base):
+    __tablename__ = 'digital_product_details'
+
+    order_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('order.id', ondelete='CASCADE'),
+        primary_key=True,
+    )
+    product_url: Mapped[str] = mapped_column(String, nullable=False)
+    commission: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    order: Mapped['OrderModel'] = relationship(back_populates='digital_product_details', uselist=False)

@@ -5,8 +5,9 @@ from decimal import Decimal
 from uuid import UUID
 
 from src.domain.entity.order import OrderStatusEnum
+from src.domain.value_objects.order import OrderType
 from src.application.common.dto import Pagination, FileDTO
-from src.application.dto.withdraw_details import WithdrawDetailsDTO, AddWithdrawDetailsDTO
+from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
 
 
 @dataclass(frozen=True)
@@ -15,7 +16,7 @@ class OrderDTO:
     user_id: int
     payment_receipt: str
     commission: int
-    withdraw_method: WithdrawDetailsDTO
+    type: OrderType
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
@@ -33,13 +34,23 @@ class GetOrderDTO:
 
 
 @dataclass(frozen=True)
-class CreateOrderDTO:
+class CreateWithdrawOrderDTO:
     user_id: int
     withdraw_method: AddWithdrawDetailsDTO
+    username: str
     receipt_photo: FileDTO = field(default=None)
     created_at: datetime = field(default=datetime.now(UTC))
     status: OrderStatusEnum = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
+
+
+@dataclass(frozen=True)
+class CreateTransferOrderDTO:
+    user_id: int
+    receiver_email: str
+    username: str
+    transfer_amount: Decimal
+    receipt_photo: FileDTO = field(default=None)
 
 
 @dataclass(frozen=True)

@@ -1,24 +1,18 @@
-import json
-from datetime import datetime, UTC
 from typing import Optional
+import json
+from decimal import Decimal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, EmailStr, model_validator
 
-from src.domain.value_objects.order import OrderStatusEnum
 from src.domain.value_objects.withdraw_method import MethodEnum
 
 
-class WithdrawDetailsSchema(BaseModel):
+class CreateWithdrawOrderSchema(BaseModel):
     method: MethodEnum
     card_number: Optional[str] = Field(default=None)
     card_holder_name: Optional[str] = Field(default=None)
     crypto_address: Optional[str] = Field(default=None)
     crypto_network: Optional[str] = Field(default=None)
-
-class CreateOrderSchema(BaseModel):
-    created_at: datetime = Field(default=datetime.now(UTC))
-    status: OrderStatusEnum = Field(default=OrderStatusEnum.NEW)
-    withdraw_method: WithdrawDetailsSchema
 
     @model_validator(mode='before')
     @classmethod
@@ -26,3 +20,8 @@ class CreateOrderSchema(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
+
+class CreateTransferOrderSchema(BaseModel):
+    receiver_email: EmailStr
+    amount: Decimal

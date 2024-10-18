@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 
-class GetPresignedURL(BaseModel):
+class GetPresignedURLSchema(BaseModel):
     filename: str

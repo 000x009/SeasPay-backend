@@ -1,4 +1,4 @@
-from src.infrastructure.dal.withdraw_method_dal import WithdrawDetailsDAL
+from src.infrastructure.dal.withdraw_details_dal import WithdrawDetailsDAL
 from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO, WithdrawDetailsDTO
 from src.domain.value_objects.withdraw_method import (
     Method,
@@ -35,7 +35,6 @@ class WithdrawService:
         await self.uow.flush()
 
         return WithdrawDetailsDTO(
-            id=withdraw_method.id.value,
             order_id=withdraw_method.order_id.value,
             method=withdraw_method.method.value,
             card_number=withdraw_method.card_number.value,
@@ -50,7 +49,6 @@ class WithdrawService:
             raise WithdrawDetailsNotFound(f"Withdraw method not found for order: {data.order_id}")
         
         return WithdrawDetailsDTO(
-            id=method.id.value,
             order_id=method.order_id.value,
             method=method.method.value,
             card_number=method.card_number.value,
