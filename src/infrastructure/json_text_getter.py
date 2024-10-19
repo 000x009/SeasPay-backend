@@ -5,7 +5,7 @@ from pathlib import Path
 from decimal import Decimal
 from uuid import UUID
 from src.domain.value_objects.order import OrderStatusEnum, OrderTypeEnum
-
+from src.domain.value_objects.purchase_request import RequestStatusEnum
 
 def get_text_by_key(key: str) -> str:
     with open(os.path.normpath(Path("files/json/texts.json")), encoding="utf-8") as f:
@@ -186,4 +186,25 @@ def get_transfer_text(
         receiver_email=receiver_email,
         amount=amount,
         commission=commission,
+    )
+
+
+def get_purchase_request_text(
+    request_id: UUID,
+    user_id: int,
+    purchase_url: str,
+    created_at: datetime,
+    status: RequestStatusEnum,
+) -> str:
+    status_mapping = {
+        RequestStatusEnum.PENDING: "⌛ Ожидание обработки",
+        RequestStatusEnum.CONFIRMED: "✅ Обработан",
+        RequestStatusEnum.CANCELLED: "❌ Отменен",
+    }
+    return get_text_by_key("purchase_request_text").format(
+        id=request_id,
+        user_id=user_id,
+        purchase_url=purchase_url,
+        created_at=created_at.strftime("%d.%m.%Y %H:%M"),
+        status=status_mapping.get(status, ""),
     )

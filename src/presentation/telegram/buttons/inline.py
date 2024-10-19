@@ -8,6 +8,9 @@ from src.presentation.telegram.buttons.callback_data.order import (
     BackToOrderCallbackData,
     TakeOrderCallbackData,
 )
+from src.presentation.telegram.buttons.callback_data.purchase_request import (
+    TakePurchaseRequestCallbackData,
+)
 
 
 def get_start_kb_markup(config: BotSettings) -> InlineKeyboardMarkup:
@@ -20,6 +23,19 @@ def get_start_kb_markup(config: BotSettings) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(text='📑 Условия пользования', url=config.terms_of_use_url),
                 InlineKeyboardButton(text='💭 Техническая поддержка', url=config.technical_support_url),
             ]
+        ]
+    )
+
+
+def get_purchase_request_kb_markup(request_id: UUID) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text='🗃️ Обработать запрос',
+                    callback_data=TakePurchaseRequestCallbackData(request_id=request_id).pack(),
+                ),
+            ],
         ]
     )
 

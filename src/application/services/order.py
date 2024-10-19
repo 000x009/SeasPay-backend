@@ -1,7 +1,8 @@
 import uuid
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from decimal import Decimal
 
+from src.application.services.telegram_service import TelegramService
 from src.infrastructure.dal import OrderDAL
 from src.application.common.dto import FileDTO
 from src.application.dto.order import (
@@ -36,8 +37,7 @@ from src.application.services.withdraw_details import WithdrawService
 from src.application.services.transfer_details import TransferDetailsService
 from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO
 from src.application.dto.transfer_details import AddTransferDetailsDTO
-from src.application.services.telegram_service import TelegramService
-from src.application.dto.telegram import SendMessageDTO
+from src.application.dto.telegram import SendOrderMessageDTO
 from src.application.services.user import UserService
 from src.application.dto.completed_order import AddCompletedOrderDTO
 from src.application.dto.user import GetUserDTO
@@ -140,8 +140,8 @@ class OrderService:
             Bucket(settings.cloud_settings.receipts_bucket_name),
             ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
-        telegram_message = await self._telegram_service.send_message(
-            SendMessageDTO(
+        telegram_message = await self._telegram_service.send_order_message(
+            SendOrderMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
                 text=get_paypal_order_text(
@@ -373,8 +373,8 @@ class OrderService:
             Bucket(settings.cloud_settings.receipts_bucket_name),
             ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
-        telegram_message = await self._telegram_service.send_message(
-            SendMessageDTO(
+        telegram_message = await self._telegram_service.send_order_message(
+            SendOrderMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
                 text=get_paypal_order_text(
