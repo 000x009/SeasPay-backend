@@ -21,7 +21,9 @@ class UserModel(Base):
         server_default=func.now(),
         default=datetime.now(UTC),
     )
-    commission: Mapped[int] = mapped_column(Integer, nullable=True, default=15)
+    withdraw_commission: Mapped[int] = mapped_column(Integer, nullable=True, default=15)
+    transfer_commission: Mapped[int] = mapped_column(Integer, nullable=True, default=15)
+    product_commission: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True, default=5)
     total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True, default=0)
 
     orders = relationship('OrderModel', back_populates='user', uselist=True, lazy='joined')

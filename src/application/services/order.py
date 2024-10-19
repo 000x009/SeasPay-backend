@@ -217,7 +217,7 @@ class OrderService:
         updated_order = await self._order_dal.update(order)
 
         user.total_withdrawn = TotalWithdrawn(user.total_withdrawn.value + data.paypal_received_amount)
-        user.update_commission(PaypalReceivedAmount(data.paypal_received_amount))
+        user.update_withdraw_commission(PaypalReceivedAmount(data.paypal_received_amount))
         await self._user_service.update_user(UpdateUserDTO(
             user_id=user.user_id.value,
             commission=user.commission.value,
