@@ -5,9 +5,8 @@ from decimal import Decimal
 from uuid import UUID
 
 from src.domain.entity.order import OrderStatusEnum
-from src.domain.value_objects.order import OrderType
+from src.domain.value_objects.order import OrderTypeEnum
 from src.application.common.dto import Pagination
-from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
 from src.domain.value_objects.withdraw_method import MethodEnum
 
 
@@ -16,7 +15,7 @@ class OrderDTO:
     id: UUID
     user_id: int
     payment_receipt: str
-    type: OrderType
+    type: OrderTypeEnum
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
@@ -56,6 +55,7 @@ class CreateTransferOrderDTO:
     username: str
     transfer_amount: Decimal
     payment_receipt_url: str
+    created_at: datetime = field(default=datetime.now(UTC))
 
 
 @dataclass(frozen=True)
@@ -82,10 +82,15 @@ class CommissionDTO:
 
 
 @dataclass(frozen=True)
-class FulfillOrderDTO:
+class FulfillWithdrawOrderDTO:
     order_id: UUID
-    paypal_received_amount: Decimal
-    user_received_amount: Decimal
+    paypal_received_amount: Optional[Decimal] = field(default=None)
+    user_received_amount: Optional[Decimal] = field(default=None)
+
+
+@dataclass(frozen=True)
+class FulfillTransferOrderDTO:
+    order_id: UUID
 
 
 @dataclass(frozen=True)

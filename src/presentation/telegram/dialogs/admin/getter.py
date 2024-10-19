@@ -9,14 +9,11 @@ from src.application.services.order import OrderService
 from src.application.services.user import UserService
 from src.application.dto.order import OrderDTO, ListOrderDTO, GetOrderDTO
 from src.application.dto.user import GetUserDTO, UserDTO
-
 from src.presentation.telegram.dialogs.common.injection import inject_getter
 from src.infrastructure.json_text_getter import (
-    get_order_info_card_text,
-    get_order_info_crypto_text,
     get_user_profile_text,
+    get_paypal_order_text,
 )
-from src.domain.value_objects.withdraw_method import MethodEnum
 
 
 @inject_getter
@@ -38,31 +35,16 @@ async def one_order_getter(
     **kwargs
 ) -> Mapping[str, OrderDTO]:
     order = await order_service.get(GetOrderDTO(order_id=uuid.UUID(dialog_manager.dialog_data.get("order_id"))))
-    order_text = ""
-    if order and order.withdraw_method.method == MethodEnum.CARD:
-        order_text = get_order_info_card_text(
-            order_id=order.id,
-            user_id=order.user_id,
-            commission=order.commission,
-            created_at=order.created_at,
-            status=order.status,
-            card_number=order.withdraw_method.card_number,
-            card_holder=order.withdraw_method.card_holder_name,
-        )
-    elif order and order.withdraw_method.method == MethodEnum.CRYPTO:
-        order_text = get_order_info_crypto_text(
-            order_id=order.id,
-            user_id=order.user_id,
-            commission=order.commission,
-            created_at=order.created_at,
-            status=order.status,
-            address=order.withdraw_method.crypto_address,
-            network=order.withdraw_method.crypto_network,
-        )
 
     return {
         "order": order,
-        "order_text": order_text,
+        "order_text": get_paypal_order_text(
+            order_id=order.id,
+            user_id=order.user_id,
+            created_at=order.created_at,
+            status=order.status,
+            order_type=order.type,
+        ),
         "is_empty": False if order else True,
     }
 

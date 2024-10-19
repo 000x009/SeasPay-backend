@@ -33,7 +33,6 @@ async def start_handler(
     try:
         user_id = message.from_user.id
         user = await user_service.get_user(GetUserDTO(user_id=user_id))
-        print(user, flush=True)
         if not user:
             await user_service.add(CreateUserDTO(user_id=user_id))
     except Exception as e:

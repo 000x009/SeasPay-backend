@@ -2,11 +2,10 @@ import uuid
 from typing import TYPE_CHECKING
 from decimal import Decimal
 
-from sqlalchemy import String, ForeignKey, Enum, UUID, DECIMAL, Integer
+from sqlalchemy import String, ForeignKey, UUID, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
-from src.domain.value_objects.order import OrderTypeEnum
 
 if TYPE_CHECKING:
     from src.infrastructure.data.models import OrderModel

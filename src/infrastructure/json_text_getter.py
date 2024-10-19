@@ -14,12 +14,11 @@ def get_text_by_key(key: str) -> str:
         return data[key]
 
 
-def get_paypal_withdraw_order_text(
+def get_paypal_order_text(
     order_id: UUID,
     user_id: int,
     created_at: datetime,
     status: OrderStatusEnum,
-    commission: int,
     order_type: OrderTypeEnum,
 ) -> str:
     status_mapping = {
@@ -34,13 +33,12 @@ def get_paypal_withdraw_order_text(
         OrderTypeEnum.TRANSFER: "перевод средств",
         OrderTypeEnum.DIGITAL_PRODUCT: "приобретение продукта",
     }
-    return get_text_by_key("paypal_withdraw_order_text").format(
+    return get_text_by_key("paypal_order_text").format(
         type=type_mapping.get(order_type, ""),
         id=order_id,
         user_id=user_id,
         created_at=created_at.strftime("%d.%m.%Y %H:%M"),
         status=status_mapping.get(status, ""),
-        commission=commission,
     )
 
 
@@ -176,4 +174,16 @@ def get_admin_service_statistics_text(
         new_week_users=new_week_users,
         new_day_users=new_day_users,
         total_withdrawn=total_withdrawn,
+    )
+
+
+def get_transfer_text(
+    receiver_email: str,
+    amount: float,
+    commission: float,
+) -> str:
+    return get_text_by_key("transfer_text").format(
+        receiver_email=receiver_email,
+        amount=amount,
+        commission=commission,
     )

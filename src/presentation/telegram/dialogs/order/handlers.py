@@ -9,11 +9,18 @@ from aiogram_dialog.widgets.input import ManagedTextInput
 from dishka.integrations.aiogram import FromDishka
 
 from src.application.services.order import OrderService
-from src.application.dto.order import CalculateCommissionDTO, FulfillOrderDTO, GetOrderDTO, CancelOrderDTO
+from src.application.dto.order import (
+    CalculateCommissionDTO,
+    FulfillWithdrawOrderDTO,
+    FulfillTransferOrderDTO,
+    GetOrderDTO,
+    CancelOrderDTO,
+)
 from src.presentation.telegram.dialogs.common.injection import inject_on_click
 from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
 from src.infrastructure.config import load_bot_settings
-from src.infrastructure.json_text_getter import get_paypal_withdraw_order_text
+from src.infrastructure.json_text_getter import get_paypal_order_text
+from src.domain.value_objects.order import OrderTypeEnum
 
 
 async def calculate_commission(
@@ -83,23 +90,27 @@ async def confirm_fulfillment(
     bot = dialog_manager.middleware_data.get("bot")
     order_id = dialog_manager.start_data.get("order_id")
     user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
+    received_amount = dialog_manager.dialog_data.get("received_amount")
+    order_type = dialog_manager.dialog_data.get("order_type")
     bot_settings = load_bot_settings()
 
     try:
-        order = await order_service.fulfill_order(FulfillOrderDTO(
-            order_id=order_id,
-            paypal_received_amount=Decimal(dialog_manager.dialog_data.get("received_amount")),
-            user_received_amount=Decimal(user_received_amount)
-        ))
+        if order_type == OrderTypeEnum.WITHDRAW:
+            order = await order_service.fulfill_withdraw_order(FulfillWithdrawOrderDTO(
+                order_id=order_id,
+                paypal_received_amount=Decimal(received_amount),
+                user_received_amount=Decimal(user_received_amount),
+            ))
+        elif order_type == OrderTypeEnum.TRANSFER:
+            order = await order_service.fulfill_transfer_order(FulfillTransferOrderDTO(order_id=order_id))
         await bot.edit_message_caption(
             chat_id=bot_settings.orders_group_id,
             message_id=order.telegram_message_id,
-            caption=get_paypal_withdraw_order_text(
+            caption=get_paypal_order_text(
                 order_id=order.id,
                 user_id=order.user_id,
                 created_at=order.created_at,
                 status=order.status.value,
-                commission=order.commission,
                 order_type=order.type,
             ),
         )
@@ -115,7 +126,7 @@ async def confirm_fulfillment(
         order = await order_service.get(GetOrderDTO(order_id=order_id))
         await bot.send_message(
             chat_id=order.user_id,
-            text=f"Ваш запрос <code>№{order.id}</code> на вывод средств успешно был выполнен!"
+            text=f"Ваш запрос <code>№{order.id}</code> успешно был выполнен!"
         )
     except Exception as e:
         logging.error(f"Error sending message: {e}")
@@ -139,12 +150,11 @@ async def cancel_order_handler(
         await bot.edit_message_caption(
             chat_id=bot_settings.orders_group_id,
             message_id=order.telegram_message_id,
-            caption=get_paypal_withdraw_order_text(
+            caption=get_paypal_order_text(
                 order_id=order.id,
                 user_id=order.user_id,
                 created_at=order.created_at,
                 status=order.status.value,
-                commission=order.commission,
                 order_type=order.type,
             ),
         )

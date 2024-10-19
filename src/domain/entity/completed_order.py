@@ -21,8 +21,8 @@ class CompletedOrder:
     def __init__(
         self,
         order_id: OrderID,
-        paypal_received_amount: PaypalReceivedAmount,
-        user_received_amount: UserReceivedAmount,
+        paypal_received_amount: Optional[PaypalReceivedAmount] = None,
+        user_received_amount: Optional[UserReceivedAmount] = None,
         completed_at: Optional[CompletedAt] = None,
     ):
         self.order_id = order_id

@@ -16,8 +16,8 @@ class CompletedOrderDTO:
 @dataclass(frozen=True)
 class AddCompletedOrderDTO:
     order_id: UUID
-    paypal_received_amount: Decimal
-    user_received_amount: Decimal
+    paypal_received_amount: Optional[Decimal] = field(default=None)
+    user_received_amount: Optional[Decimal] = field(default=None)
     completed_at: datetime = field(default=datetime.now(UTC))
 
 

@@ -78,10 +78,7 @@ async def on_order_id(
     dialog_manager: DialogManager,
     data: str,
 ) -> None:
-    if not message.text.isdigit():
-        await message.answer('ID заказа введено неверно. ID должно содержать только цифры!')
-        return
-    dialog_manager.dialog_data['order_id'] = int(data)
+    dialog_manager.dialog_data['order_id'] = data
     await dialog_manager.switch_to(AdminSearchSG.ORDER)
 
 

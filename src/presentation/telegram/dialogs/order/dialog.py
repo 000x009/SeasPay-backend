@@ -1,3 +1,5 @@
+from aiogram import F
+
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Format, Const, Multi
 from aiogram_dialog.widgets.input import TextInput, MessageInput
@@ -9,7 +11,8 @@ from aiogram_dialog.widgets.kbd import (
 )
 from aiogram_dialog.widgets.text import Format, Const
 
-from src.presentation.telegram.dialogs.order.getter import order_getter, order_cancel_getter
+from src.presentation.telegram.dialogs.order.getter import order_getter, order_cancel_getter, order_text_getter
+from src.domain.value_objects.order import OrderTypeEnum
 from src.presentation.telegram.states import OrderFulfillmentSG
 from src.presentation.telegram.dialogs.order.handlers import (
     on_wrote_paypal_received_amount,
@@ -30,17 +33,19 @@ order_dialog = Dialog(
         DynamicMedia("payment_receipt", when="payment_receipt"),
         Multi(
             Format("{order_text}\n"),
-            Format("{withdraw_method_text}"),
+            Format("{details_text}"),
         ),
         Button(
             text=Const("🧮 Рассчитать комиссию"),
             id="calculate_commission",
             on_click=calculate_commission,
+            when=F['order'].type == OrderTypeEnum.WITHDRAW,
         ),
         SwitchTo(
             text=Const("🪙 Полученная сумма пользователем"),
             id="user_received_amount",
             state=OrderFulfillmentSG.USER_RECEIVED_AMOUNT,
+            when=F['order'].type == OrderTypeEnum.WITHDRAW,
         ),
         Button(
             text=Const("🖇️ Прикрепить фото чека"),
@@ -65,7 +70,7 @@ order_dialog = Dialog(
             id='cancel_order',
             state=OrderFulfillmentSG.PRE_CONFIRM_CANCEL,
         ),
-        getter=order_getter,
+        getter=[order_getter, order_text_getter],
         state=OrderFulfillmentSG.ORDER_INFO,
     ),
     Window(

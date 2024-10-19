@@ -160,7 +160,7 @@ look_up_order_dialog = Dialog(
             text=Format("🔄 Начать выполнение заказа"),
             id='start_fulfillment',
             on_click=switch_to_fulfillment,
-            when=F['order'].status.value.in_(('NEW', 'DELAY', 'PROCESSING')),
+            when=F['order'].status.in_(('NEW', 'DELAY', 'PROCESSING')),
         ),
         SwitchTo(
             text=Format("◀️ Назад"),
@@ -375,7 +375,7 @@ admin_search_dialog = Dialog(
             text=Format("🔄 Начать выполнение заказа"),
             id='start_fulfillment',
             on_click=switch_to_fulfillment,
-            when=F['order'].status.value.in_(('NEW', 'DELAY', 'PROCESSING')),
+            when=F['order'].status.in_(('NEW', 'DELAY', 'PROCESSING')),
         ),
         SwitchTo(
             text=Format("◀️ Назад"),

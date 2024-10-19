@@ -16,13 +16,13 @@ class CompletedOrderModel(Base):
     __tablename__ = 'completed_order'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    order_id: Mapped[int] = mapped_column(
+    order_id: Mapped[uuid.UUID] = mapped_column(
         UUID,
         ForeignKey('order.id', ondelete='CASCADE'),
         nullable=False,
     )
-    paypal_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
-    user_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
+    paypal_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True)
+    user_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True)
     completed_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,

@@ -32,8 +32,8 @@ class CompletedOrderService:
     async def add(self, data: AddCompletedOrderDTO) -> None:
         await self._dal.insert(CompletedOrder(
             order_id=OrderID(data.order_id),
-            paypal_received_amount=PaypalReceivedAmount(data.paypal_received_amount),
-            user_received_amount=UserReceivedAmount(data.user_received_amount),
+            paypal_received_amount=PaypalReceivedAmount(data.paypal_received_amount) if data.paypal_received_amount else None,
+            user_received_amount=UserReceivedAmount(data.user_received_amount) if data.user_received_amount else None,
             completed_at=CompletedAt(data.completed_at),
         ))
         await self.uow.commit()

@@ -25,8 +25,8 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
     async def insert(self, completed_order: CompletedOrder) -> None:
         query = insert(CompletedOrderModel).values(
             order_id=completed_order.order_id.value,
-            paypal_received_amount=completed_order.paypal_received_amount.value,
-            user_received_amount=completed_order.user_received_amount.value,
+            paypal_received_amount=completed_order.paypal_received_amount.value if completed_order.paypal_received_amount else None,
+            user_received_amount=completed_order.user_received_amount.value if completed_order.user_received_amount else None,
             completed_at=completed_order.completed_at.value,
         )
         await self._session.execute(query)

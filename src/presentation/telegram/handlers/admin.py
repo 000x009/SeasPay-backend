@@ -15,7 +15,7 @@ from aiogram_dialog import DialogManager, StartMode, ShowMode
 
 from src.presentation.telegram.filters import AdminFilter, ChatFilter
 from src.infrastructure.json_text_getter import (
-    get_paypal_withdraw_order_text,
+    get_paypal_order_text,
     get_user_profile_text,
     get_admin_service_statistics_text,
 )
@@ -60,12 +60,11 @@ async def take_order_handler(
         updated_order = await order_service.take_order(TakeOrderDTO(order_id=order_id))
         await bot.send_message(
             chat_id=callback.from_user.id,
-            text=get_paypal_withdraw_order_text(
+            text=get_paypal_order_text(
                 order_id=updated_order.id,
                 user_id=updated_order.user_id,
                 created_at=updated_order.created_at,
                 status=updated_order.status.value,
-                commission=customer.commission,
                 order_type=updated_order.type.value,
             ),
             reply_markup=inline.get_order_fulfillment_kb_markup(order_id=order_id),
@@ -73,13 +72,12 @@ async def take_order_handler(
         await bot.edit_message_caption(
             chat_id=bot_settings.orders_group_id,
             message_id=updated_order.telegram_message_id,
-            caption=get_paypal_withdraw_order_text(
+            caption=get_paypal_order_text(
                 order_id=updated_order.id,
                 user_id=updated_order.user_id,
-                type=updated_order.type.value,
+                order_type=updated_order.type.value,
                 created_at=updated_order.created_at,
                 status=updated_order.status.value,
-                commission=customer.commission,
             ),
         )
         await callback.answer(
