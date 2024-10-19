@@ -1,5 +1,5 @@
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, func, UUID, String, ForeignKey, BigInteger, Enum
@@ -9,7 +9,7 @@ from src.infrastructure.data.models import Base
 from src.domain.value_objects.purchase_request import RequestStatusEnum
 
 if TYPE_CHECKING:
-    from src.infrastructure.data.models import UserModel
+    from src.infrastructure.data.models import UserModel, ProductApplicationModel
 
 
 class PurchaseRequestModel(Base):
@@ -29,3 +29,6 @@ class PurchaseRequestModel(Base):
     )
 
     user: Mapped['UserModel'] = relationship(back_populates='purchase_requests', uselist=False)
+    product_applications: Mapped[Optional['ProductApplicationModel']] = relationship(
+        back_populates='purchase_request', uselist=False
+    )
