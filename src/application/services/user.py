@@ -9,7 +9,10 @@ from src.application.dto.user import (
     NewUsersDTO,
 )
 from src.domain.entity.user import User
-from src.domain.value_objects.user import UserID, JoinedAt, Commission, TotalWithdrawn
+from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn
+from src.domain.value_objects.digital_product_details import Commission as ProductCommission
+from src.domain.value_objects.transfer_details import Commission as TransferCommission
+from src.domain.value_objects.withdraw_method import WithdrawCommission
 from src.domain.exceptions.user import UserNotFoundError
 from src.domain.value_objects.statistics import TimeSpan
 from src.application.common.uow import UoW
@@ -28,7 +31,9 @@ class UserService:
         user = await self._user_dal.insert(User(
             user_id=UserID(data.user_id),
             joined_at=JoinedAt(data.joined_at),
-            commission=Commission(data.commission),
+            withdraw_commission=WithdrawCommission(data.withdraw_commission),
+            transfer_commission=TransferCommission(data.transfer_commission),
+            product_commission=ProductCommission(data.product_commission),
             total_withdrawn=TotalWithdrawn(data.total_withdrawn)
         ))
         await self.uow.commit()
@@ -36,7 +41,9 @@ class UserService:
         return UserDTO(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            commission=user.commission.value,
+            withdraw_commission=user.withdraw_commission.value, 
+            transfer_commission=user.transfer_commission.value,
+            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value
         )
     
@@ -48,7 +55,9 @@ class UserService:
         return UserDTO(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            commission=user.commission.value,
+            withdraw_commission=user.withdraw_commission.value,
+            transfer_commission=user.transfer_commission.value,
+            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value
         )
 
@@ -58,7 +67,9 @@ class UserService:
         return [UserDTO(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            commission=user.commission.value,
+            withdraw_commission=user.withdraw_commission.value,
+            transfer_commission=user.transfer_commission.value,
+            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value
         ) for user in users]
     
@@ -70,7 +81,9 @@ class UserService:
         await self._user_dal.update(UserID(data.user_id), User(
             user_id=UserID(data.user_id),
             joined_at=JoinedAt(user.joined_at.value),
-            commission=Commission(data.commission),
+            withdraw_commission=WithdrawCommission(data.withdraw_commission),
+            transfer_commission=TransferCommission(data.transfer_commission),
+            product_commission=ProductCommission(data.product_commission),
             total_withdrawn=TotalWithdrawn(data.total_withdrawn)
         ))
         await self.uow.commit()

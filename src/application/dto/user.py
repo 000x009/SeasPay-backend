@@ -8,7 +8,9 @@ from dataclasses import dataclass, field
 class UserDTO:
     user_id: int
     joined_at: datetime = field(default=datetime.now(UTC))
-    commission: int = field(default=15)
+    withdraw_commission: int = field(default=15)
+    transfer_commission: int = field(default=15)
+    product_commission: Decimal = field(default=5)
     total_withdrawn: Decimal = field(default=0)
 
 
@@ -16,21 +18,27 @@ class UserDTO:
 class CreateUserDTO:
     user_id: int
     joined_at: datetime = field(default=datetime.now(UTC))
-    commission: int = field(default=15)
+    withdraw_commission: int = field(default=15)
+    transfer_commission: int = field(default=15)
+    product_commission: Decimal = field(default=5)
     total_withdrawn: Decimal = field(default=0)
 
 
 @dataclass(frozen=True)
 class UpdateUserDTO:
     user_id: int
-    commission: int
+    withdraw_commission: int
+    transfer_commission: int
+    product_commission: Decimal
     total_withdrawn: Decimal
 
 
 @dataclass(frozen=True)
 class UpdateUserCommissionDTO:
     user_id: int
-    commission: int
+    withdraw_commission: int
+    transfer_commission: int
+    product_commission: Decimal
 
 
 @dataclass(frozen=True)

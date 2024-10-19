@@ -6,7 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseUserDAL
 from src.domain.entity.user import User
-from src.domain.value_objects.user import UserID, JoinedAt, Commission, TotalWithdrawn
+from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn
+from src.domain.value_objects.digital_product_details import Commission as ProductCommission
+from src.domain.value_objects.transfer_details import Commission as TransferCommission
+from src.domain.value_objects.withdraw_method import WithdrawCommission
 from src.infrastructure.data.models import UserModel
 from src.domain.value_objects.statistics import TimeSpan
 
@@ -19,7 +22,9 @@ class UserDAL(BaseUserDAL):
         user_model = UserModel(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            commission=user.commission.value,
+            withdraw_commission=user.withdraw_commission.value,
+            transfer_commission=user.transfer_commission.value,
+            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value
         )
         self._session.add(user_model)
@@ -36,7 +41,9 @@ class UserDAL(BaseUserDAL):
         return User(
             user_id=UserID(db_user.user_id),
             joined_at=JoinedAt(db_user.joined_at),
-            commission=Commission(db_user.commission),
+            withdraw_commission=WithdrawCommission(db_user.withdraw_commission),
+            transfer_commission=TransferCommission(db_user.transfer_commission),
+            product_commission=ProductCommission(db_user.product_commission),
             total_withdrawn=TotalWithdrawn(db_user.total_withdrawn)
         )
 
@@ -51,7 +58,9 @@ class UserDAL(BaseUserDAL):
             User(
                 user_id=UserID(db_user.user_id),
                 joined_at=JoinedAt(db_user.joined_at),
-                commission=Commission(db_user.commission),
+                withdraw_commission=WithdrawCommission(db_user.withdraw_commission),
+                transfer_commission=TransferCommission(db_user.transfer_commission),
+                product_commission=ProductCommission(db_user.product_commission),
                 total_withdrawn=TotalWithdrawn(db_user.total_withdrawn)
             )
             for db_user in db_users
@@ -59,7 +68,9 @@ class UserDAL(BaseUserDAL):
 
     async def update(self, user_id: UserID, user: User) -> None:
         query = update(UserModel).where(UserModel.user_id == user_id.value).values(
-            commission=user.commission.value,
+            withdraw_commission=user.withdraw_commission.value,
+            transfer_commission=user.transfer_commission.value,
+            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value
         )
         await self._session.execute(query)

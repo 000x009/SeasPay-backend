@@ -7,6 +7,8 @@ from .user_topic import UserTopicModel
 from .withdraw_details import WithdrawDetailsModel
 from .transfer_details import TransferDetailsModel
 from .digital_product_details import DigitalProductDetailsModel
+from .purchase_request import PurchaseRequestModel
+
 
 __all__ = [
     'Base',
@@ -18,4 +20,5 @@ __all__ = [
     'WithdrawDetailsModel',
     'TransferDetailsModel',
     'DigitalProductDetailsModel',
+    'PurchaseRequestModel',
 ]

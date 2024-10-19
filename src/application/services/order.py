@@ -45,7 +45,10 @@ from src.infrastructure.json_text_getter import get_paypal_order_text
 from src.domain.value_objects.completed_order import PaypalReceivedAmount
 from src.application.services.completed_order import CompletedOrderService
 from src.domain.entity.user import User
-from src.domain.value_objects.user import JoinedAt, Commission as UserCommission, TotalWithdrawn
+from src.domain.value_objects.user import JoinedAt, TotalWithdrawn
+from src.domain.value_objects.digital_product_details import Commission as ProductCommission
+from src.domain.value_objects.transfer_details import Commission as TransferCommission
+from src.domain.value_objects.withdraw_method import WithdrawCommission
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey
@@ -125,7 +128,7 @@ class OrderService:
             AddWithdrawDetailsDTO(
                 order_id=order.id.value,
                 payment_receipt=data.payment_receipt_url,
-                commission=user.commission,
+                commission=user.withdraw_commission,
                 method=data.method,
                 card_number=data.card_number,
                 card_holder_name=data.card_holder_name,
@@ -207,7 +210,9 @@ class OrderService:
         user = User(
             user_id=UserID(user.user_id),
             joined_at=JoinedAt(user.joined_at),
-            commission=UserCommission(user.commission),
+            withdraw_commission=WithdrawCommission(user.withdraw_commission),
+            transfer_commission=TransferCommission(user.transfer_commission),
+            product_commission=ProductCommission(user.product_commission),
             total_withdrawn=TotalWithdrawn(user.total_withdrawn),
         )
         if not order:
@@ -220,7 +225,9 @@ class OrderService:
         user.update_withdraw_commission(PaypalReceivedAmount(data.paypal_received_amount))
         await self._user_service.update_user(UpdateUserDTO(
             user_id=user.user_id.value,
-            commission=user.commission.value,
+            withdraw_commission=user.withdraw_commission.value,
+            transfer_commission=user.transfer_commission.value,
+            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value,
         ))
         await self._completed_order_service.add(AddCompletedOrderDTO(

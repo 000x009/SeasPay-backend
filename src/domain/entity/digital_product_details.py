@@ -1,5 +1,5 @@
-from src.domain.value_objects.order import OrderID, OrderType, Commission
-from src.domain.value_objects.digital_product_details import ProductURL
+from src.domain.value_objects.order import OrderID, OrderType
+from src.domain.value_objects.digital_product_details import PurchaseURL, Commission
 
 
 class DigitalProductDetails:
@@ -14,10 +14,10 @@ class DigitalProductDetails:
         self,
         order_id: OrderID,
         type_: OrderType,
-        product_url: ProductURL,
+        purchase_url: PurchaseURL,
         commission: Commission,
     ) -> None:
         self.order_id = order_id
         self.type_ = type_
-        self.product_url = product_url
+        self.purchase_url = purchase_url
         self.commission = commission

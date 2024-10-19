@@ -1,4 +1,7 @@
-from src.domain.value_objects.purchase_request import PurchaseURL, PurchaseRequestId
+from typing import Optional
+from datetime import datetime, UTC
+
+from src.domain.value_objects.purchase_request import PurchaseURL, PurchaseRequestId, CreatedAt
 from src.domain.value_objects.user import UserID
 
 
@@ -7,6 +10,7 @@ class PurchaseRequest:
         'id',
         'user_id',
         'purchase_url',
+        'created_at',
     )
 
     def __init__(
@@ -14,8 +18,12 @@ class PurchaseRequest:
         id: PurchaseRequestId,
         user_id: UserID,
         purchase_url: PurchaseURL,
+        created_at: Optional[CreatedAt] = None,
     ):
         self.id = id
         self.user_id = user_id
         self.purchase_url = purchase_url
+        self.created_at = created_at
 
+        if not self.created_at:
+            self.created_at = CreatedAt(datetime.now(UTC))

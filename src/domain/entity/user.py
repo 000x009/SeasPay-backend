@@ -9,7 +9,7 @@ from src.domain.value_objects.user import (
 from src.domain.value_objects.completed_order import PaypalReceivedAmount
 from src.infrastructure.config import load_settings
 from src.domain.value_objects.transfer_details import Commission as TransferCommission
-# from src.domain.value_objects.digital_product_details import Commission as ProductCommission
+from src.domain.value_objects.digital_product_details import Commission as ProductCommission
 from src.domain.value_objects.withdraw_method import WithdrawCommission
 
 
