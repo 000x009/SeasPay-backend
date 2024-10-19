@@ -27,6 +27,7 @@ class PurchaseRequestModel(Base):
         Enum('PENDING', 'CONFIRMED', 'CANCELLED', name='request_status'),
         default=RequestStatusEnum.PENDING,
     )
+    telegram_message_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
 
     user: Mapped['UserModel'] = relationship(back_populates='purchase_requests', uselist=False)
     product_applications: Mapped[Optional['ProductApplicationModel']] = relationship(

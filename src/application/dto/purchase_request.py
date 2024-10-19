@@ -11,6 +11,7 @@ class PurchaseRequestDTO:
     id: UUID
     user_id: int
     purchase_url: str
+    message_id: int
     created_at: datetime = field(default=datetime.now(UTC))
     status: RequestStatusEnum = field(default=RequestStatusEnum.PENDING)
 

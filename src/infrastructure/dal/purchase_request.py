@@ -6,7 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.common.dal.purchase_request import PurchaseRequestDal
 from src.infrastructure.data.models import PurchaseRequestModel
 from src.domain.entity.purchase_request import PurchaseRequest
-from src.domain.value_objects.purchase_request import PurchaseRequestId, PurchaseURL, CreatedAt, PurchaseRequestStatus
+from src.domain.value_objects.purchase_request import (
+    PurchaseRequestId,
+    PurchaseURL,
+    CreatedAt,
+    PurchaseRequestStatus,
+    MessageID,
+)
 from src.domain.value_objects.user import UserID
 
 
@@ -21,6 +27,7 @@ class PurchaseRequestDalImpl(PurchaseRequestDal):
             purchase_url=purchase_request.purchase_url.value,
             created_at=purchase_request.created_at.value,
             status=purchase_request.status.value,
+            telegram_message_id=purchase_request.message_id.value if purchase_request.message_id else None,
         )
         self.session.add(request_model)
 
@@ -39,6 +46,7 @@ class PurchaseRequestDalImpl(PurchaseRequestDal):
             purchase_url=PurchaseURL(request_model.purchase_url),
             created_at=CreatedAt(request_model.created_at),
             status=PurchaseRequestStatus(request_model.status),
+            message_id=MessageID(request_model.telegram_message_id) if request_model.telegram_message_id else None,
         )
 
     async def list_by_user(self, user_id: UserID, limit: int, offset: int) -> List[PurchaseRequest]:
@@ -53,6 +61,7 @@ class PurchaseRequestDalImpl(PurchaseRequestDal):
                 purchase_url=PurchaseURL(request_model.purchase_url),
                 created_at=CreatedAt(request_model.created_at),
                 status=PurchaseRequestStatus(request_model.status),
+                message_id=MessageID(request_model.telegram_message_id) if request_model.telegram_message_id else None,
             )
             for request_model in request_models
         ]
@@ -69,6 +78,7 @@ class PurchaseRequestDalImpl(PurchaseRequestDal):
                 purchase_url=PurchaseURL(request_model.purchase_url),
                 created_at=CreatedAt(request_model.created_at),
                 status=PurchaseRequestStatus(request_model.status),
+                message_id=MessageID(request_model.telegram_message_id) if request_model.telegram_message_id else None,
             )
             for request_model in request_models
         ]

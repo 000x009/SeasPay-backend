@@ -6,6 +6,7 @@ from src.domain.value_objects.purchase_request import (
     PurchaseRequestId,
     CreatedAt,
     PurchaseRequestStatus,
+    MessageID,
 )
 from src.domain.value_objects.user import UserID
 
@@ -17,6 +18,7 @@ class PurchaseRequest:
         'purchase_url',
         'created_at',
         'status',
+        'message_id',
     )
 
     def __init__(
@@ -26,6 +28,7 @@ class PurchaseRequest:
         purchase_url: PurchaseURL,
         created_at: Optional[CreatedAt] = None,
         status: Optional[PurchaseRequestStatus] = None,
+        message_id: Optional[MessageID] = None,
     ):
         self.id = id
         self.user_id = user_id

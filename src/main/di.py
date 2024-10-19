@@ -34,6 +34,8 @@ from src.application.services.statistics import StatisticsService
 from src.infrastructure.config import load_settings, load_bot_settings, BotSettings
 from src.infrastructure.telegram import TelegramClient
 from src.application.services.telegram_service import TelegramService
+from src.application.services.product_application import ProductApplicationService
+from src.infrastructure.dal.product_application import ProductApplicationDALImpl
 from src.application.common.telegram import TelegramClientInterface
 from src.application.common.uow import UoW
 from src.infrastructure.data.uow import SAUoW
@@ -68,6 +70,7 @@ class DALProvider(Provider):
     withdraw_method_dal = provide(WithdrawDetailsDAL, scope=Scope.REQUEST, provides=WithdrawDetailsDAL)
     transfer_details_dal = provide(TransferDetailsDAL, scope=Scope.REQUEST, provides=TransferDetailsDAL)
     purchase_request_dal = provide(PurchaseRequestDalImpl, scope=Scope.REQUEST, provides=PurchaseRequestDalImpl)
+    product_application_dal = provide(ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl)
     uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
 
 
@@ -83,7 +86,7 @@ class ServiceProvider(Provider):
     transfer_details_service = provide(TransferDetailsService, scope=Scope.REQUEST, provides=TransferDetailsService)
     cloud_service = provide(CloudService, scope=Scope.REQUEST, provides=CloudService)
     purchase_request_service = provide(PurchaseRequestService, scope=Scope.REQUEST, provides=PurchaseRequestService)
-    
+    product_application_service = provide(ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService)
 
 class TelegramProvider(Provider):
     @asynccontextmanager
