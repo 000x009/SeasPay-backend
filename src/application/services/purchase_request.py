@@ -15,12 +15,15 @@ from src.application.dto.purchase_request import(
     CreatePurchaseRequestDTO,
     GetUserPurchaseRequestsDTO,
     GetAllPurchaseRequestsDTO,
-    GetOnePurchaseRequestDTO
+    GetOnePurchaseRequestDTO,
+    TakePurchaseRequestDTO,
 )
+from src.domain.value_objects.order_message import MessageID
 from src.application.services.telegram_service import TelegramService
 from src.application.dto.telegram import SendPurchaseRequestMessageDTO
 from src.infrastructure.json_text_getter import get_purchase_request_text
 from src.application.common.uow import UoW
+from src.domain.exceptions.purchase_request import PurchaseRequestNotFound, PurchaseRequestAlreadyTaken
 
 
 class PurchaseRequestService:
@@ -57,13 +60,46 @@ class PurchaseRequestService:
                 username=data.username,
             )
         )
+        request.message_id = MessageID(telegram_message.message_id)
+        await self.dal.update(request)
         await self.uow.commit()
 
         return PurchaseRequestDTO(
-            id=PurchaseRequestId(request.id),
-            user_id=UserID(request.user_id),
-            purchase_url=PurchaseURL(request.purchase_url),
-            created_at=CreatedAt(request.created_at),
-            status=PurchaseRequestStatus(request.status),
+            id=request.id.value,
+            user_id=request.user_id.value,
+            purchase_url=request.purchase_url.value,
+            created_at=request.created_at.value,
+            status=request.status.value,
+            message_id=request.message_id.value if request.message_id else None,
+        )
+
+    async def get_request(self, data: GetOnePurchaseRequestDTO) -> PurchaseRequestDTO:
+        request = await self.dal.get_one(PurchaseRequestId(data.id))
+        if request is None:
+            raise PurchaseRequestNotFound(f"Purchase request not found with id: {data.id}")
+        
+        return PurchaseRequestDTO(
+            id=request.id.value,
+            user_id=request.user_id.value,
+            purchase_url=request.purchase_url.value,
+            created_at=request.created_at.value,
+            status=request.status.value,
+            message_id=request.message_id.value if request.message_id else None,
+        )
+    
+    async def take_request(self, data: TakePurchaseRequestDTO) -> PurchaseRequestDTO:
+        request = await self.dal.get_one(PurchaseRequestId(data.id))
+        if request is None:
+            raise PurchaseRequestNotFound(f"Purchase request not found with id: {data.id}")
+        if request.status.value != RequestStatusEnum.PENDING:
+            raise PurchaseRequestAlreadyTaken(f"Purchase request with id: {data.id} already taken")
+
+        return PurchaseRequestDTO(
+            id=request.id.value,
+            user_id=request.user_id.value,
+            purchase_url=request.purchase_url.value,
+            created_at=request.created_at.value,
+            status=request.status,
+            message_id=request.message_id.value if request.message_id else None,
         )
 

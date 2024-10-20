@@ -29,5 +29,5 @@ class ProductApplicationModel(Base):
         default=ProductApplicationStatusEnum.SENT,
     )
 
-    user: Mapped['UserModel'] = relationship(back_populates='purchase_requests', uselist=False)
+    user: Mapped['UserModel'] = relationship(back_populates='product_applications', uselist=False)
     purchase_request: Mapped['PurchaseRequestModel'] = relationship(back_populates='product_applications', uselist=False)

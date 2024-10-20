@@ -10,7 +10,7 @@ from src.infrastructure.data.models import Base
 if TYPE_CHECKING:
     from src.infrastructure.data.models import UserTopicModel
     from src.infrastructure.data.models import PurchaseRequestModel
-
+    from src.infrastructure.data.models import ProductApplicationModel
 
 class UserModel(Base):
     __tablename__ = 'user'
@@ -31,5 +31,8 @@ class UserModel(Base):
     feedbacks = relationship('FeedbackModel', back_populates='user', uselist=True, lazy='joined')
     topics: Mapped[Optional[List["UserTopicModel"]]] = relationship(back_populates='user', uselist=True, lazy='joined')
     purchase_requests: Mapped[Optional[List["PurchaseRequestModel"]]] = relationship(
+        back_populates='user', uselist=True, lazy='joined'
+    )
+    product_applications: Mapped[Optional[List["ProductApplicationModel"]]] = relationship(
         back_populates='user', uselist=True, lazy='joined'
     )

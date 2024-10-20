@@ -16,14 +16,16 @@ from aiogram_dialog import DialogManager, StartMode, ShowMode
 from src.presentation.telegram.filters import AdminFilter, ChatFilter
 from src.infrastructure.json_text_getter import (
     get_paypal_order_text,
-    get_user_profile_text,
     get_admin_service_statistics_text,
+    get_purchase_request_text,
 )
 from src.presentation.telegram.buttons import inline
 from src.application.services.order import OrderService
 from src.application.services.user import UserService
-from src.application.dto.order import GetOrderDTO, TakeOrderDTO
-from src.application.dto.user import GetUserDTO
+from src.application.services.product_application import ProductApplicationService
+from src.application.services.purchase_request import PurchaseRequestService
+from src.application.dto.purchase_request import GetOnePurchaseRequestDTO, TakePurchaseRequestDTO
+from src.application.dto.order import TakeOrderDTO
 from src.domain.exceptions.order import OrderAlreadyTakenError, OrderNotFoundError
 from src.application.services.statistics import StatisticsService
 from src.presentation.telegram.states import (
@@ -34,6 +36,7 @@ from src.presentation.telegram.states import (
     AdminOrderLookUpSG,
     AdminSearchSG,
 )
+from src.domain.exceptions.purchase_request import PurchaseRequestNotFound, PurchaseRequestAlreadyTaken
 from src.infrastructure.config import load_bot_settings
 
 
@@ -49,11 +52,8 @@ async def take_order_handler(
     callback: CallbackQuery,
     bot: Bot,
     order_service: FromDishka[OrderService],
-    user_service: FromDishka[UserService],
 ) -> None:
     order_id = UUID(callback.data.split(':')[1])
-    order = await order_service.get(GetOrderDTO(order_id=order_id))
-    customer = await user_service.get_user(GetUserDTO(user_id=order.user_id))
     bot_settings = load_bot_settings()
 
     try:
@@ -88,6 +88,54 @@ async def take_order_handler(
         await callback.answer("❌ Этот заказ уже взят другим администратором!", show_alert=True)
     except OrderNotFoundError:
         await callback.answer("❌ Заказ с таким ID не был найден!", show_alert=True)
+
+
+@router.callback_query(
+    F.data.startswith('take_purchase_request'),
+    AdminFilter(),
+    ChatFilter(chat_type=ChatType.SUPERGROUP),
+)
+async def take_product_purchase_request_handler(
+    callback: CallbackQuery,
+    bot: Bot,
+    purchase_request_service: FromDishka[PurchaseRequestService],
+) -> None:
+    request_id = UUID(callback.data.split(':')[1])
+    bot_settings = load_bot_settings()
+
+    try:
+        purchase_request = await purchase_request_service.take_request(TakePurchaseRequestDTO(id=request_id))
+        await bot.send_message(
+            chat_id=callback.from_user.id,
+            text=get_purchase_request_text(
+                request_id=purchase_request.id,
+                user_id=purchase_request.user_id,
+                created_at=purchase_request.created_at,
+                status=purchase_request.status.value,
+                purchase_url=purchase_request.purchase_url,
+            ),
+            reply_markup=inline.get_purchase_request_fulfillment_kb_markup(purchase_request_id=request_id),
+        )
+        print(purchase_request, flush=True)
+        await bot.edit_message_text(
+            chat_id=bot_settings.orders_group_id,
+            message_id=purchase_request.message_id,
+            text=get_purchase_request_text(
+                request_id=purchase_request.id,
+                user_id=purchase_request.user_id,
+                created_at=purchase_request.created_at,
+                status=purchase_request.status.value,
+                purchase_url=purchase_request.purchase_url,
+            ),
+        )
+        await callback.answer(
+            'Вы успешно взялись за запрос! Вам было отправлено сообщение с информацией о запросе в личный чат с ботом.',
+            show_alert=True,
+        )
+    except PurchaseRequestAlreadyTaken:
+        await callback.answer("❌ Этот запрос уже взят другим администратором!", show_alert=True)
+    except PurchaseRequestNotFound:
+        await callback.answer("❌ Запрос с таким ID не был найден!", show_alert=True)
 
 
 @router.callback_query(

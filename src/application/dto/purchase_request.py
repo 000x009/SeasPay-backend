@@ -17,6 +17,11 @@ class PurchaseRequestDTO:
 
 
 @dataclass(frozen=True)
+class TakePurchaseRequestDTO:
+    id: UUID
+
+
+@dataclass(frozen=True)
 class CreatePurchaseRequestDTO:
     user_id: int
     purchase_url: str

@@ -13,6 +13,16 @@ from src.presentation.telegram.buttons.callback_data.purchase_request import (
 )
 
 
+def get_purchase_request_fulfillment_kb_markup(purchase_request_id: UUID) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text='🔁 Начать выполнение', callback_data=f'start_request_fulfillment:{purchase_request_id}'),
+            ],
+        ]
+    )
+
+
 def get_start_kb_markup(config: BotSettings) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[

@@ -33,6 +33,19 @@ class PurchaseRequestDalImpl(PurchaseRequestDal):
 
         return purchase_request
 
+    async def update(self, purchase_request: PurchaseRequest) -> PurchaseRequest:
+        request_model = PurchaseRequestModel(
+            id=purchase_request.id.value,
+            user_id=purchase_request.user_id.value,
+            purchase_url=purchase_request.purchase_url.value,
+            created_at=purchase_request.created_at.value,
+            status=purchase_request.status.value,
+            telegram_message_id=purchase_request.message_id.value,
+        )
+        await self.session.merge(request_model)
+
+        return purchase_request
+
     async def get_one(self, request_id: PurchaseRequestId) -> Optional[PurchaseRequest]:
         query = select(PurchaseRequestModel).where(PurchaseRequestModel.id == request_id.value)
         result = await self.session.execute(query)

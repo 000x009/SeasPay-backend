@@ -22,3 +22,7 @@ class PurchaseRequestDal(Protocol):
     @abstractmethod
     async def list_all(self) -> List[PurchaseRequest]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, purchase_request: PurchaseRequest) -> PurchaseRequest:
+        raise NotImplementedError

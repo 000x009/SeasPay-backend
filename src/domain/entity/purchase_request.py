@@ -35,6 +35,7 @@ class PurchaseRequest:
         self.purchase_url = purchase_url
         self.created_at = created_at
         self.status = status
+        self.message_id = message_id
 
         if not self.created_at:
             self.created_at = CreatedAt(datetime.now(UTC))
