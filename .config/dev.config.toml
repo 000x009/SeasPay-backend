@@ -1,4 +1,5 @@
 [commission]
+digital_product = 5
 [commission.paypal]
 min_percentage_to_withdraw = 7
 max_percentage_to_withdraw = 15

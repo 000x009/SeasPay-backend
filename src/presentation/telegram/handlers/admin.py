@@ -38,6 +38,7 @@ from src.presentation.telegram.states import (
 )
 from src.domain.exceptions.purchase_request import PurchaseRequestNotFound, PurchaseRequestAlreadyTaken
 from src.infrastructure.config import load_bot_settings
+from src.presentation.telegram.states.purchase_request import PurchaseRequestFulfillmentSG
 
 
 router = Router()
@@ -154,6 +155,24 @@ async def order_fulfillment_handler(
         OrderFulfillmentSG.ORDER_INFO,
         mode=StartMode.RESET_STACK,
         data=dict(order_id=order_id),
+    )
+
+
+@router.callback_query(
+    F.data.startswith('start_request_fulfillment'),
+    AdminFilter(),
+    ChatFilter(chat_type=ChatType.PRIVATE),
+)
+async def start_request_fulfillment_handler(
+    callback: CallbackQuery,
+    bot: Bot,
+    dialog_manager: DialogManager,
+) -> None:
+    request_id = callback.data.split(':')[1]
+    await dialog_manager.start(
+        state=PurchaseRequestFulfillmentSG.REQUEST_INFO,
+        mode=StartMode.RESET_STACK,
+        data=dict(request_id=request_id),
     )
 
 

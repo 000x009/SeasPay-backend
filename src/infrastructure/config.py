@@ -78,6 +78,7 @@ class Commission:
     """Commission settings"""
 
     paypal: PayPalCommission
+    digital_product: float
 
 
 @dataclass
@@ -135,7 +136,8 @@ def load_settings() -> Settings:
             max_amount_to_withdraw=toml_cfg['commission']['paypal']['max_amount_to_withdraw'],
             max_amount_to_transfer=toml_cfg['commission']['paypal']['max_amount_to_transfer'],
             commission_to_transfer=toml_cfg['commission']['paypal']['commission_to_transfer'],
-        )
+        ),
+        digital_product=toml_cfg['commission']['digital_product'],
     )
     cloud_settings = YandexCloudSettings(
         access_key_id=toml_cfg['yandex-cloud']['yandex-access-key-id'],

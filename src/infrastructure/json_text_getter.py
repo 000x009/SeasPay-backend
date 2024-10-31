@@ -208,3 +208,11 @@ def get_purchase_request_text(
         created_at=created_at.strftime("%d.%m.%Y %H:%M"),
         status=status_mapping.get(status, ""),
     )
+
+
+def get_purchase_request_price_text(price: float) -> str:
+    return get_text_by_key("purchase_request_price_text").format(price=price)
+
+
+def get_purchase_product_loging_fields_text(login_fields: list[str]) -> str:
+    return get_text_by_key("purchase_product_loging_fields_text").format(login_fields="\n".join(login_fields))
