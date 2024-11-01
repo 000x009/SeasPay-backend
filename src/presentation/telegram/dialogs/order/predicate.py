@@ -4,6 +4,7 @@ from aiogram_dialog.widgets.common.when import Predicate, Whenable
 from aiogram_dialog import DialogManager
 from src.domain.value_objects.order import OrderTypeEnum
 
+
 def new_confirm_fulfillment() -> Predicate:
     def when_confirm_fulfillment(
         data: Dict,
@@ -22,6 +23,8 @@ def new_confirm_fulfillment() -> Predicate:
         if order_type == OrderTypeEnum.WITHDRAW:
             if payment_receipt and received_amount and user_must_receive and user_received_amount:
                 return True
+        if order_type == OrderTypeEnum.DIGITAL_PRODUCT:
+            return True
         return False
 
     return when_confirm_fulfillment

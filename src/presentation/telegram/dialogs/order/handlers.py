@@ -16,6 +16,7 @@ from src.application.dto.order import (
     FulfillTransferOrderDTO,
     GetOrderDTO,
     CancelOrderDTO,
+    FulfillDigitalProductOrderDTO,
 )
 from src.presentation.telegram.dialogs.common.injection import inject_on_click
 from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
@@ -118,6 +119,10 @@ async def confirm_fulfillment(
             ))
         elif order_type == OrderTypeEnum.TRANSFER:
             order = await order_service.fulfill_transfer_order(FulfillTransferOrderDTO(order_id=order_id))
+        elif order_type == OrderTypeEnum.DIGITAL_PRODUCT:
+            order = await order_service.fulfill_digital_product_order(FulfillDigitalProductOrderDTO(
+                order_id=order_id,
+            ))
         await bot.edit_message_caption(
             chat_id=bot_settings.orders_group_id,
             message_id=order.telegram_message_id,

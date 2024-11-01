@@ -35,7 +35,7 @@ def get_paypal_order_text(
     type_mapping = {
         OrderTypeEnum.WITHDRAW: "вывод средств",
         OrderTypeEnum.TRANSFER: "перевод средств",
-        OrderTypeEnum.DIGITAL_PRODUCT: "приобретение продукта",
+        OrderTypeEnum.DIGITAL_PRODUCT: "приобретение виртуального продукта/услуги",
     }
     return get_text_by_key("paypal_order_text").format(
         type=type_mapping.get(order_type, ""),
@@ -43,6 +43,18 @@ def get_paypal_order_text(
         user_id=user_id,
         created_at=created_at.strftime("%d.%m.%Y %H:%M"),
         status=status_mapping.get(status, ""),
+    )
+
+
+def get_digital_product_details_text(
+    product_purchase_url: str,
+    login_data: dict[str, str],
+) -> str:
+    login_fields = "\n".join([f"<b>• {key}</b>: <code>{value}</code>" for key, value in login_data.items()])
+
+    return get_text_by_key("digital_product_details_text").format(
+        purchase_url=product_purchase_url,
+        generated_login_fields=login_fields,
     )
 
 

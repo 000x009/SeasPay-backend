@@ -25,7 +25,10 @@ from src.infrastructure.json_text_getter import (
     get_withdraw_card_text,
     get_withdraw_crypto_text,
     get_transfer_text,
+    get_digital_product_details_text,
 )
+from src.application.services.digital_product_details import DigitalProductDetailsService
+from src.application.dto.digital_product_details import GetDigitalProductDetailsDTO
 
 
 @inject_getter
@@ -51,6 +54,7 @@ async def order_getter(
 
     return {
         "order": order,
+        "order_type": order.type,
         "customer": customer,
         "payment_receipt": payment_receipt if payment_receipt else None,
         "user_received_amount": user_received_amount,
@@ -63,6 +67,7 @@ async def order_text_getter(
     order_service: FromDishka[OrderService],
     withdraw_service: FromDishka[WithdrawService],
     transfer_details_service: FromDishka[TransferDetailsService],
+    digital_product_service: FromDishka[DigitalProductDetailsService],
     **_,
 ) -> Dict[str, str]:
     order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
@@ -96,6 +101,12 @@ async def order_text_getter(
             receiver_email=db_details.receiver_email,
             amount=db_details.amount,
             commission=db_details.commission,
+        )
+    elif order.type == OrderTypeEnum.DIGITAL_PRODUCT:
+        db_details = await digital_product_service.get(GetDigitalProductDetailsDTO(order_id=order.id))
+        details_text = get_digital_product_details_text(
+            product_purchase_url=db_details.purchase_url,
+            login_data=db_details.login_data,
         )
 
     return {

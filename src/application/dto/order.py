@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
-from typing import Optional
+from typing import Optional, Dict
 from decimal import Decimal
 from uuid import UUID
 
@@ -45,7 +45,6 @@ class CreateWithdrawOrderDTO:
     card_holder_name: Optional[str] = field(default=None)
     crypto_address: Optional[str] = field(default=None)
     crypto_network: Optional[str] = field(default=None)
-
 
 
 @dataclass(frozen=True)
@@ -95,4 +94,18 @@ class FulfillTransferOrderDTO:
 
 @dataclass(frozen=True)
 class CancelOrderDTO:
+    order_id: UUID
+
+
+@dataclass(frozen=True)
+class CreateDigitalProductOrderDTO:
+    application_id: UUID
+    user_id: int
+    payment_receipt_url: str
+    login_data: Dict[str, str]
+    username: str
+
+
+@dataclass(frozen=True)
+class FulfillDigitalProductOrderDTO:
     order_id: UUID

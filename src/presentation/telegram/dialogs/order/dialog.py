@@ -39,19 +39,19 @@ order_dialog = Dialog(
             text=Const("🧮 Рассчитать комиссию"),
             id="calculate_commission",
             on_click=calculate_commission,
-            when=F['order'].type == OrderTypeEnum.WITHDRAW,
+            when=F['order_type'].in_((OrderTypeEnum.TRANSFER, OrderTypeEnum.WITHDRAW)),
         ),
         Button(
             text=Const("🖇️ Прикрепить фото чека"),
             id="attach_receipt",
             on_click=attach_receipt,
-            when=~F["payment_receipt"],
+            when=~F["payment_receipt"] & F['order_type'].in_((OrderTypeEnum.TRANSFER, OrderTypeEnum.WITHDRAW)),
         ),
         Button(
             text=Const("🖇️ Поменять фото чека"),
             id="attach_receipt",
             on_click=attach_receipt,
-            when=F["payment_receipt"],
+            when=F["payment_receipt"] & F['order_type'].in_((OrderTypeEnum.TRANSFER, OrderTypeEnum.WITHDRAW)),
         ),
         SwitchTo(
             text=Const("🪙 Полученная сумма пользователем"),

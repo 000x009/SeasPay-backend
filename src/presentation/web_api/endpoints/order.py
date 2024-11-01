@@ -17,10 +17,14 @@ from src.application.dto.order import (
     GetOrderDTO,
     CreateWithdrawOrderDTO,
     CreateTransferOrderDTO,
+    CreateDigitalProductOrderDTO,
 )
 from src.application.common.dto import Pagination
-from src.presentation.web_api.schema.order import CreateWithdrawOrderSchema, CreateTransferOrderSchema
-from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
+from src.presentation.web_api.schema.order import (
+    CreateWithdrawOrderSchema,
+    CreateTransferOrderSchema,
+    CreateDigitalProductOrderSchema,
+)
 
 router = APIRouter(
     prefix='/order',
@@ -100,6 +104,25 @@ async def create_transfer_order(
             username='some username',
             transfer_amount=data.amount,
             payment_receipt_url=data.payment_receipt_url,
+        )
+    )
+
+    return response
+
+
+@router.post('/digital-product', response_model=OrderDTO)
+async def create_digital_product_order(
+    data: CreateDigitalProductOrderSchema,
+    order_service: FromDishka[OrderService],
+    # user_data: WebAppInitData = Depends(user_init_data_provider),
+) -> OrderDTO:
+    response = await order_service.create_digital_product_order(
+        CreateDigitalProductOrderDTO(
+            user_id=22223,
+            application_id=data.application_id,
+            payment_receipt_url=data.payment_receipt_url,
+            login_data=data.login_data,
+            username='some username',
         )
     )
 

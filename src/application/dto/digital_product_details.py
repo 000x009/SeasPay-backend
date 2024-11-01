@@ -14,5 +14,13 @@ class DigitalProductDetailsDTO:
 
 
 @dataclass(frozen=True)
+class AddDigitalProductDetailsDTO:
+    order_id: UUID
+    purchase_url: str
+    commission: Decimal
+    login_data: Dict[str, str]
+
+
+@dataclass(frozen=True)
 class GetDigitalProductDetailsDTO:
     order_id: UUID

@@ -1,8 +1,7 @@
-from typing import Optional
-import json
+from typing import Optional, Dict
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, EmailStr, model_validator
+from pydantic import BaseModel, Field, EmailStr, UUID4
 
 from src.domain.value_objects.withdraw_method import MethodEnum
 
@@ -20,3 +19,9 @@ class CreateTransferOrderSchema(BaseModel):
     receiver_email: EmailStr
     amount: Decimal
     payment_receipt_url: str
+
+
+class CreateDigitalProductOrderSchema(BaseModel):
+    application_id: UUID4
+    payment_receipt_url: str
+    login_data: Dict[str, str]

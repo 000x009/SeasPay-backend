@@ -2,6 +2,7 @@ from src.application.common.uow import UoW
 from src.application.dto.digital_product_details import (
     GetDigitalProductDetailsDTO,
     DigitalProductDetailsDTO,
+    AddDigitalProductDetailsDTO,
 )
 from src.infrastructure.dal.digital_product_details import DigitalProductDetailsDAL
 from src.domain.entity.digital_product_details import DigitalProductDetails
@@ -32,13 +33,14 @@ class DigitalProductDetailsService:
             login_data=details.login_data.value,
         )
 
-    async def insert(self, data: DigitalProductDetailsDTO) -> DigitalProductDetailsDTO:
+    async def insert(self, data: AddDigitalProductDetailsDTO) -> DigitalProductDetailsDTO:
         details = await self.dal.insert(DigitalProductDetails(
             order_id=OrderID(data.order_id),
             purchase_url=PurchaseURL(data.purchase_url),
             commission=Commission(data.commission),
             login_data=LoginData(data.login_data),
         ))
+        print(details, flush=True)
         await self.uow.commit()
 
         return DigitalProductDetailsDTO(

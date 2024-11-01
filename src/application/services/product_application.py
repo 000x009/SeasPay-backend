@@ -7,6 +7,7 @@ from src.application.dto.product_application import (
     GetProductApplicationDTO,
     ProductApplicationDTO,
     GetProductApplicationByRequestIdDTO,
+    FulfillProductApplicationDTO,
 )
 from src.domain.entity.product_application import ProductApplication
 from src.domain.value_objects.product_application import (
@@ -22,7 +23,8 @@ from src.domain.value_objects.purchase_request import PurchaseRequestId
 
 class ProductApplicationService:
     def __init__(
-        self, dal: ProductApplicationDALImpl,
+        self,
+        dal: ProductApplicationDALImpl,
         uow: UoW,
     ) -> None:
         self.dal = dal
@@ -72,11 +74,10 @@ class ProductApplicationService:
             status=product_application.status.value,
         )
 
-    async def fulfill_application(self, data: GetProductApplicationDTO) -> ProductApplicationDTO:
+    async def fulfill_application(self, data: FulfillProductApplicationDTO) -> ProductApplicationDTO:
         product_application = await self.dal.get_one(ProductApplicationID(data.id))
         product_application.status = ProductApplicationStatus(ProductApplicationStatusEnum.FULFILLED)
         product_application = await self.dal.update(product_application)
-
         await self.uow.commit()
 
         return ProductApplicationDTO(

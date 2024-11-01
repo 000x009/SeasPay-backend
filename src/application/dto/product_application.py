@@ -31,6 +31,11 @@ class GetProductApplicationDTO:
 
 
 @dataclass(frozen=True)
+class FulfillProductApplicationDTO:
+    id: UUID
+
+
+@dataclass(frozen=True)
 class GetProductApplicationByRequestIdDTO:
     purchase_request_id: UUID
 

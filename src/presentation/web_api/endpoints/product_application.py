@@ -4,9 +4,11 @@ from fastapi import APIRouter
 
 from dishka.integrations.fastapi import DishkaRoute
 
-from src.application.dto.product_application import ProductApplicationDTO, GetProductApplicationDTO
+from src.application.dto.product_application import (
+    ProductApplicationDTO,
+    GetProductApplicationDTO,
+)
 from src.application.services.product_application import ProductApplicationService
-from src.presentation.web_api.schema.product_application import FulfillProductApplicationSchema
 
 
 router = APIRouter(
@@ -23,19 +25,6 @@ async def get_product_application(
 ) -> ProductApplicationDTO:
     response = await application_service.get_application_by_id(GetProductApplicationDTO(
         id=application_id,
-    ))
-
-    return response
-
-
-@router.post('/')
-async def fulfill_application(
-    data: FulfillProductApplicationSchema,
-    application_service: ProductApplicationService,
-) -> ProductApplicationDTO:
-    response = await application_service.fulfill_application(GetProductApplicationDTO(
-        id=data.application_id,
-
     ))
 
     return response
