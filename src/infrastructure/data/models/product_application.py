@@ -1,5 +1,5 @@
 import uuid
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, List
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, func, UUID, ForeignKey, BigInteger, Enum, JSON
@@ -23,9 +23,9 @@ class ProductApplicationModel(Base):
         nullable=False,
         server_default=func.now(),
     )
-    required_fields: Mapped[Dict[str, List[str]]] = mapped_column(JSON)
+    login_data: Mapped[List[str]] = mapped_column(JSON)
     status: Mapped[ProductApplicationStatusEnum] = mapped_column(
-        Enum('SENT', 'FULLFILLED', name='product_application_status'),
+        Enum('SENT', 'FULFILLED', name='product_application_status'),
         default=ProductApplicationStatusEnum.SENT,
     )
 

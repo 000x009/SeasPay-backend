@@ -136,7 +136,7 @@ class PurchaseRequestService:
         await self.product_application_service.create_application(CreateProductApplicationDTO(
             user_id=request.user_id.value,
             purchase_request_id=request.id.value,
-            required_fields=data.login_fields,
+            login_data=data.login_fields,
             status=ProductApplicationStatusEnum.SENT,
         ))
         await self.uow.commit()
