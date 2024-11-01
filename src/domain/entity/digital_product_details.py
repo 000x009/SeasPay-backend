@@ -1,23 +1,23 @@
-from src.domain.value_objects.order import OrderID, OrderType, Commission
-from src.domain.value_objects.digital_product_details import PurchaseURL
+from src.domain.value_objects.order import OrderID
+from src.domain.value_objects.digital_product_details import PurchaseURL, LoginData, Commission
 
 
 class DigitalProductDetails:
     __slots__ = (
         'order_id',
-        'type_',
-        'product_url',
+        'purchase_url',
         'commission',
+        'login_data',
     )
 
     def __init__(
         self,
         order_id: OrderID,
-        type_: OrderType,
-        product_url: PurchaseURL,
+        purchase_url: PurchaseURL,
         commission: Commission,
+        login_data: LoginData,
     ) -> None:
         self.order_id = order_id
-        self.type_ = type_
-        self.product_url = product_url
+        self.purchase_url = purchase_url
         self.commission = commission
+        self.login_data = login_data

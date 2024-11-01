@@ -7,7 +7,7 @@ from src.domain.value_objects.order import OrderID
 
 class BaseTransferDetailsDAL(Protocol):
     @abstractmethod
-    async def insert(self, withdraw_method: DigitalProductDetails) -> None:
+    async def insert(self, withdraw_method: DigitalProductDetails) -> DigitalProductDetails:
         raise NotImplementedError
 
     @abstractmethod

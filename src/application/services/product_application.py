@@ -77,7 +77,6 @@ class ProductApplicationService:
         product_application.status = ProductApplicationStatus(ProductApplicationStatusEnum.FULFILLED)
         product_application = await self.dal.update(product_application)
 
-
         await self.uow.commit()
 
         return ProductApplicationDTO(

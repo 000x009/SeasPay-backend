@@ -18,7 +18,7 @@ class DigitalProductDetailsModel(Base):
         ForeignKey('order.id', ondelete='CASCADE'),
         primary_key=True,
     )
-    product_url: Mapped[str] = mapped_column(String, nullable=False)
+    purchase_url: Mapped[str] = mapped_column(String, nullable=False)
     commission: Mapped[int] = mapped_column(Integer, nullable=False)
     login_data: Mapped[Dict[str, str]] = mapped_column(JSON, nullable=True)
 

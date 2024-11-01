@@ -34,6 +34,8 @@ from src.application.services.cloud import CloudService
 from src.application.services.transfer_details import TransferDetailsService
 from src.infrastructure.dal.tranfer_details import TransferDetailsDAL
 from src.application.services.statistics import StatisticsService
+from src.application.services.digital_product_details import DigitalProductDetailsService
+from src.infrastructure.dal.digital_product_details import DigitalProductDetailsDAL
 from src.infrastructure.config import load_settings, load_bot_settings, BotSettings
 from src.infrastructure.telegram import TelegramClient
 from src.application.services.telegram_service import TelegramService
@@ -77,6 +79,9 @@ class DALProvider(Provider):
         ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl
     )
     user_commission_dal = provide(UserCommissionDALImpl, scope=Scope.REQUEST, provides=UserCommissionDAL)
+    digital_product_details_dal = provide(
+        DigitalProductDetailsDAL, scope=Scope.REQUEST, provides=DigitalProductDetailsDAL
+    )
     uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
 
 
@@ -94,6 +99,9 @@ class ServiceProvider(Provider):
     purchase_request_service = provide(PurchaseRequestService, scope=Scope.REQUEST, provides=PurchaseRequestService)
     product_application_service = provide(
         ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService
+    )
+    digital_product_details_service = provide(
+        DigitalProductDetailsService, scope=Scope.REQUEST, provides=DigitalProductDetailsService
     )
     user_commission_service = provide(UserCommissionService, scope=Scope.REQUEST, provides=UserCommissionService)
 
