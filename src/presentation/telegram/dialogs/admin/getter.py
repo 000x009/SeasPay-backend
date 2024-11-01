@@ -1,5 +1,5 @@
 import uuid
-from typing import Mapping, Dict
+from typing import Dict
 
 from aiogram_dialog import DialogManager
 
@@ -7,6 +7,8 @@ from dishka.integrations.aiogram import FromDishka
 
 from src.application.services.order import OrderService
 from src.application.services.user import UserService
+from src.application.services.user_commission import UserCommissionService
+from src.application.dto.user_commission import GetUserCommissionDTO
 from src.application.dto.order import OrderDTO, ListOrderDTO, GetOrderDTO
 from src.application.dto.user import GetUserDTO, UserDTO
 from src.presentation.telegram.dialogs.common.injection import inject_getter
@@ -21,7 +23,7 @@ async def order_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs
-) -> Mapping[str, list[OrderDTO]]:
+) -> Dict[str, list[OrderDTO]]:
     user_id = dialog_manager.start_data.get("user_id")
     orders = await order_service.list_orders(ListOrderDTO(user_id=12823))
 
@@ -33,7 +35,7 @@ async def one_order_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs
-) -> Mapping[str, OrderDTO]:
+) -> Dict[str, OrderDTO]:
     order = await order_service.get(GetOrderDTO(order_id=uuid.UUID(dialog_manager.dialog_data.get("order_id"))))
 
     return {
@@ -45,7 +47,6 @@ async def one_order_getter(
             status=order.status,
             order_type=order.type,
         ),
-        "is_empty": False if order else True,
     }
 
 
@@ -54,13 +55,12 @@ async def all_orders_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs
-) -> Mapping[str, str]:
+) -> Dict[str, str | list[OrderDTO]]:
     orders = await order_service.get_all_orders()
     
     return {
         "count": len(orders) if orders else 0,
         "orders": orders,
-        "is_empty": orders is None or len(orders) == 0,
     }
 
 
@@ -69,13 +69,12 @@ async def processing_orders_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs
-) -> Mapping[str, str]:
+) -> Dict[str, str | list[OrderDTO]]:
     orders = await order_service.get_processing_orders()
     
     return {
         "count": len(orders) if orders else 0,
         "orders": orders,
-        "is_empty": orders is None or len(orders) == 0,
     }
 
 
@@ -84,7 +83,7 @@ async def completed_orders_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs
-) -> Mapping[str, str]:
+) -> Dict[str, str]:
     orders = await order_service.get_completed_orders()
     
     return {
@@ -99,13 +98,12 @@ async def cancelled_orders_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs
-) -> Mapping[str, str]:
+) -> Dict[str, str | list[OrderDTO]]:
     orders = await order_service.get_cancelled_orders()
     
     return {
         "count": len(orders) if orders else 0,
         "orders": orders,
-        "is_empty": orders is None or len(orders) == 0,
     }
 
 
@@ -113,22 +111,25 @@ async def cancelled_orders_getter(
 async def user_getter(
     dialog_manager: DialogManager,
     user_service: FromDishka[UserService],
+    user_commission_service: FromDishka[UserCommissionService],
     **kwargs,
 ) -> Dict[str, UserDTO]:
     user_id = dialog_manager.dialog_data.get('search_user_id')
     user = await user_service.get_user(GetUserDTO(user_id=user_id))
     user_text = None
     if user:
+        user_commission = await user_commission_service.get(GetUserCommissionDTO(user_id=user_id))
         user_text = get_user_profile_text(
             user_id=user.user_id,
-            commission=user.commission,
             total_withdrawn=user.total_withdrawn,
+            transfer_commission=user_commission.transfer,
+            purchase_commission=user_commission.withdraw,
+            product_purchase_commission=user_commission.digital_product,
         )
 
     return {
         'user': user,
         'user_text': user_text,
-        'is_empty': False if user else True,
     }
 
 
@@ -148,11 +149,10 @@ async def user_orders_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     **kwargs,
-) -> Dict[str, list[OrderDTO] | bool]:
+) -> Dict[str, list[OrderDTO]]:
     user_id = dialog_manager.dialog_data.get('search_user_id')
     orders = await order_service.list_orders(ListOrderDTO(user_id=user_id))
 
     return {
         'orders': orders,
-        'is_empty': True if not orders else False,
     }

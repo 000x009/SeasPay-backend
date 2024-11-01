@@ -43,6 +43,7 @@ from src.presentation.telegram.dialogs.admin.handlers import (
 admin_dialog = Dialog(
     Window(
         Const("Заказы пользователя", when="orders"),
+        Const("На данный момент у пользователя нет заказов", when=~F["orders"]),
         ScrollingGroup(
             Select(
                 id="order_select",
@@ -117,7 +118,7 @@ look_up_order_dialog = Dialog(
     ),
     Window(
         Format('🌐 Все заказы ({count})', when="orders"),
-        Format("На данный момент еще нет заказов", when="is_empty"),
+        Format("На данный момент еще нет заказов", when=~F["orders"]),
         ScrollingGroup(
             Select(
                 id="order_select",
@@ -175,7 +176,7 @@ look_up_order_dialog = Dialog(
     ),
     Window(
         Format("🔄 Не выполненные заказы ({count})", when="orders"),
-        Format("На данный момент еще нет не выполненных заказов", when="is_empty"),
+        Format("На данный момент еще нет не выполненных заказов", when=~F["orders"]),
         ScrollingGroup(
             Select(
                 id="order_select",
@@ -216,7 +217,7 @@ look_up_order_dialog = Dialog(
     ),
     Window(
         Format("✅ Выполненные заказы ({count})", when="orders"),
-        Format("На данный момент еще нет выполненных заказов", when="is_empty"),
+        Format("На данный момент еще нет выполненных заказов", when=~F["orders"]),
         ScrollingGroup(
             Select(
                 id="order_select",
@@ -256,7 +257,7 @@ look_up_order_dialog = Dialog(
         getter=completed_orders_getter,
     ),
     Window(
-        Format("На данный момент еще нет отмененных заказов", when="is_empty"),
+        Format("На данный момент еще нет отмененных заказов", when=~F["orders"]),
         Format("❌ Отмененные заказы ({count})", when="orders"),
         ScrollingGroup(
             Select(
@@ -346,7 +347,7 @@ admin_search_dialog = Dialog(
     ),
     Window(
         Format('{user_text}', when='user'),
-        Const('Пользователь с данным ID не был найден...', when='is_empty'),
+        Const('Пользователь с данным ID не был найден...', when=~F['user']),
         MessageInput(
             func=message_input_fixing,
         ),
@@ -370,7 +371,7 @@ admin_search_dialog = Dialog(
     ),
     Window(
         Format("{order_text}"),
-        Const('Заказ с данным ID не был найден...', when='is_empty'),
+        Const('Заказ с данным ID не был найден...', when=~F['order']),
         Button(
             text=Format("🔄 Начать выполнение заказа"),
             id='start_fulfillment',
@@ -418,7 +419,7 @@ admin_search_dialog = Dialog(
     ),
     Window(
         Const('Заказы пользователя:', when='orders'),
-        Const('У пользователя нет заказов', when='is_empty'),
+        Const('У пользователя нет заказов', when=~F['orders']),
         ScrollingGroup(
             Select(
                 id="order_select",
