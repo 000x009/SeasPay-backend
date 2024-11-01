@@ -1,8 +1,6 @@
 import uuid
-from typing import Optional, List, TYPE_CHECKING
-from decimal import Decimal
+from typing import Optional, List
 
-from src.application.services.telegram_service import TelegramService
 from src.infrastructure.dal import OrderDAL
 from src.application.common.dto import FileDTO
 from src.application.dto.order import (
@@ -11,8 +9,6 @@ from src.application.dto.order import (
     GetOrderDTO,
     CreateWithdrawOrderDTO,
     TakeOrderDTO,
-    CalculateCommissionDTO,
-    CommissionDTO,
     FulfillWithdrawOrderDTO,
     CancelOrderDTO,
     CreateTransferOrderDTO,
@@ -27,7 +23,6 @@ from src.domain.value_objects.order import (
     OrderStatus,
     OrderStatusEnum,
     OrderType,
-    Commission as OrderCommission,
     OrderTypeEnum,
 )
 from src.domain.entity.order import Order
@@ -36,24 +31,28 @@ from src.domain.value_objects.order_message import MessageID
 from src.application.services.withdraw_details import WithdrawService
 from src.application.services.transfer_details import TransferDetailsService
 from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO
-from src.application.dto.transfer_details import AddTransferDetailsDTO
-from src.application.dto.telegram import SendOrderMessageDTO
+from src.application.services.telegram_service import TelegramService
+from src.application.dto.telegram import SendMessageDTO
 from src.application.services.user import UserService
 from src.application.dto.completed_order import AddCompletedOrderDTO
 from src.application.dto.user import GetUserDTO
 from src.infrastructure.json_text_getter import get_paypal_order_text
-from src.domain.value_objects.completed_order import PaypalReceivedAmount
 from src.application.services.completed_order import CompletedOrderService
 from src.domain.entity.user import User
 from src.domain.value_objects.user import JoinedAt, TotalWithdrawn
-from src.domain.value_objects.digital_product_details import Commission as ProductCommission
-from src.domain.value_objects.transfer_details import Commission as TransferCommission
-from src.domain.value_objects.withdraw_method import WithdrawCommission
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey
 from src.infrastructure.config import load_settings
 from src.application.dto.transfer_details import AddTransferDetailsDTO
+from src.application.services.user_commission import UserCommissionService
+from src.application.dto.user_commission import GetUserCommissionDTO, UpdateUserCommissionDTO
+from src.domain.entity.user_commission import UserCommission
+from src.domain.value_objects.user_commission import (
+    UserTransferCommission,
+    UserWithdrawCommission,
+    UserDigitalProductCommission
+)
 
 
 class OrderService:
@@ -67,6 +66,7 @@ class OrderService:
         completed_order_service: CompletedOrderService,
         uow: UoW,
         cloud_storage: CloudStorage,
+        user_commission_service: UserCommissionService,
     ) -> None:
         self._order_dal = order_dal
         self._withdraw_service = withdraw_service
@@ -76,6 +76,7 @@ class OrderService:
         self.uow = uow
         self.cloud_storage = cloud_storage
         self.transfer_service = transfer_service
+        self.user_commission_service = user_commission_service
 
     async def list_orders(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
         orders = await self._order_dal.list_(
@@ -90,7 +91,7 @@ class OrderService:
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            type=order.type_,
+            type=order.type_.value,
             created_at=order.created_at.value,
             status=order.status.value,
             telegram_message_id=order.telegram_message_id.value,
@@ -113,7 +114,9 @@ class OrderService:
 
     async def create_withdraw_order(self, data: CreateWithdrawOrderDTO) -> OrderDTO:
         settings = load_settings()
-        user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
+        user_commission = await self.user_commission_service.get(GetUserCommissionDTO(
+            user_id=data.user_id,
+        ))
         order = await self._order_dal.insert(
             Order(
                 id=OrderID(uuid.uuid4()),
@@ -124,11 +127,11 @@ class OrderService:
                 type_=OrderType(OrderTypeEnum.WITHDRAW),
             )
         )
-        withdraw_details = await self._withdraw_service.add_method(
+        await self._withdraw_service.add_method(
             AddWithdrawDetailsDTO(
                 order_id=order.id.value,
                 payment_receipt=data.payment_receipt_url,
-                commission=user.withdraw_commission,
+                commission=user_commission.withdraw,
                 method=data.method,
                 card_number=data.card_number,
                 card_holder_name=data.card_holder_name,
@@ -140,8 +143,8 @@ class OrderService:
             Bucket(settings.cloud_settings.receipts_bucket_name),
             ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
-        telegram_message = await self._telegram_service.send_order_message(
-            SendOrderMessageDTO(
+        telegram_message = await self._telegram_service.send_message(
+            SendMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
                 text=get_paypal_order_text(
@@ -187,52 +190,48 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=updated_order.type_,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             telegram_message_id=updated_order.telegram_message_id.value,
-        )
-    
-    async def calculate_commission(self, data: CalculateCommissionDTO) -> CommissionDTO:
-        order = await self._order_dal.get(OrderID(data.order_id))
-        if not order:
-            raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
-        user_must_receive = order.calculate_commission(PaypalReceivedAmount(data.paypal_received_amount))
-
-        return CommissionDTO(
-            commission=order.commission.value,
-            user_must_receive=round(user_must_receive.value, 2)
         )
 
     async def fulfill_withdraw_order(self, data: FulfillWithdrawOrderDTO) -> OrderDTO:
         order = await self._order_dal.get(OrderID(data.order_id))
         user = await self._user_service.get_user(GetUserDTO(user_id=order.user_id.value))
+        user_commission = await self.user_commission_service.get(GetUserCommissionDTO(user_id=user.user_id))
+        user_commission = UserCommission(
+            user_id=UserID(user.user_id),
+            transfer=UserTransferCommission(user_commission.transfer),
+            withdraw=UserWithdrawCommission(user_commission.withdraw),
+            digital_product=UserDigitalProductCommission(user_commission.digital_product),
+        )
         user = User(
             user_id=UserID(user.user_id),
             joined_at=JoinedAt(user.joined_at),
-            withdraw_commission=WithdrawCommission(user.withdraw_commission),
-            transfer_commission=TransferCommission(user.transfer_commission),
-            product_commission=ProductCommission(user.product_commission),
             total_withdrawn=TotalWithdrawn(user.total_withdrawn),
         )
         if not order:
             raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
-        
+
         order.status = OrderStatus(OrderStatusEnum.COMPLETE)
         updated_order = await self._order_dal.update(order)
 
-        user.total_withdrawn = TotalWithdrawn(user.total_withdrawn.value + data.paypal_received_amount)
-        user.update_withdraw_commission(PaypalReceivedAmount(data.paypal_received_amount))
+        user.total_withdrawn = TotalWithdrawn(user.total_withdrawn.value + data.payment_system_received_amount)
+        user_commission.update_withdraw_commission(user_total_withdrawn=user.total_withdrawn)
+        await self.user_commission_service.update(UpdateUserCommissionDTO(
+            user_id=user.user_id.value,
+            transfer=user_commission.transfer.value,
+            withdraw=user_commission.withdraw.value,
+            digital_product=user_commission.digital_product.value,
+        ))
         await self._user_service.update_user(UpdateUserDTO(
             user_id=user.user_id.value,
-            withdraw_commission=user.withdraw_commission.value,
-            transfer_commission=user.transfer_commission.value,
-            product_commission=user.product_commission.value,
             total_withdrawn=user.total_withdrawn.value,
         ))
         await self._completed_order_service.add(AddCompletedOrderDTO(
             order_id=updated_order.id.value,
-            paypal_received_amount=data.paypal_received_amount,
+            payment_system_received_amount=data.payment_system_received_amount,
             user_received_amount=data.user_received_amount,
         ))
         await self.uow.commit()
@@ -241,7 +240,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=updated_order.type_,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             telegram_message_id=updated_order.telegram_message_id.value,
@@ -254,7 +253,6 @@ class OrderService:
         
         order.status = OrderStatus(OrderStatusEnum.COMPLETE)
         updated_order = await self._order_dal.update(order)
-
         await self._completed_order_service.add(AddCompletedOrderDTO(order_id=updated_order.id.value))
         await self.uow.commit()
 
@@ -262,7 +260,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=updated_order.type_,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             telegram_message_id=updated_order.telegram_message_id.value,
@@ -282,7 +280,7 @@ class OrderService:
             id=updated_order.id.value,
             user_id=updated_order.user_id.value,
             payment_receipt=updated_order.payment_receipt.value,
-            type=updated_order.type_,
+            type=updated_order.type_.value,
             created_at=updated_order.created_at.value,
             status=updated_order.status.value,
             telegram_message_id=updated_order.telegram_message_id.value,
@@ -297,7 +295,7 @@ class OrderService:
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
-            type=order.type_,
+            type=order.type_.value,
             created_at=order.created_at.value,
             status=order.status.value,
             telegram_message_id=order.telegram_message_id.value,
@@ -350,7 +348,7 @@ class OrderService:
 
     async def create_transfer_order(self, data: CreateTransferOrderDTO) -> OrderDTO:
         settings = load_settings()
-        user = await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
+        await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
         order = await self._order_dal.insert(
             Order(
                 id=OrderID(uuid.uuid4()),
@@ -360,21 +358,22 @@ class OrderService:
                 type_=OrderType(OrderTypeEnum.TRANSFER),
             )
         )
-        transfer_details = await self.transfer_service.add_details(
+        user_commission = await self.user_commission_service.get(GetUserCommissionDTO(user_id=data.user_id))
+        await self.transfer_service.add_details(
             AddTransferDetailsDTO(
                 order_id=order.id.value,
                 receiver_email=data.receiver_email,
                 amount=data.transfer_amount,
                 receipt_photo_url=data.payment_receipt_url,
-                commission=user.commission,
+                commission=user_commission.transfer,
             )
         )
         payment_receipt_object = self.cloud_storage.get_object_file(
             Bucket(settings.cloud_settings.receipts_bucket_name),
             ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
-        telegram_message = await self._telegram_service.send_order_message(
-            SendOrderMessageDTO(
+        telegram_message = await self._telegram_service.send_message(
+            SendMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
                 text=get_paypal_order_text(

@@ -1,7 +1,7 @@
 from aiogram import F
 
 from aiogram_dialog import Dialog, Window
-from aiogram_dialog.widgets.text import Format, Const, Multi
+from aiogram_dialog.widgets.text import Multi
 from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.kbd import (
@@ -25,7 +25,7 @@ from src.presentation.telegram.dialogs.order.handlers import (
     on_reason_cancel_order,
     on_user_received_amount
 )
-from src.presentation.telegram.dialogs.order.predicate import new_confirm_fulfillment, new_when_no_payment_receipt
+from src.presentation.telegram.dialogs.order.predicate import new_confirm_fulfillment
 
 
 order_dialog = Dialog(
@@ -41,23 +41,23 @@ order_dialog = Dialog(
             on_click=calculate_commission,
             when=F['order'].type == OrderTypeEnum.WITHDRAW,
         ),
-        SwitchTo(
-            text=Const("🪙 Полученная сумма пользователем"),
-            id="user_received_amount",
-            state=OrderFulfillmentSG.USER_RECEIVED_AMOUNT,
-            when=F['order'].type == OrderTypeEnum.WITHDRAW,
-        ),
         Button(
             text=Const("🖇️ Прикрепить фото чека"),
             id="attach_receipt",
             on_click=attach_receipt,
-            when=new_when_no_payment_receipt(),
+            when=~F["payment_receipt"],
         ),
         Button(
             text=Const("🖇️ Поменять фото чека"),
             id="attach_receipt",
             on_click=attach_receipt,
-            when="payment_receipt",
+            when=F["payment_receipt"],
+        ),
+        SwitchTo(
+            text=Const("🪙 Полученная сумма пользователем"),
+            id="user_received_amount",
+            state=OrderFulfillmentSG.USER_RECEIVED_AMOUNT,
+            when=F['order'].type == OrderTypeEnum.WITHDRAW,
         ),
         Button(
             text=Const("✅ Подтвердить выполнение"),

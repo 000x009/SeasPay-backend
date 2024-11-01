@@ -7,6 +7,7 @@ from .user_topic import UserTopicModel
 from .withdraw_details import WithdrawDetailsModel
 from .transfer_details import TransferDetailsModel
 from .digital_product_details import DigitalProductDetailsModel
+from .user_commission import UserCommissionModel
 from .purchase_request import PurchaseRequestModel
 from .product_application import ProductApplicationModel
 
@@ -20,6 +21,7 @@ __all__ = [
     'WithdrawDetailsModel',
     'TransferDetailsModel',
     'DigitalProductDetailsModel',
+    'UserCommissionModel',
     'PurchaseRequestModel',
     'ProductApplicationModel',
 ]

@@ -13,8 +13,9 @@ from src.domain.value_objects.order import (
     Commission,
 )
 from src.domain.value_objects.order_message import MessageID
-from src.domain.value_objects.completed_order import PaypalReceivedAmount
+from src.domain.value_objects.completed_order import PaymentSystemReceivedAmount
 from src.domain.value_objects.order import MustReceiveAmount, OrderType
+
 
 class Order:
     __slots__ = (
@@ -59,9 +60,13 @@ class Order:
             return True
         return False
 
-    def calculate_commission(self, paypal_received_amount: PaypalReceivedAmount) -> MustReceiveAmount:
-        commission_percentage = Decimal(self.commission.value / 100)
-        commission_amount = paypal_received_amount.value * commission_percentage
-        user_amount = paypal_received_amount.value - commission_amount
+    def calculate_commission(
+            self,
+            commission: Commission,
+            payment_system_received_amount: PaymentSystemReceivedAmount,
+    ) -> MustReceiveAmount:
+        commission_percentage = Decimal(commission.value / 100)
+        commission_amount = payment_system_received_amount.value * commission_percentage
+        user_amount = payment_system_received_amount.value - commission_amount
 
         return MustReceiveAmount(user_amount)

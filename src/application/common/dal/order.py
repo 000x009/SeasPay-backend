@@ -15,13 +15,11 @@ class BaseOrderDAL(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def get(
-        self, user_id: UserID, order_id: OrderID,
-    ) -> Optional[OrderDTO]:
+    async def get(self, order_id: OrderID) -> Optional[Order]:
         raise NotImplementedError
 
     @abstractmethod
-    async def insert(self, order: Order) -> None:
+    async def insert(self, order: Order) -> Order:
         raise NotImplementedError
 
     @abstractmethod

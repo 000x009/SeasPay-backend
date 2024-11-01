@@ -10,7 +10,7 @@ from src.domain.entity.completed_order import CompletedOrder
 from src.domain.value_objects.order import OrderID
 from src.domain.value_objects.completed_order import (
     CompletedOrderID,
-    PaypalReceivedAmount,
+    PaymentSystemReceivedAmount,
     UserReceivedAmount,
     CompletedAt,
 )
@@ -25,20 +25,22 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
     async def insert(self, completed_order: CompletedOrder) -> None:
         query = insert(CompletedOrderModel).values(
             order_id=completed_order.order_id.value,
-            paypal_received_amount=completed_order.paypal_received_amount.value if completed_order.paypal_received_amount else None,
-            user_received_amount=completed_order.user_received_amount.value if completed_order.user_received_amount else None,
+            payment_system_received_amount=completed_order.payment_system_received_amount.value
+            if completed_order.payment_system_received_amount else None,
+            user_received_amount=completed_order.user_received_amount.value
+            if completed_order.user_received_amount else None,
             completed_at=completed_order.completed_at.value,
         )
         await self._session.execute(query)
 
     async def get(self, completed_order_id: CompletedOrderID) -> Optional[CompletedOrder]:
-        query = select(CompletedOrderModel).where(CompletedOrderModel.id == completed_order_id.value)
+        query = select(CompletedOrderModel).where(CompletedOrderModel.order_id == completed_order_id.value)
         result = await self._session.execute(query)
         completed_order = result.scalar_one_or_none()
 
         return CompletedOrder(
             order_id=OrderID(completed_order.order_id),
-            paypal_received_amount=PaypalReceivedAmount(completed_order.paypal_received_amount),
+            payment_system_received_amount=PaymentSystemReceivedAmount(completed_order.paypal_received_amount),
             user_received_amount=UserReceivedAmount(completed_order.user_received_amount),
             completed_at=CompletedAt(completed_order.completed_at),
         )

@@ -1,11 +1,11 @@
 import uuid
 from typing import TYPE_CHECKING
+from decimal import Decimal
 
-from sqlalchemy import String, ForeignKey, Enum, UUID, Integer
+from sqlalchemy import String, ForeignKey, Enum, UUID, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
-from src.domain.value_objects.order import OrderTypeEnum
 
 if TYPE_CHECKING:
     from src.infrastructure.data.models import OrderModel
@@ -25,6 +25,6 @@ class WithdrawDetailsModel(Base):
     card_holder_name: Mapped[str] = mapped_column(String, nullable=True)
     crypto_address: Mapped[str] = mapped_column(String, nullable=True)
     crypto_network: Mapped[str] = mapped_column(String, nullable=True)
-    commission: Mapped[int] = mapped_column(Integer, nullable=False)
+    commission: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
 
     order: Mapped['OrderModel'] = relationship(back_populates='withdraw_details', uselist=False)

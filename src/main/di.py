@@ -18,7 +18,10 @@ from src.infrastructure.dal import (
     UserTopicDAL,
     CompletedOrderDAL,
     WithdrawDetailsDAL,
+    UserCommissionDALImpl,
 )
+from src.application.common.dal.user_commission import UserCommissionDAL
+from src.application.services.user_commission import UserCommissionService
 from src.application.services.user import UserService
 from src.application.services.order import OrderService
 from src.application.services.feedback import FeedbackService
@@ -70,7 +73,10 @@ class DALProvider(Provider):
     withdraw_method_dal = provide(WithdrawDetailsDAL, scope=Scope.REQUEST, provides=WithdrawDetailsDAL)
     transfer_details_dal = provide(TransferDetailsDAL, scope=Scope.REQUEST, provides=TransferDetailsDAL)
     purchase_request_dal = provide(PurchaseRequestDalImpl, scope=Scope.REQUEST, provides=PurchaseRequestDalImpl)
-    product_application_dal = provide(ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl)
+    product_application_dal = provide(
+        ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl
+    )
+    user_commission_dal = provide(UserCommissionDALImpl, scope=Scope.REQUEST, provides=UserCommissionDAL)
     uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
 
 
@@ -86,7 +92,11 @@ class ServiceProvider(Provider):
     transfer_details_service = provide(TransferDetailsService, scope=Scope.REQUEST, provides=TransferDetailsService)
     cloud_service = provide(CloudService, scope=Scope.REQUEST, provides=CloudService)
     purchase_request_service = provide(PurchaseRequestService, scope=Scope.REQUEST, provides=PurchaseRequestService)
-    product_application_service = provide(ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService)
+    product_application_service = provide(
+        ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService
+    )
+    user_commission_service = provide(UserCommissionService, scope=Scope.REQUEST, provides=UserCommissionService)
+
 
 class TelegramProvider(Provider):
     @asynccontextmanager

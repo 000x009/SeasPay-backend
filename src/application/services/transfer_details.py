@@ -1,11 +1,18 @@
 from src.infrastructure.dal.tranfer_details import TransferDetailsDAL
-from src.application.dto.transfer_details import AddTransferDetailsDTO, GetTransferDetailsDTO, TransferDetailsDTO
+from src.application.dto.transfer_details import (
+    AddTransferDetailsDTO,
+    GetTransferDetailsDTO,
+    TransferDetailsDTO,
+    CalculateTransferCommissionDTO,
+    CalculationsDTO,
+)
 from src.domain.value_objects.transfer_details import (
     ReceiptPhotoURL,
     ReceiverEmail,
     TransferAmount,
     Commission,
 )
+from src.domain.value_objects.completed_order import PaymentSystemReceivedAmount
 from src.domain.entity.transfer_details import TransferDetails
 from src.domain.value_objects.order import OrderID
 from src.domain.exceptions.transfer_details import TransferDetailsNotFound
@@ -51,4 +58,22 @@ class TransferDetailsService:
             receipt_photo_url=transfer_details.receipt_photo_url.value,
             amount=transfer_details.amount.value,
             commission=transfer_details.commission.value,
+        )
+
+    async def calculate_commission(self, data: CalculateTransferCommissionDTO) -> CalculationsDTO:
+        transfer_details = await self.get_details(GetTransferDetailsDTO(order_id=data.order_id))
+        transfer_details = TransferDetails(
+            order_id=OrderID(transfer_details.order_id),
+            receiver_email=ReceiverEmail(transfer_details.receiver_email),
+            amount=TransferAmount(transfer_details.amount),
+            receipt_photo_url=ReceiptPhotoURL(transfer_details.receipt_photo_url),
+            commission=Commission(transfer_details.commission),
+        )
+        user_must_receive = transfer_details.calculate_amount_user_must_receive(
+            PaymentSystemReceivedAmount(data.payment_system_received_amount)
+        )
+
+        return CalculationsDTO(
+            transfer_commission=transfer_details.commission.value,
+            recipient_must_receive=user_must_receive.value,
         )

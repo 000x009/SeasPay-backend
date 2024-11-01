@@ -62,23 +62,17 @@ class AmazonConfig:
 
 
 @dataclass
-class PayPalCommission:
-    """PayPal commission settings"""
-
-    min_percentage_to_withdraw: int
-    max_percentage_to_withdraw: int
-    min_amount_to_withdraw: Union[float, str]
-    max_amount_to_withdraw: Union[float, str]
-    max_amount_to_transfer: Union[float, str]
-    commission_to_transfer: float
-
-
-@dataclass
 class Commission:
     """Commission settings"""
 
-    paypal: PayPalCommission
-    digital_product: float
+    min_withdraw_percentage: float
+    max_withdraw_percentage: float
+    min_withdraw_amount: float
+    max_withdraw_amount: float
+    max_transfer_amount: float
+    max_transfer_percentage: float
+    min_transfer_percentage: float
+    digital_product_usd_amount_commission: float
 
 
 @dataclass
@@ -129,15 +123,14 @@ def load_settings() -> Settings:
     config_path = Path(os.environ['TOML_CONFIG_PATH'])
     toml_cfg = load_toml_config(config_path)
     commission = Commission(
-        paypal=PayPalCommission(
-            min_percentage_to_withdraw=toml_cfg['commission']['paypal']['min_percentage_to_withdraw'],
-            max_percentage_to_withdraw=toml_cfg['commission']['paypal']['max_percentage_to_withdraw'],
-            min_amount_to_withdraw=toml_cfg['commission']['paypal']['min_amount_to_withdraw'],
-            max_amount_to_withdraw=toml_cfg['commission']['paypal']['max_amount_to_withdraw'],
-            max_amount_to_transfer=toml_cfg['commission']['paypal']['max_amount_to_transfer'],
-            commission_to_transfer=toml_cfg['commission']['paypal']['commission_to_transfer'],
-        ),
-        digital_product=toml_cfg['commission']['digital_product'],
+            min_withdraw_percentage=toml_cfg['commission']['paypal']['min-withdraw-percentage'],
+            max_withdraw_percentage=toml_cfg['commission']['paypal']['max-withdraw-percentage'],
+            min_withdraw_amount=toml_cfg['commission']['paypal']['min-withdraw-usd-amount'],
+            max_withdraw_amount=toml_cfg['commission']['paypal']['max-withdraw-usd-amount'],
+            max_transfer_amount=toml_cfg['commission']['paypal']['max-transfer-amount'],
+            max_transfer_percentage=toml_cfg['commission']['paypal']['max-transfer-percentage'],
+            min_transfer_percentage=toml_cfg['commission']['paypal']['min-transfer-percentage'],
+            digital_product_usd_amount_commission=toml_cfg['commission']['digital-product']['usd-amount-commission'],
     )
     cloud_settings = YandexCloudSettings(
         access_key_id=toml_cfg['yandex-cloud']['yandex-access-key-id'],
@@ -162,3 +155,6 @@ def load_paypal_settings() -> PayPal:
 
 def load_bot_settings() -> BotSettings:
     return load_settings().bot
+
+
+app_settings = load_settings()

@@ -20,20 +20,11 @@ router = APIRouter(
 
 
 @router.post('/')
-@cache(expire=60 * 60 * 24)
 async def register_user(
-    data: CreateUserSchema,
     user_service: FromDishka[UserService],
-    user_data: WebAppInitData = Depends(user_init_data_provider)
+    # user_data: WebAppInitData = Depends(user_init_data_provider)
 ) -> UserDTO:
-    response = await user_service.add(
-        CreateUserDTO(
-            user_id=user_data.user.id,
-            joined_at=data.joined_at,
-            commission=data.commission,
-            total_withdrawn=data.total_withdrawn,
-        )
-    )
+    response = await user_service.add(CreateUserDTO(user_id=22223))
 
     return response
 

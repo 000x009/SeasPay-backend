@@ -11,3 +11,7 @@ class InvalidUserReceivedAmountError(DomainError):
 
 class InvalidPaypalReceivedAmountError(DomainError):
     pass
+
+
+class CompletedOrderNotFoundError(DomainError):
+    pass

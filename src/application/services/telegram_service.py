@@ -2,10 +2,9 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from src.application.services.user_topic import UserTopicService
 from src.application.dto.user_topic import GetUserTopicByUserIdDTO, CreateUserTopicDTO
-from src.application.dto.telegram import SendOrderMessageDTO, SendPurchaseRequestMessageDTO
+from src.application.dto.telegram import SendMessageDTO, SendPurchaseRequestMessageDTO
 from src.infrastructure.config import load_bot_settings
 from src.application.common.telegram import TelegramClientInterface
-# from src.presentation.telegram.buttons.inline import get_take_order_kb_markup, get_purchase_request_kb_markup
 
 
 class TelegramService:
@@ -18,7 +17,7 @@ class TelegramService:
         self._user_topic_service = user_topic_service
         self._config = load_bot_settings()
 
-    async def send_order_message(self, data: SendOrderMessageDTO) -> Message:
+    async def send_message(self, data: SendMessageDTO) -> Message:
         user_topic = await self._user_topic_service.get_user_topic_by_user_id(
             GetUserTopicByUserIdDTO(user_id=data.user_id)
         )

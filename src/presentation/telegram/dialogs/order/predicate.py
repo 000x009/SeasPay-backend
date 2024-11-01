@@ -25,14 +25,3 @@ def new_confirm_fulfillment() -> Predicate:
         return False
 
     return when_confirm_fulfillment
-
-
-def new_when_no_payment_receipt() -> Predicate:
-    def when_no_payment_receipt(
-        data: Dict,
-        widget: Whenable,
-        manager: DialogManager,
-    ) -> bool:
-        return manager.dialog_data.get("payment_receipt_id") is None
-
-    return when_no_payment_receipt

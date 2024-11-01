@@ -5,5 +5,7 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class WithdrawCommission(ValueObject[Decimal]):
+class UserTransferCommission(ValueObject[int]):
+    """Commission percentage"""
+
     value: Decimal

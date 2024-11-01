@@ -31,7 +31,7 @@ def upgrade() -> None:
     op.add_column('user', sa.Column('withdraw_commission', sa.Integer(), nullable=True))
     op.add_column('user', sa.Column('transfer_commission', sa.Integer(), nullable=True))
     op.add_column('user', sa.Column('product_commission', sa.DECIMAL(), nullable=True))
-    op.drop_column('user', 'commission')
+    # op.drop_column('user', 'commission')
     # ### end Alembic commands ###
 
 

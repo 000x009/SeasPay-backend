@@ -72,7 +72,7 @@ class AddTelegramMessageIdDTO:
 @dataclass(frozen=True)
 class CalculateCommissionDTO:
     order_id: UUID
-    paypal_received_amount: Decimal
+    payment_system_received_amount: Decimal
 
 
 @dataclass(frozen=True)
@@ -84,7 +84,7 @@ class CommissionDTO:
 @dataclass(frozen=True)
 class FulfillWithdrawOrderDTO:
     order_id: UUID
-    paypal_received_amount: Optional[Decimal] = field(default=None)
+    payment_system_received_amount: Optional[Decimal] = field(default=None)
     user_received_amount: Optional[Decimal] = field(default=None)
 
 

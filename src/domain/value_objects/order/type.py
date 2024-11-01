@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import StrEnum, auto
+from enum import StrEnum
 
 from src.domain.common.value_objects import ValueObject
 

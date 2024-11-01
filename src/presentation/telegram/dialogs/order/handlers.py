@@ -1,6 +1,8 @@
+import uuid
 from decimal import Decimal
 import logging
 
+from aiogram import Bot
 from aiogram.types import CallbackQuery, Message
 
 from aiogram_dialog import DialogManager
@@ -10,7 +12,6 @@ from dishka.integrations.aiogram import FromDishka
 
 from src.application.services.order import OrderService
 from src.application.dto.order import (
-    CalculateCommissionDTO,
     FulfillWithdrawOrderDTO,
     FulfillTransferOrderDTO,
     GetOrderDTO,
@@ -21,6 +22,10 @@ from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
 from src.infrastructure.config import load_bot_settings
 from src.infrastructure.json_text_getter import get_paypal_order_text
 from src.domain.value_objects.order import OrderTypeEnum
+from src.application.services.transfer_details import TransferDetailsService
+from src.application.services.withdraw_details import WithdrawService
+from src.application.dto.transfer_details import CalculateTransferCommissionDTO
+from src.application.dto.withdraw_details import CalculateWithdrawCommissionDTO
 
 
 async def calculate_commission(
@@ -37,17 +42,26 @@ async def on_wrote_paypal_received_amount(
     widget: ManagedTextInput[str],
     dialog_manager: DialogManager,
     value: str,
-    order_service: FromDishka[OrderService]
+    order_service: FromDishka[OrderService],
+    transfer_service: FromDishka[TransferDetailsService],
+    withdraw_service: FromDishka[WithdrawService],
 ) -> None:
     order_id = dialog_manager.start_data.get("order_id")
-    commission = await order_service.calculate_commission(
-        CalculateCommissionDTO(
-            order_id=order_id,
-            paypal_received_amount=Decimal(value),
-        )
-    )
+    order = await order_service.get(GetOrderDTO(order_id=uuid.UUID(order_id)))
+    commission = None
+    if order.type == OrderTypeEnum.TRANSFER:
+        commission = await transfer_service.calculate_commission(CalculateTransferCommissionDTO(
+            order_id=order.id,
+            payment_system_received_amount=Decimal(value),
+        ))
+    elif order.type == OrderTypeEnum.WITHDRAW:
+        commission = await withdraw_service.calculate_commission(CalculateWithdrawCommissionDTO(
+            order_id=order.id,
+            payment_system_received_amount=Decimal(value),
+        ))
+
     dialog_manager.dialog_data["received_amount"] = float(value)
-    dialog_manager.dialog_data["user_must_receive"] = float(commission.user_must_receive)
+    dialog_manager.dialog_data["user_must_receive"] = float(commission.recipient_must_receive)
     await dialog_manager.switch_to(OrderFulfillmentSG.ORDER_INFO)
 
 
@@ -87,7 +101,7 @@ async def confirm_fulfillment(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService]
 ) -> None:
-    bot = dialog_manager.middleware_data.get("bot")
+    bot: Bot = dialog_manager.middleware_data.get("bot")
     order_id = dialog_manager.start_data.get("order_id")
     user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
     received_amount = dialog_manager.dialog_data.get("received_amount")
@@ -95,10 +109,11 @@ async def confirm_fulfillment(
     bot_settings = load_bot_settings()
 
     try:
+        order = None
         if order_type == OrderTypeEnum.WITHDRAW:
             order = await order_service.fulfill_withdraw_order(FulfillWithdrawOrderDTO(
                 order_id=order_id,
-                paypal_received_amount=Decimal(received_amount),
+                payment_system_received_amount=Decimal(received_amount),
                 user_received_amount=Decimal(user_received_amount),
             ))
         elif order_type == OrderTypeEnum.TRANSFER:
@@ -110,7 +125,7 @@ async def confirm_fulfillment(
                 order_id=order.id,
                 user_id=order.user_id,
                 created_at=order.created_at,
-                status=order.status.value,
+                status=order.status,
                 order_type=order.type,
             ),
         )
@@ -154,7 +169,7 @@ async def cancel_order_handler(
                 order_id=order.id,
                 user_id=order.user_id,
                 created_at=order.created_at,
-                status=order.status.value,
+                status=order.status,
                 order_type=order.type,
             ),
         )

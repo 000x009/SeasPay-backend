@@ -68,7 +68,7 @@ def get_withdraw_card_text(
     card_number: str,
     card_holder: str,
     user_must_receive: float,
-    commission: float,
+    commission: Decimal,
     profit: float,
 ) -> str:
     return get_text_by_key("withdraw_card_text").format(
@@ -84,7 +84,7 @@ def get_withdraw_crypto_text(
     address: str,
     network: str,
     user_must_receive: float,
-    commission: float,
+    commission: Decimal,
     profit: float,
 ) -> str:
     return get_text_by_key("withdraw_crypto_text").format(
@@ -179,8 +179,8 @@ def get_admin_service_statistics_text(
 
 def get_transfer_text(
     receiver_email: str,
-    amount: float,
-    commission: float,
+    amount: Decimal,
+    commission: Decimal,
 ) -> str:
     return get_text_by_key("transfer_text").format(
         receiver_email=receiver_email,

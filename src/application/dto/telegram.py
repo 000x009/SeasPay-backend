@@ -6,7 +6,7 @@ from src.application.common.dto import FileDTO
 
 
 @dataclass(frozen=True)
-class SendOrderMessageDTO:
+class SendMessageDTO:
     user_id: int
     username: str
     order_id: UUID

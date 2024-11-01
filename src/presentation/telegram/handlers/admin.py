@@ -59,14 +59,15 @@ async def take_order_handler(
 
     try:
         updated_order = await order_service.take_order(TakeOrderDTO(order_id=order_id))
+
         await bot.send_message(
             chat_id=callback.from_user.id,
             text=get_paypal_order_text(
                 order_id=updated_order.id,
                 user_id=updated_order.user_id,
                 created_at=updated_order.created_at,
-                status=updated_order.status.value,
-                order_type=updated_order.type.value,
+                status=updated_order.status,
+                order_type=updated_order.type,
             ),
             reply_markup=inline.get_order_fulfillment_kb_markup(order_id=order_id),
         )
@@ -76,9 +77,9 @@ async def take_order_handler(
             caption=get_paypal_order_text(
                 order_id=updated_order.id,
                 user_id=updated_order.user_id,
-                order_type=updated_order.type.value,
+                order_type=updated_order.type,
                 created_at=updated_order.created_at,
-                status=updated_order.status.value,
+                status=updated_order.status,
             ),
         )
         await callback.answer(

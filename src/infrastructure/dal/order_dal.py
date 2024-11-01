@@ -33,7 +33,7 @@ class OrderDAL(BaseOrderDAL):
                 )
                 .limit(limit + 1)
                 .offset(offset)
-                .order_by(OrderModel.time)
+                .order_by(OrderModel.created_at)
             )
         else:
             query = (
@@ -134,7 +134,11 @@ class OrderDAL(BaseOrderDAL):
         ) for order in orders]
     
     async def list_processing(self) -> Optional[List[Order]]:
-        query = select(OrderModel).filter_by(status=OrderStatusEnum.PROCESSING.value).order_by(OrderModel.created_at.desc())
+        query = (
+            select(OrderModel)
+            .filter_by(status=OrderStatusEnum.PROCESSING.value)
+            .order_by(OrderModel.created_at.desc())
+        )
         result = await self._session.execute(query)
         orders = result.unique().scalars().all()
         if not orders:
@@ -151,7 +155,11 @@ class OrderDAL(BaseOrderDAL):
         ) for order in orders]
     
     async def list_completed(self) -> Optional[List[Order]]:
-        query = select(OrderModel).filter_by(status=OrderStatusEnum.COMPLETE.value).order_by(OrderModel.created_at.desc())
+        query = (
+            select(OrderModel)
+            .filter_by(status=OrderStatusEnum.COMPLETE.value)
+            .order_by(OrderModel.created_at.desc())
+        )
         result = await self._session.execute(query)
         orders = result.unique().scalars().all()
         if not orders:

@@ -1,5 +1,11 @@
 from src.infrastructure.dal.withdraw_details_dal import WithdrawDetailsDAL
-from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO, WithdrawDetailsDTO
+from src.application.dto.withdraw_details import (
+    AddWithdrawDetailsDTO,
+    GetWithdrawDetailsDTO,
+    WithdrawDetailsDTO,
+    CalculateWithdrawCommissionDTO,
+    WithdrawCalculationsDTO,
+)
 from src.domain.value_objects.withdraw_method import (
     Method,
     CardNumber,
@@ -13,6 +19,7 @@ from src.domain.entity.withdraw_details import WithdrawDetails
 from src.domain.value_objects.order import OrderID
 from src.domain.exceptions.withdraw_details import WithdrawDetailsNotFound
 from src.application.common.uow import UoW
+from src.domain.entity.completed_order import PaymentSystemReceivedAmount
 
 
 class WithdrawService:
@@ -63,4 +70,25 @@ class WithdrawService:
             crypto_network=method.crypto_network.value,
             payment_receipt=method.payment_receipt.value,
             commission=method.commission.value,
+        )
+
+    async def calculate_commission(self, data: CalculateWithdrawCommissionDTO) -> WithdrawCalculationsDTO:
+        withdraw_details = await self.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
+        withdraw_details = WithdrawDetails(
+            order_id=OrderID(withdraw_details.order_id),
+            card_number=CardNumber(withdraw_details.card_number),
+            card_holder_name=CardHolderName(withdraw_details.card_holder_name),
+            method=Method(withdraw_details.method),
+            crypto_address=CryptoAddress(withdraw_details.crypto_address),
+            crypto_network=CryptoNetwork(withdraw_details.crypto_network),
+            payment_receipt=PaymentReceipt(withdraw_details.payment_receipt),
+            commission=WithdrawCommission(withdraw_details.commission),
+        )
+        user_must_receive = withdraw_details.calculate_amount_user_must_receive(
+            PaymentSystemReceivedAmount(data.payment_system_received_amount)
+        )
+
+        return WithdrawCalculationsDTO(
+            withdraw_commission=withdraw_details.commission.value,
+            recipient_must_receive=user_must_receive.value,
         )

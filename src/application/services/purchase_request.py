@@ -10,11 +10,9 @@ from src.domain.value_objects.purchase_request import (
     RequestStatusEnum,
 )
 from src.domain.value_objects.user import UserID
-from src.application.dto.purchase_request import(
+from src.application.dto.purchase_request import (
     PurchaseRequestDTO,
     CreatePurchaseRequestDTO,
-    GetUserPurchaseRequestsDTO,
-    GetAllPurchaseRequestsDTO,
     GetOnePurchaseRequestDTO,
     TakePurchaseRequestDTO,
 )
@@ -99,7 +97,6 @@ class PurchaseRequestService:
             user_id=request.user_id.value,
             purchase_url=request.purchase_url.value,
             created_at=request.created_at.value,
-            status=request.status,
+            status=request.status.value,
             message_id=request.message_id.value if request.message_id else None,
         )
-    

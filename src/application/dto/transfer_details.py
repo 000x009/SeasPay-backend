@@ -24,3 +24,15 @@ class AddTransferDetailsDTO:
 @dataclass(frozen=True)
 class GetTransferDetailsDTO:
     order_id: UUID
+
+
+@dataclass(frozen=True)
+class CalculateTransferCommissionDTO:
+    order_id: UUID
+    payment_system_received_amount: Decimal
+
+
+@dataclass(frozen=True)
+class CalculationsDTO:
+    transfer_commission: Decimal
+    recipient_must_receive: Decimal

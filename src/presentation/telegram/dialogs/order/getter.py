@@ -1,5 +1,5 @@
 import uuid
-from typing import Mapping
+from typing import Dict
 from decimal import Decimal
 
 from aiogram.types import ContentType
@@ -33,8 +33,8 @@ async def order_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     user_service: FromDishka[UserService],
-    **kwargs
-) -> Mapping[str, OrderDTO]:
+    **kwargs,
+) -> Dict[str, OrderDTO]:
     order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
     user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
     order = await order_service.get(GetOrderDTO(order_id=order_id))
@@ -63,30 +63,29 @@ async def order_text_getter(
     order_service: FromDishka[OrderService],
     withdraw_service: FromDishka[WithdrawService],
     transfer_details_service: FromDishka[TransferDetailsService],
-    **kwargs
-) -> Mapping[str, OrderDTO]:
+    **kwargs,
+) -> Dict[str, str]:
     order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
     order = await order_service.get(GetOrderDTO(order_id=order_id))
     details_text = ""
-    db_details = None
 
     if order.type == OrderTypeEnum.WITHDRAW:
         db_details = await withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=order.id))
         user_must_receive = dialog_manager.dialog_data.get("user_must_receive")
         if user_must_receive:
             received_amount = dialog_manager.dialog_data.get("received_amount")
-            if order.withdraw_method.method == MethodEnum.CARD:
+            if db_details.method == MethodEnum.CARD:
                 details_text = get_withdraw_card_text(
-                    card_number=order.withdraw_method.card_number,
-                    card_holder=order.withdraw_method.card_holder_name,
+                    card_number=db_details.card_number,
+                    card_holder=db_details.card_holder_name,
                     user_must_receive=round(user_must_receive, 2),
                     commission=db_details.commission,
                     profit=round(received_amount - user_must_receive, 2),
                 )
-            elif order.withdraw_method.method == MethodEnum.CRYPTO:
+            elif db_details.method == MethodEnum.CRYPTO:
                 details_text = get_withdraw_crypto_text(
-                    address=order.withdraw_method.crypto_address,
-                    network=order.withdraw_method.crypto_network,
+                    address=db_details.crypto_address,
+                    network=db_details.crypto_network,
                     user_must_receive=round(user_must_receive, 2),
                     commission=db_details.commission,
                     profit=round(Decimal(received_amount) - user_must_receive, 2),
@@ -111,11 +110,10 @@ async def order_text_getter(
     }
 
 
-
 async def order_cancel_getter(
     dialog_manager: DialogManager,
-    **kwargs
-) -> Mapping[str, str]:
+    **kwargs,
+) -> Dict[str, str]:
     return {
         "reason": dialog_manager.dialog_data.get("reason"),
     }

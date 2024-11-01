@@ -21,7 +21,7 @@ class CompletedOrderModel(Base):
         ForeignKey('order.id', ondelete='CASCADE'),
         nullable=False,
     )
-    paypal_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True)
+    payment_system_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True)
     user_received_amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True)
     completed_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),

@@ -11,13 +11,14 @@ from src.application.dto.completed_order import (
 from src.domain.entity.completed_order import CompletedOrder
 from src.domain.value_objects.completed_order import (
     CompletedOrderID,
-    PaypalReceivedAmount,
+    PaymentSystemReceivedAmount,
     UserReceivedAmount,
     CompletedAt,
 )
 from src.domain.value_objects.order import OrderID
 from src.domain.value_objects.statistics import TimeSpan
 from src.application.common.uow import UoW
+from src.domain.exceptions.completed_order import CompletedOrderNotFoundError
 
 
 class CompletedOrderService:
@@ -32,20 +33,21 @@ class CompletedOrderService:
     async def add(self, data: AddCompletedOrderDTO) -> None:
         await self._dal.insert(CompletedOrder(
             order_id=OrderID(data.order_id),
-            paypal_received_amount=PaypalReceivedAmount(data.paypal_received_amount) if data.paypal_received_amount else None,
+            payment_system_received_amount=PaymentSystemReceivedAmount(data.payment_system_received_amount)
+            if data.payment_system_received_amount else None,
             user_received_amount=UserReceivedAmount(data.user_received_amount) if data.user_received_amount else None,
             completed_at=CompletedAt(data.completed_at),
         ))
         await self.uow.commit()
 
     async def get(self, data: GetCompletedOrderDTO) -> Optional[CompletedOrderDTO]:
-        completed_order = await self._dal.get(CompletedOrderID(data.id))
+        completed_order = await self._dal.get(CompletedOrderID(data.order_id))
         if not completed_order:
-            return None
+            raise CompletedOrderNotFoundError(f"Completed order details not found for order: <{data.order_id}>")
 
         return CompletedOrderDTO(
             order_id=completed_order.order_id.value,
-            paypal_received_amount=completed_order.paypal_received_amount.value,
+            payment_system_received_amount=completed_order.payment_system_received_amount.value,
             user_received_amount=completed_order.user_received_amount.value,
             completed_at=completed_order.completed_at.value,
         )

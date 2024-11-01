@@ -6,7 +6,7 @@ from src.domain.exceptions.completed_order import InvalidUserReceivedAmountError
 
 
 @dataclass(frozen=True)
-class PaypalReceivedAmount(ValueObject[Decimal]):
+class PaymentSystemReceivedAmount(ValueObject[Decimal]):
     value: Decimal
 
     def _validate(self) -> None:

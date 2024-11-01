@@ -8,7 +8,7 @@ from typing import Optional
 @dataclass(frozen=True)
 class CompletedOrderDTO:
     order_id: UUID
-    paypal_received_amount: Decimal
+    payment_system_received_amount: Decimal
     user_received_amount: Decimal
     completed_at: datetime = field(default=datetime.now(UTC))
 
@@ -16,14 +16,14 @@ class CompletedOrderDTO:
 @dataclass(frozen=True)
 class AddCompletedOrderDTO:
     order_id: UUID
-    paypal_received_amount: Optional[Decimal] = field(default=None)
+    payment_system_received_amount: Optional[Decimal] = field(default=None)
     user_received_amount: Optional[Decimal] = field(default=None)
     completed_at: datetime = field(default=datetime.now(UTC))
 
 
 @dataclass(frozen=True)
 class GetCompletedOrderDTO:
-    id: UUID
+    order_id: UUID
 
 
 @dataclass(frozen=True)
