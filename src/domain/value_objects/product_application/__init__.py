@@ -1,4 +1,4 @@
 from .created_at import ProductApplicationCreatedAt
 from .id import ProductApplicationID
-from .required_fields import ProductApplicationRequiredFields
+from .login_data import LoginData
 from .status import ProductApplicationStatus, ProductApplicationStatusEnum

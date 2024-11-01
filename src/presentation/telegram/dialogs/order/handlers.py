@@ -41,7 +41,7 @@ async def on_wrote_paypal_received_amount(
     message: Message,
     widget: ManagedTextInput[str],
     dialog_manager: DialogManager,
-    value: str,
+    data: str,
     order_service: FromDishka[OrderService],
     transfer_service: FromDishka[TransferDetailsService],
     withdraw_service: FromDishka[WithdrawService],
@@ -52,15 +52,15 @@ async def on_wrote_paypal_received_amount(
     if order.type == OrderTypeEnum.TRANSFER:
         commission = await transfer_service.calculate_commission(CalculateTransferCommissionDTO(
             order_id=order.id,
-            payment_system_received_amount=Decimal(value),
+            payment_system_received_amount=Decimal(data),
         ))
     elif order.type == OrderTypeEnum.WITHDRAW:
         commission = await withdraw_service.calculate_commission(CalculateWithdrawCommissionDTO(
             order_id=order.id,
-            payment_system_received_amount=Decimal(value),
+            payment_system_received_amount=Decimal(data),
         ))
 
-    dialog_manager.dialog_data["received_amount"] = float(value)
+    dialog_manager.dialog_data["received_amount"] = float(data)
     dialog_manager.dialog_data["user_must_receive"] = float(commission.recipient_must_receive)
     await dialog_manager.switch_to(OrderFulfillmentSG.ORDER_INFO)
 

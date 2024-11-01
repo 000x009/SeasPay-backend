@@ -70,7 +70,7 @@ order_dialog = Dialog(
             id='cancel_order',
             state=OrderFulfillmentSG.PRE_CONFIRM_CANCEL,
         ),
-        getter=[order_getter, order_text_getter],
+        getter=[order_getter, order_text_getter],  # type: ignore
         state=OrderFulfillmentSG.ORDER_INFO,
     ),
     Window(

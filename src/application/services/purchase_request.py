@@ -15,6 +15,8 @@ from src.application.dto.purchase_request import (
     CreatePurchaseRequestDTO,
     GetOnePurchaseRequestDTO,
     TakePurchaseRequestDTO,
+    CancelPurchaseRequestDTO,
+    ConfirmPurchaseRequestDTO,
 )
 from src.domain.value_objects.order_message import MessageID
 from src.application.services.telegram_service import TelegramService
@@ -22,6 +24,9 @@ from src.application.dto.telegram import SendPurchaseRequestMessageDTO
 from src.infrastructure.json_text_getter import get_purchase_request_text
 from src.application.common.uow import UoW
 from src.domain.exceptions.purchase_request import PurchaseRequestNotFound, PurchaseRequestAlreadyTaken
+from src.application.services.product_application import ProductApplicationService
+from src.application.dto.product_application import CreateProductApplicationDTO
+from src.domain.entity.product_application import ProductApplicationStatusEnum
 
 
 class PurchaseRequestService:
@@ -29,11 +34,13 @@ class PurchaseRequestService:
         self,
         dal: PurchaseRequestDalImpl,
         telegram_service: TelegramService,
+        product_application_service: ProductApplicationService,
         uow: UoW,
     ) -> None:
         self.dal = dal
         self.telegram_service = telegram_service
         self.uow = uow
+        self.product_application_service = product_application_service
     
     async def send_request(self, data: CreatePurchaseRequestDTO) -> PurchaseRequestDTO:
         request = PurchaseRequest(
@@ -91,6 +98,48 @@ class PurchaseRequestService:
             raise PurchaseRequestNotFound(f"Purchase request not found with id: {data.id}")
         if request.status.value != RequestStatusEnum.PENDING:
             raise PurchaseRequestAlreadyTaken(f"Purchase request with id: {data.id} already taken")
+
+        return PurchaseRequestDTO(
+            id=request.id.value,
+            user_id=request.user_id.value,
+            purchase_url=request.purchase_url.value,
+            created_at=request.created_at.value,
+            status=request.status.value,
+            message_id=request.message_id.value if request.message_id else None,
+        )
+
+    async def cancel_request(self, data: CancelPurchaseRequestDTO) -> PurchaseRequestDTO:
+        request = await self.dal.get_one(PurchaseRequestId(data.request_id))
+        if request is None:
+            raise PurchaseRequestNotFound(f"Purchase request not found with id: {data.request_id}")
+
+        request.status = PurchaseRequestStatus(RequestStatusEnum.CANCELLED)
+        await self.dal.update(request)
+        await self.uow.commit()
+
+        return PurchaseRequestDTO(
+            id=request.id.value,
+            user_id=request.user_id.value,
+            purchase_url=request.purchase_url.value,
+            created_at=request.created_at.value,
+            status=request.status.value,
+            message_id=request.message_id.value if request.message_id else None,
+        )
+
+    async def confirm_request(self, data: ConfirmPurchaseRequestDTO) -> PurchaseRequestDTO:
+        request = await self.dal.get_one(PurchaseRequestId(data.request_id))
+        if request is None:
+            raise PurchaseRequestNotFound(f"Purchase request not found with id: {data.request_id}")
+
+        request.status = PurchaseRequestStatus(RequestStatusEnum.CONFIRMED)
+        await self.dal.update(request)
+        await self.product_application_service.create_application(CreateProductApplicationDTO(
+            user_id=request.user_id.value,
+            purchase_request_id=request.id.value,
+            required_fields=data.login_fields,
+            status=ProductApplicationStatusEnum.SENT,
+        ))
+        await self.uow.commit()
 
         return PurchaseRequestDTO(
             id=request.id.value,

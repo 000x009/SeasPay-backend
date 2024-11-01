@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Dict, Any, Union
+from typing import Dict, Any
 from dataclasses import dataclass
 
 import toml
@@ -85,6 +85,12 @@ class YandexCloudSettings:
 
 
 @dataclass
+class WebSettings:
+    web_app_url: str
+    application_fulfilling_url: str
+
+
+@dataclass
 class Settings:
     """App settings"""
 
@@ -93,6 +99,7 @@ class Settings:
     bot: BotSettings
     commission: Commission
     cloud_settings: YandexCloudSettings
+    web: WebSettings
 
 
 def load_settings() -> Settings:
@@ -118,6 +125,10 @@ def load_settings() -> Settings:
         terms_of_use_url=os.environ['TELEGRAPH_TERMS_OF_USE_URL'],
         web_app_url=os.environ['WEB_APP_URL'],
         technical_support_url=os.environ['TECHNICAL_SUPPORT_URL'],
+    )
+    web = WebSettings(
+        web_app_url=os.environ['WEB_APP_URL'],
+        application_fulfilling_url=os.environ['APPLICATION_FULFILLING_URL'],
     )
 
     config_path = Path(os.environ['TOML_CONFIG_PATH'])
@@ -146,6 +157,7 @@ def load_settings() -> Settings:
         bot=bot,
         commission=commission,
         cloud_settings=cloud_settings,
+        web=web,
     )
 
 

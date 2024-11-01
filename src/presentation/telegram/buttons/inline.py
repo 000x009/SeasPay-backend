@@ -2,7 +2,7 @@ from uuid import UUID
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
-from src.infrastructure.config import BotSettings
+from src.infrastructure.config import BotSettings, app_settings
 from src.presentation.telegram.buttons.callback_data.order import (
     OrderFulfillmentCallbackData,
     BackToOrderCallbackData,
@@ -18,6 +18,18 @@ def get_purchase_request_fulfillment_kb_markup(purchase_request_id: UUID) -> Inl
         inline_keyboard=[
             [
                 InlineKeyboardButton(text='🔁 Начать выполнение', callback_data=f'start_request_fulfillment:{purchase_request_id}'),
+            ],
+        ]
+    )
+
+
+def fulfill_product_application_kb_markup(application_id: UUID) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Заполнить форму', web_app=WebAppInfo(
+                    url=app_settings.web.application_fulfilling_url.format(id=application_id)
+                )),
             ],
         ]
     )

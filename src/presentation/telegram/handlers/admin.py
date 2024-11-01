@@ -113,7 +113,7 @@ async def take_product_purchase_request_handler(
                 request_id=purchase_request.id,
                 user_id=purchase_request.user_id,
                 created_at=purchase_request.created_at,
-                status=purchase_request.status.value,
+                status=purchase_request.status,
                 purchase_url=purchase_request.purchase_url,
             ),
             reply_markup=inline.get_purchase_request_fulfillment_kb_markup(purchase_request_id=request_id),
@@ -126,7 +126,7 @@ async def take_product_purchase_request_handler(
                 request_id=purchase_request.id,
                 user_id=purchase_request.user_id,
                 created_at=purchase_request.created_at,
-                status=purchase_request.status.value,
+                status=purchase_request.status,
                 purchase_url=purchase_request.purchase_url,
             ),
         )

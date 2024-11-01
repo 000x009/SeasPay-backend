@@ -1,6 +1,8 @@
 from uuid import UUID
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
+from typing import Sequence
+from decimal import Decimal
 
 from src.application.common.dto import Pagination
 from src.domain.value_objects.purchase_request import RequestStatusEnum
@@ -43,3 +45,15 @@ class GetAllPurchaseRequestsDTO:
 @dataclass(frozen=True)
 class GetOnePurchaseRequestDTO:
     id: UUID
+
+
+@dataclass(frozen=True)
+class CancelPurchaseRequestDTO:
+    request_id: UUID
+
+
+@dataclass(frozen=True)
+class ConfirmPurchaseRequestDTO:
+    request_id: UUID
+    login_fields: Sequence[str]
+    price: Decimal

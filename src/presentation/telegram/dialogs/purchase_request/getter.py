@@ -1,5 +1,5 @@
 import uuid
-from typing import Mapping, Any
+from typing import Dict, List
 
 from aiogram_dialog import DialogManager
 
@@ -20,8 +20,8 @@ from src.infrastructure.config import load_settings
 async def purchase_request_text_getter(
     dialog_manager: DialogManager,
     purchase_request_service: FromDishka[PurchaseRequestService],
-    **kwargs
-) -> Mapping[str, Any]:
+    **_,
+) -> Dict[str, str]:
     request_id = dialog_manager.start_data.get('request_id')
     request = await purchase_request_service.get_request(GetOnePurchaseRequestDTO(id=uuid.UUID(request_id)))
 
@@ -39,15 +39,14 @@ async def purchase_request_text_getter(
 @inject_getter
 async def purchase_request_price_text_getter(
     dialog_manager: DialogManager,
-    purchase_request_service: FromDishka[PurchaseRequestService],
-    **kwargs
-) -> Mapping[str, Any]:
-    product_price = dialog_manager.dialog_data.get('product_price')
+    **_,
+) -> Dict[str, str]:
+    product_price = dialog_manager.dialog_data.get('price')
     if not product_price:
         price_text = ''
     else:
         settings = load_settings()
-        final_price = float(product_price) + settings.commission.digital_product
+        final_price = float(product_price) + settings.commission.digital_product_usd_amount_commission
         price_text = get_purchase_request_price_text(final_price)
 
     return {
@@ -58,14 +57,18 @@ async def purchase_request_price_text_getter(
 @inject_getter
 async def purchase_product_loging_fields_text_getter(
     dialog_manager: DialogManager,
-    **kwargs
-) -> Mapping[str, Any]:
+    **_,
+) -> Dict[str, str]:
     login_fields = dialog_manager.dialog_data.get('login_fields')
-    if not login_fields:
-        login_fields_text = ''
-    else:
-        login_fields_text = get_purchase_product_loging_fields_text(login_fields)
 
     return {
-        "login_fields_text": login_fields_text
+        "login_fields": login_fields
+    }
+
+
+async def fields_getter(dialog_manager: DialogManager, **_) -> Dict[str, List[str]]:
+    login_fields: list[str] = dialog_manager.dialog_data.get('login_fields')
+
+    return {
+        "fields": login_fields
     }

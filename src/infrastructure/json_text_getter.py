@@ -4,8 +4,12 @@ import os
 from pathlib import Path
 from decimal import Decimal
 from uuid import UUID
+
 from src.domain.value_objects.order import OrderStatusEnum, OrderTypeEnum
 from src.domain.value_objects.purchase_request import RequestStatusEnum
+from src.infrastructure.config import app_settings
+
+
 
 def get_text_by_key(key: str) -> str:
     with open(os.path.normpath(Path("files/json/texts.json")), encoding="utf-8") as f:
@@ -220,3 +224,22 @@ def get_purchase_request_price_text(price: float) -> str:
 
 def get_purchase_product_loging_fields_text(login_fields: list[str]) -> str:
     return get_text_by_key("purchase_product_loging_fields_text").format(login_fields="\n".join(login_fields))
+
+
+def get_cancel_purchase_reqeust_text(
+    request_id: UUID,
+    cancel_reason: str,
+) -> str:
+    return get_text_by_key("cancel_purchase_reqeust_text").format(
+        request_id=request_id,
+        cancel_reason=cancel_reason,
+    )
+
+
+def get_confirm_purchase_request_text(
+    request_id: UUID,
+) -> str:
+    return get_text_by_key("confirm_purchase_request_text").format(
+        request_id=request_id,
+        application_fulfilling_url=app_settings.web.application_fulfilling_url.format(id=request_id),
+    )

@@ -33,7 +33,7 @@ async def order_getter(
     dialog_manager: DialogManager,
     order_service: FromDishka[OrderService],
     user_service: FromDishka[UserService],
-    **kwargs,
+    **_,
 ) -> Dict[str, OrderDTO]:
     order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
     user_received_amount = dialog_manager.dialog_data.get("user_received_amount")
@@ -63,7 +63,7 @@ async def order_text_getter(
     order_service: FromDishka[OrderService],
     withdraw_service: FromDishka[WithdrawService],
     transfer_details_service: FromDishka[TransferDetailsService],
-    **kwargs,
+    **_,
 ) -> Dict[str, str]:
     order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
     order = await order_service.get(GetOrderDTO(order_id=order_id))
@@ -112,7 +112,7 @@ async def order_text_getter(
 
 async def order_cancel_getter(
     dialog_manager: DialogManager,
-    **kwargs,
+    **_,
 ) -> Dict[str, str]:
     return {
         "reason": dialog_manager.dialog_data.get("reason"),

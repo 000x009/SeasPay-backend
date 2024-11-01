@@ -29,7 +29,7 @@ class PurchaseRequest:
         created_at: Optional[CreatedAt] = None,
         status: Optional[PurchaseRequestStatus] = None,
         message_id: Optional[MessageID] = None,
-    ):
+    ) -> None:
         self.id = id
         self.user_id = user_id
         self.purchase_url = purchase_url
