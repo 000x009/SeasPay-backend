@@ -10,6 +10,8 @@ from .digital_product_details import DigitalProductDetailsModel
 from .user_commission import UserCommissionModel
 from .purchase_request import PurchaseRequestModel
 from .product_application import ProductApplicationModel
+from .platform import PlatformModel
+from .platform_product import PlatformProductModel
 
 __all__ = [
     'Base',
@@ -24,4 +26,6 @@ __all__ = [
     'UserCommissionModel',
     'PurchaseRequestModel',
     'ProductApplicationModel',
+    'PlatformModel',
+    'PlatformProductModel',
 ]

@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
-from dishka.integrations.fastapi import DishkaRoute
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from src.application.dto.product_application import (
     ProductApplicationDTO,
@@ -12,8 +12,8 @@ from src.application.services.product_application import ProductApplicationServi
 
 
 router = APIRouter(
-    prefix='/order',
-    tags=['Order'],
+    prefix='/product_application',
+    tags=['Product Application'],
     route_class=DishkaRoute,
 )
 
@@ -21,7 +21,7 @@ router = APIRouter(
 @router.get('/{application_id}')
 async def get_product_application(
     application_id: UUID,
-    application_service: ProductApplicationService,
+    application_service: FromDishka[ProductApplicationService],
 ) -> ProductApplicationDTO:
     response = await application_service.get_application_by_id(GetProductApplicationDTO(
         id=application_id,

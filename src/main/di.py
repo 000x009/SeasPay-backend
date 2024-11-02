@@ -20,6 +20,12 @@ from src.infrastructure.dal import (
     WithdrawDetailsDAL,
     UserCommissionDALImpl,
 )
+from src.application.common.dal.platform_product import PlatformProductDAL
+from src.infrastructure.dal.platform_product import PlatformProductDALImpl
+from src.application.services.platform_product import PlatformProductService
+from src.application.common.dal.platform import PlatformDAL
+from src.infrastructure.dal.platform import PlatformDALImpl
+from src.application.services.platform import PlatformService
 from src.application.common.dal.user_commission import UserCommissionDAL
 from src.application.services.user_commission import UserCommissionService
 from src.application.services.user import UserService
@@ -75,14 +81,16 @@ class DALProvider(Provider):
     withdraw_method_dal = provide(WithdrawDetailsDAL, scope=Scope.REQUEST, provides=WithdrawDetailsDAL)
     transfer_details_dal = provide(TransferDetailsDAL, scope=Scope.REQUEST, provides=TransferDetailsDAL)
     purchase_request_dal = provide(PurchaseRequestDalImpl, scope=Scope.REQUEST, provides=PurchaseRequestDalImpl)
+    platform_dal = provide(PlatformDALImpl, scope=Scope.REQUEST, provides=PlatformDAL)
+    user_commission_dal = provide(UserCommissionDALImpl, scope=Scope.REQUEST, provides=UserCommissionDAL)
+    uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
+    platform_product_dal = provide(PlatformProductDALImpl, scope=Scope.REQUEST, provides=PlatformProductDAL)
     product_application_dal = provide(
         ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl
     )
-    user_commission_dal = provide(UserCommissionDALImpl, scope=Scope.REQUEST, provides=UserCommissionDAL)
     digital_product_details_dal = provide(
         DigitalProductDetailsDAL, scope=Scope.REQUEST, provides=DigitalProductDetailsDAL
     )
-    uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
 
 
 class ServiceProvider(Provider):
@@ -97,13 +105,15 @@ class ServiceProvider(Provider):
     transfer_details_service = provide(TransferDetailsService, scope=Scope.REQUEST, provides=TransferDetailsService)
     cloud_service = provide(CloudService, scope=Scope.REQUEST, provides=CloudService)
     purchase_request_service = provide(PurchaseRequestService, scope=Scope.REQUEST, provides=PurchaseRequestService)
+    platform_service = provide(PlatformService, scope=Scope.REQUEST, provides=PlatformService)
+    user_commission_service = provide(UserCommissionService, scope=Scope.REQUEST, provides=UserCommissionService)
+    platform_product_service = provide(PlatformProductService, scope=Scope.REQUEST, provides=PlatformProductService)
     product_application_service = provide(
         ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService
     )
     digital_product_details_service = provide(
         DigitalProductDetailsService, scope=Scope.REQUEST, provides=DigitalProductDetailsService
     )
-    user_commission_service = provide(UserCommissionService, scope=Scope.REQUEST, provides=UserCommissionService)
 
 
 class TelegramProvider(Provider):
