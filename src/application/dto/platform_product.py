@@ -24,3 +24,9 @@ class GetPlatformProductDTO:
 class ListPlatformProductDTO:
     platform_id: int
     pagination: Pagination
+
+
+@dataclass(frozen=True)
+class PurchasePlatformProductDTO:
+    product_id: int
+

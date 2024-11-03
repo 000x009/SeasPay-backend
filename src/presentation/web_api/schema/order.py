@@ -25,3 +25,9 @@ class CreateDigitalProductOrderSchema(BaseModel):
     application_id: UUID4
     payment_receipt_url: str
     login_data: Dict[str, str]
+
+
+class PurchasePlatformProductSchema(BaseModel):
+    platform_product_id: UUID4
+    payment_receipt_url: str
+    login_data: Dict[str, str]

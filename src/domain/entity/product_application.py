@@ -19,7 +19,7 @@ class ProductApplication:
         'purchase_request_id',
         'created_at',
         'login_data',
-        'status'
+        'status',
     )
 
     def __init__(

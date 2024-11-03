@@ -15,6 +15,7 @@ from src.application.dto.order import (
     FulfillTransferOrderDTO,
     CreateDigitalProductOrderDTO,
     FulfillDigitalProductOrderDTO,
+    PurchasePlatformProductDTO,
 )
 from src.application.dto.user import UpdateUserDTO
 from src.domain.value_objects.user import UserID
@@ -62,6 +63,8 @@ from src.application.services.digital_product_details import DigitalProductDetai
 from src.application.dto.digital_product_details import AddDigitalProductDetailsDTO
 from src.application.services.purchase_request import PurchaseRequestService
 from src.application.dto.purchase_request import GetOnePurchaseRequestDTO
+from src.application.services.platform_product import PlatformProductService
+from src.application.dto.platform_product import GetPlatformProductDTO
 
 
 class OrderService:
@@ -79,6 +82,7 @@ class OrderService:
         product_application_service: ProductApplicationService,
         digital_product_details_service: DigitalProductDetailsService,
         purchase_request_service: PurchaseRequestService,
+        platform_product_service: PlatformProductService,
     ) -> None:
         self._order_dal = order_dal
         self._withdraw_service = withdraw_service
@@ -92,6 +96,7 @@ class OrderService:
         self.product_application_service = product_application_service
         self.digital_product_details_service = digital_product_details_service
         self.purchase_request_service = purchase_request_service
+        self.platform_product_service = platform_product_service
 
     async def create_digital_product_order(self, data: CreateDigitalProductOrderDTO) -> OrderDTO:
         application = await self.product_application_service.fulfill_application(FulfillProductApplicationDTO(
@@ -112,6 +117,60 @@ class OrderService:
             order_id=order.id.value,
             commission=app_settings.commission.digital_product_usd_amount_commission,
             purchase_url=purchase_request.purchase_url,
+            login_data=data.login_data,
+        ))
+        payment_receipt_object = self.cloud_storage.get_object_file(
+            Bucket(app_settings.cloud_settings.receipts_bucket_name),
+            ObjectKey(data.payment_receipt_url.split('/')[-1])
+        )
+        telegram_message = await self._telegram_service.send_message(
+            SendMessageDTO(
+                user_id=data.user_id,
+                order_id=order.id.value,
+                text=get_paypal_order_text(
+                    order_id=order.id.value,
+                    user_id=order.user_id.value,
+                    created_at=order.created_at.value,
+                    status=order.status.value,
+                    order_type=order.type_.value,
+                ),
+                username=data.username,
+                photo=FileDTO(
+                    filename=data.payment_receipt_url.split('/')[-1],
+                    input_file=payment_receipt_object.file.value,
+                )
+            )
+        )
+        order.telegram_message_id = MessageID(telegram_message.message_id)
+        updated_order = await self._order_dal.update(order)
+        await self.uow.commit()
+
+        return OrderDTO(
+            id=updated_order.id.value,
+            user_id=updated_order.user_id.value,
+            payment_receipt=updated_order.payment_receipt.value,
+            type=updated_order.type_.value,
+            created_at=updated_order.created_at.value,
+            status=updated_order.status,
+            telegram_message_id=updated_order.telegram_message_id.value,
+        )
+
+    async def purchase_platform_product(self, data: PurchasePlatformProductDTO) -> OrderDTO:
+        product = await self.platform_product_service.get_platform_product(
+            GetPlatformProductDTO(id=data.platform_product_id)
+        )
+        order = await self._order_dal.insert(
+            Order(
+                id=OrderID(uuid.uuid4()),
+                user_id=UserID(data.user_id),
+                payment_receipt=PaymentReceipt(data.payment_receipt_url),
+                type_=OrderType(OrderTypeEnum.DIGITAL_PRODUCT),
+            )
+        )
+        await self.digital_product_details_service.insert(AddDigitalProductDetailsDTO(
+            order_id=order.id.value,
+            commission=app_settings.commission.digital_product_usd_amount_commission,
+            purchase_url=product.purchase_url,
             login_data=data.login_data,
         ))
         payment_receipt_object = self.cloud_storage.get_object_file(

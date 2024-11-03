@@ -17,7 +17,7 @@ class ProductApplicationModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('user.user_id'))
-    purchase_request_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey('purchase_request.id'))
+    purchase_request_id: Mapped[uuid.UUID] = mapped_column(UUID, ForeignKey('purchase_request.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,

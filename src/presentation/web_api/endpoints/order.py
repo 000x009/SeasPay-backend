@@ -24,6 +24,7 @@ from src.presentation.web_api.schema.order import (
     CreateWithdrawOrderSchema,
     CreateTransferOrderSchema,
     CreateDigitalProductOrderSchema,
+    PurchasePlatformProductSchema,
 )
 
 router = APIRouter(
@@ -120,6 +121,25 @@ async def create_digital_product_order(
         CreateDigitalProductOrderDTO(
             user_id=22223,
             application_id=data.application_id,
+            payment_receipt_url=data.payment_receipt_url,
+            login_data=data.login_data,
+            username='some username',
+        )
+    )
+
+    return response
+
+
+@router.post('/purchase/platform-product', response_model=OrderDTO)
+async def purchase_platform_product(
+    data: PurchasePlatformProductSchema,
+    order_service: FromDishka[OrderService],
+    # user_data: WebAppInitData = Depends(user_init_data_provider),
+) -> OrderDTO:
+    response = await order_service.create_digital_product_order(
+        CreateDigitalProductOrderDTO(
+            user_id=22223,
+            platform_product_id=data.platform_product_id,
             payment_receipt_url=data.payment_receipt_url,
             login_data=data.login_data,
             username='some username',

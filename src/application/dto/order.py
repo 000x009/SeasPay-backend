@@ -107,5 +107,14 @@ class CreateDigitalProductOrderDTO:
 
 
 @dataclass(frozen=True)
+class PurchasePlatformProductDTO:
+    platform_product_id: int
+    user_id: int
+    payment_receipt_url: str
+    login_data: Dict[str, str]
+    username: str
+
+
+@dataclass(frozen=True)
 class FulfillDigitalProductOrderDTO:
     order_id: UUID
