@@ -1,7 +1,16 @@
 from src.application.common.cloud_storage import CloudStorage
-from src.application.dto.cloud import GetPresignedPostDTO, PresignedPostDTO
-from src.infrastructure.config import load_settings
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey
+from src.application.dto.cloud import (
+    GetPresignedPostDTO,
+    PresignedPostDTO,
+    UploadObjectDTO,
+    UploadedObjectResultDTO,
+    GetObjectDTO,
+    ObjectDTO,
+)
+from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey, File
+from src.domain.entity.yandex_cloud import StorageObject
+from src.infrastructure.config import app_settings
+from src.domain.value_objects.yandex_cloud import ObjectURL
 
 
 class CloudService:
@@ -9,9 +18,8 @@ class CloudService:
         self.storage_client = storage_client
 
     def get_object_presigned_post(self, data: GetPresignedPostDTO) -> PresignedPostDTO:
-        settings = load_settings()
         presigned_post = self.storage_client.generate_presigned_post(
-            bucket=Bucket(settings.cloud_settings.receipts_bucket_name),
+            bucket=Bucket(app_settings.cloud_settings.receipts_bucket_name),
             name=ObjectKey(data.filename),
         )
 
@@ -21,4 +29,27 @@ class CloudService:
             access_key_id=presigned_post.access_key_id.value,
             signature=presigned_post.signature.value,
             policy=presigned_post.policy.value,
+        )
+
+    def upload_object(self, data: UploadObjectDTO) -> UploadedObjectResultDTO:
+        storage_object = self.storage_client.upload_object(StorageObject(
+            bucket=Bucket(data.bucket),
+            key=ObjectKey(data.filename),
+            file=File(data.file),
+        ))
+        url = storage_object.get_object_url(app_settings.cloud_settings.base_storage_url).value
+
+        return UploadedObjectResultDTO(url=url)
+
+    def get_object(self, data: GetObjectDTO) -> StorageObject:
+        object_url = ObjectURL(data.url)
+        storage_object = self.storage_client.get_object_file(
+            bucket=Bucket(object_url.get_bucket()),
+            name=ObjectKey(object_url.get_key()),
+        )
+
+        return ObjectDTO(
+            file=storage_object.file.value,
+            key=storage_object.key.value,
+            bucket=storage_object.bucket.value,
         )

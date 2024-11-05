@@ -36,11 +36,10 @@ class StorageObject:
             self.key = self._generate_object_name()
 
     def get_object_url(self, base_storage_url: str) -> ObjectURL:
-        return ObjectURL(f'{base_storage_url}/{self.bucket.value}/{self.name.value}')
+        return ObjectURL(f'{base_storage_url}/{self.bucket.value}/{self.key.value}')
 
     def _generate_object_name(self) -> ObjectKey:
         return ObjectKey(uuid.uuid4().hex)
-
 
 
 class PresignedPost:

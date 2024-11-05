@@ -80,6 +80,7 @@ class YandexCloudSettings:
     base_storage_url: str
     receipts_bucket_name: str
     feedbacks_bucket_name: str
+    platforms_bucket_name: str
     access_key_id: str
     access_secret_key: str
 
@@ -146,6 +147,7 @@ def load_settings() -> Settings:
     cloud_settings = YandexCloudSettings(
         access_key_id=toml_cfg['yandex-cloud']['yandex-access-key-id'],
         access_secret_key=toml_cfg['yandex-cloud']['yandex-access-secret-key'],
+        platforms_bucket_name=toml_cfg['yandex-cloud']['platforms-bucket-name'],
         base_storage_url=toml_cfg['yandex-cloud']['base-storage-url'],
         receipts_bucket_name=toml_cfg['yandex-cloud']['receipts-bucket-name'],
         feedbacks_bucket_name=toml_cfg['yandex-cloud']['feedbacks-bucket-name'],

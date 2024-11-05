@@ -22,9 +22,8 @@ from src.infrastructure.json_text_getter import (
 from src.presentation.telegram.buttons import inline
 from src.application.services.order import OrderService
 from src.application.services.user import UserService
-from src.application.services.product_application import ProductApplicationService
 from src.application.services.purchase_request import PurchaseRequestService
-from src.application.dto.purchase_request import GetOnePurchaseRequestDTO, TakePurchaseRequestDTO
+from src.application.dto.purchase_request import TakePurchaseRequestDTO
 from src.application.dto.order import TakeOrderDTO
 from src.domain.exceptions.order import OrderAlreadyTakenError, OrderNotFoundError
 from src.application.services.statistics import StatisticsService
@@ -39,6 +38,7 @@ from src.presentation.telegram.states import (
 from src.domain.exceptions.purchase_request import PurchaseRequestNotFound, PurchaseRequestAlreadyTaken
 from src.infrastructure.config import load_bot_settings
 from src.presentation.telegram.states.purchase_request import PurchaseRequestFulfillmentSG
+from src.presentation.telegram.states.platform import PlatformManagementSG
 
 
 router = Router()
@@ -118,7 +118,6 @@ async def take_product_purchase_request_handler(
             ),
             reply_markup=inline.get_purchase_request_fulfillment_kb_markup(purchase_request_id=request_id),
         )
-        print(purchase_request, flush=True)
         await bot.edit_message_text(
             chat_id=bot_settings.orders_group_id,
             message_id=purchase_request.message_id,
@@ -155,6 +154,7 @@ async def order_fulfillment_handler(
     await dialog_manager.start(
         OrderFulfillmentSG.ORDER_INFO,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.EDIT,
         data=dict(order_id=order_id),
     )
 
@@ -166,13 +166,13 @@ async def order_fulfillment_handler(
 )
 async def start_request_fulfillment_handler(
     callback: CallbackQuery,
-    bot: Bot,
     dialog_manager: DialogManager,
 ) -> None:
     request_id = callback.data.split(':')[1]
     await dialog_manager.start(
         state=PurchaseRequestFulfillmentSG.REQUEST_INFO,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.EDIT,
         data=dict(request_id=request_id),
     )
 
@@ -283,6 +283,7 @@ async def admin_user_orders_handler(
     await dialog_manager.start(
         AdminUserOrdersSG.USER_ORDERS,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.EDIT,
         data=dict(user_id=user_id),
     )
 
@@ -431,4 +432,20 @@ async def admin_service_statistics_handler(
             total_withdrawn=statistics.total_withdrawn,
         ),
         reply_markup=inline.back_to_apanel_kb_markup,
+    )
+
+
+@router.callback_query(
+    F.data == 'admin_products',
+    AdminFilter(),
+    ChatFilter(chat_type=ChatType.PRIVATE),
+)
+async def admin_products_handler(
+    callback: CallbackQuery,
+    dialog_manager: DialogManager,
+) -> None:
+    await dialog_manager.start(
+        state=PlatformManagementSG.PLATFORM_LIST,
+        mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.EDIT,
     )

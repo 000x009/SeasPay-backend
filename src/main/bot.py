@@ -21,6 +21,7 @@ from src.main.di import get_di_container
 from src.presentation.telegram.handlers import all_handlers
 from src.presentation.telegram.dialogs import dialogs
 from src.presentation.telegram.middlewares import LoginMiddleware
+from src.presentation.telegram.dialogs.common.message_manager import YandexStorageMedia
 
 
 logger = logging.getLogger(__name__)
@@ -35,17 +36,15 @@ async def setup_bot_dishka(dispatcher: Dispatcher) -> AsyncGenerator[None, None]
 
 
 def get_dispatcher() -> Dispatcher:
-    # storage = RedisStorage.from_url(
-    #     'redis://redis:6379/0',
-    #     key_builder=DefaultKeyBuilder(with_destiny=True),
-    # )
-    dispatcher = Dispatcher()
+    storage = RedisStorage.from_url(
+        'redis://redis:6379/0',
+        key_builder=DefaultKeyBuilder(with_destiny=True),
+    )
+    dispatcher = Dispatcher(storage=storage)
     dispatcher.include_routers(*all_handlers)
     dispatcher.include_routers(*dialogs)
     LoginMiddleware(dishka_container=get_di_container(), router=dispatcher)
     TTLCacheAlbumMiddleware(router=dispatcher)
-
-    setup_dialogs(dispatcher)
 
     return dispatcher
 
@@ -58,8 +57,10 @@ async def main() -> None:
     dispatcher = get_dispatcher()
     config = load_bot_settings()
     bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    
     container = get_di_container()
     setup_dishka(container=container, router=dispatcher, auto_inject=True)
+    setup_dialogs(dispatcher, message_manager=YandexStorageMedia(container))
 
     try:
         await dispatcher.start_polling(bot, skip_updates=True)

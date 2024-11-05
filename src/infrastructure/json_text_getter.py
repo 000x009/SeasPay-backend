@@ -10,7 +10,6 @@ from src.domain.value_objects.purchase_request import RequestStatusEnum
 from src.infrastructure.config import app_settings
 
 
-
 def get_text_by_key(key: str) -> str:
     with open(os.path.normpath(Path("files/json/texts.json")), encoding="utf-8") as f:
         data = json.load(f)
@@ -254,4 +253,18 @@ def get_confirm_purchase_request_text(
     return get_text_by_key("confirm_purchase_request_text").format(
         request_id=request_id,
         application_fulfilling_url=app_settings.web.application_fulfilling_url.format(id=request_id),
+    )
+
+
+def get_platform_info_text(
+    name: str,
+    description: str,
+    web_place: int,
+    login_data: list[str],
+) -> str:
+    return get_text_by_key("platform_info_text").format(
+        name=name,
+        description=description,
+        web_place=web_place,
+        login_data="\n".join(map(lambda field: f"- <code>{field}</code>", login_data)),
     )

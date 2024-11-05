@@ -1,3 +1,4 @@
+from typing import BinaryIO
 from dataclasses import dataclass
 
 
@@ -14,3 +15,26 @@ class PresignedPostDTO:
     signature: str
     policy: str
 
+
+@dataclass(frozen=True)
+class UploadObjectDTO:
+    file: BinaryIO
+    filename: str
+    bucket: str
+
+
+@dataclass(frozen=True)
+class UploadedObjectResultDTO:
+    url: str
+
+
+@dataclass(frozen=True)
+class GetObjectDTO:
+    url: str
+
+
+@dataclass(frozen=True)
+class ObjectDTO:
+    file: BinaryIO
+    key: str
+    bucket: str

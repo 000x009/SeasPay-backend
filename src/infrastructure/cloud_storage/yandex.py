@@ -25,7 +25,7 @@ class YandexCloudStorage(CloudStorage):
         self.client.upload_fileobj(
             storage_object.file.value,
             storage_object.bucket.value,
-            storage_object.name.value,
+            storage_object.key.value,
         )
 
         return storage_object

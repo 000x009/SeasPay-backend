@@ -17,7 +17,9 @@ def get_purchase_request_fulfillment_kb_markup(purchase_request_id: UUID) -> Inl
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text='🔁 Начать выполнение', callback_data=f'start_request_fulfillment:{purchase_request_id}'),
+                InlineKeyboardButton(
+                    text='🔁 Начать выполнение', callback_data=f'start_request_fulfillment:{purchase_request_id}'
+                ),
             ],
         ]
     )
@@ -66,7 +68,9 @@ def get_order_fulfillment_kb_markup(order_id: UUID) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text='🔁 Начать выполнение', callback_data=OrderFulfillmentCallbackData(order_id=order_id).pack()),
+                InlineKeyboardButton(
+                    text='🔁 Начать выполнение', callback_data=OrderFulfillmentCallbackData(order_id=order_id).pack()
+                ),
             ],
         ]
     )
@@ -86,7 +90,9 @@ def get_take_order_kb_markup(order_id: UUID) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text='🗃️ Взяться за заказ', callback_data=TakeOrderCallbackData(order_id=order_id).pack()),
+                InlineKeyboardButton(
+                    text='🗃️ Взяться за заказ', callback_data=TakeOrderCallbackData(order_id=order_id).pack()
+                ),
             ],
         ]
     )
@@ -116,6 +122,9 @@ def get_admin_panel_kb_markup() -> InlineKeyboardMarkup:
             ],
             [
                 InlineKeyboardButton(text='📨 Рассылка', callback_data="admin_mailing"),
+            ],
+            [
+                InlineKeyboardButton(text='®️ Управление продуктами', callback_data="admin_products"),
             ]
         ]
     )
