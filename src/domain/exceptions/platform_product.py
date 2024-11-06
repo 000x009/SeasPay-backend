@@ -11,3 +11,7 @@ class InvalidProductPriceError(DomainError):
 
 class InvalidProductNameError(DomainError):
     pass
+
+
+class InvalidImageURL(DomainError):
+    pass

@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import CallbackQuery, Message
 
-from aiogram_dialog import DialogManager
+from aiogram_dialog import DialogManager, StartMode, ShowMode
 from aiogram_dialog.widgets.kbd import Button, Select
 from aiogram_dialog.widgets.input import ManagedTextInput, MessageInput
 
@@ -300,12 +300,14 @@ async def start_edit_platform(
     await dialog_manager.switch_to(state=PlatformManagementSG.PLATFORM)
 
 
-
 async def start_platform_products(
     event: CallbackQuery,
     widget: Button,
     dialog_manager: DialogManager,
 ) -> None:
-    platform_id = dialog_manager.dialog_data.get("platform_id")
-
-    await dialog_manager.switch_to(state=PlatformProductManagementSG.PRODUCT_LIST)
+    await dialog_manager.start(
+        state=PlatformProductManagementSG.PRODUCT_LIST,
+        mode=StartMode.NORMAL,
+        data={"platform_id": dialog_manager.dialog_data.get("platform_id")},
+        show_mode=ShowMode.EDIT,
+    )

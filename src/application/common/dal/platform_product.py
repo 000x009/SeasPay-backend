@@ -18,3 +18,16 @@ class PlatformProductDAL(Protocol):
     @abstractmethod
     async def insert(self, platform: PlatformProduct) -> PlatformProductDB:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_total(self, platform_id: PlatformID) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, platform_id: PlatformProductID) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, platform_product: PlatformProductDB) -> PlatformProductDB:
+        raise NotImplementedError
+

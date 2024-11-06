@@ -49,6 +49,7 @@ async def one_platform_getter(
     platform_id = dialog_manager.dialog_data.get("platform_id")
     if platform_id is None:
         platform_id = dialog_manager.start_data.get("platform_id")
+        dialog_manager.dialog_data["platform_id"] = platform_id
 
     platform = await platform_service.get_platform(
         GetPlatformDTO(platform_id=platform_id)

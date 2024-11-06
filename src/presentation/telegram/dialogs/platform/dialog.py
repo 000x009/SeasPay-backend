@@ -12,19 +12,20 @@ from aiogram_dialog.widgets.kbd import (
     SwitchTo,
     Button,
     Row,
+    Start,
     ScrollingGroup,
 )
 from aiogram_dialog.widgets.text import Format, Const, Multi
 from aiogram_dialog.widgets.media import DynamicMedia
 
 from src.presentation.telegram.states.platform import PlatformManagementSG
+from src.presentation.telegram.states.platform_products import PlatformProductManagementSG
 from src.presentation.telegram.dialogs.platform.getter import (
     platform_list_getter,
     one_platform_getter,
     login_data_fields_getter,
 )
 from src.presentation.telegram.dialogs.platform.handlers import on_selected_platform
-from src.presentation.telegram.states.platform_products import PlatformProductManagementSG
 from src.presentation.telegram.dialogs.platform.handlers import (
     delete_platform,
     on_edit_platform_image,
@@ -38,6 +39,7 @@ from src.presentation.telegram.dialogs.platform.handlers import (
     on_new_platform_login_data,
     on_new_platform_image,
     email_password_login_data,
+    start_platform_products,
 )
 
 
@@ -64,6 +66,11 @@ platform_dialog = Dialog(
                 id="list",
             ),
         ),
+        SwitchTo(
+            Const("➕ Добавить сервис"),
+            id="add_platform",
+            state=PlatformManagementSG.ADD_PLATFORM_NAME,
+        ),
         Row(
             PrevPage(
                 scroll="scroll", text=Format("◀️"),
@@ -74,12 +81,7 @@ platform_dialog = Dialog(
             NextPage(
                 scroll="scroll", text=Format("▶️"),
             ),
-            when="platforms",
-        ),
-        SwitchTo(
-            Const("➕ Добавить сервис"),
-            id="add_platform",
-            state=PlatformManagementSG.ADD_PLATFORM_NAME,
+            when=F["platforms"] & (F["pages"] > 1),
         ),
         getter=platform_list_getter,  # type: ignore
         state=PlatformManagementSG.PLATFORM_LIST,
@@ -92,10 +94,10 @@ platform_dialog = Dialog(
             id="edit_platform",
             state=PlatformManagementSG.PLATFORM_INFO,
         ),
-        SwitchTo(
+        Button(
             Const("🛒 Товары сервиса"),
             id="platform_products",
-            state=PlatformProductManagementSG.PRODUCT_LIST,
+            on_click=start_platform_products,
         ),
         Button(
             id="delete_platform",

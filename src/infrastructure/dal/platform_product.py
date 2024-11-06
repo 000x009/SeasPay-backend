@@ -1,7 +1,7 @@
 from typing import List
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func, delete
 
 from src.domain.value_objects.platform_product import (
     Instruction,
@@ -80,3 +80,36 @@ class PlatformProductDALImpl(PlatformProductDAL):
             )
             for platform_product in platform_products
         ]
+
+    async def get_total(self, platform_id: PlatformID) -> int:
+        query = select(func.count(PlatformProductModel.id)).filter_by(platform_id=platform_id.value)
+        result = await self.session.execute(query)
+
+        return result.scalar_one()
+
+    async def delete(self, product_id: PlatformProductID) -> None:
+        query = delete(PlatformProductModel).where(PlatformProductModel.id == product_id.value)
+        await self.session.execute(query)
+
+    async def update(self, platform_product: PlatformProductDB) -> PlatformProductDB:
+        model = PlatformProductModel(
+            id=platform_product.platform_product_id.value,
+            platform_id=platform_product.platform_id.value,
+            purchase_url=platform_product.purchase_url.value,
+            price=platform_product.price.value,
+            image_url=platform_product.image_url.value,
+            instruction=platform_product.instruction.value,
+            name=platform_product.name.value,
+        )
+
+        await self.session.merge(model)
+
+        return PlatformProductDB(
+            platform_product_id=PlatformProductID(model.id),
+            platform_id=PlatformID(model.platform_id),
+            purchase_url=PurchaseURL(model.purchase_url),
+            price=Price(model.price),
+            image_url=ImageURL(model.image_url),
+            instruction=Instruction(model.instruction),
+            name=ProductName(model.name),
+        )

@@ -268,3 +268,17 @@ def get_platform_info_text(
         web_place=web_place,
         login_data="\n".join(map(lambda field: f"- <code>{field}</code>", login_data)),
     )
+
+
+def get_platform_product_text(
+    product_id: int,
+    name: str,
+    price: Decimal,
+    instruction: str,
+) -> str:
+    return get_text_by_key("platform_product_text").format(
+        product_id=product_id,
+        name=name,
+        price=price,
+        instruction=instruction,
+    )
