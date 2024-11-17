@@ -1,7 +1,11 @@
 from src.domain.exceptions.base import DomainError
 
 
-class ReceiverEmailError(DomainError):
+class TransferDetailsDataError(DomainError):
+    pass
+
+
+class ReceiverEmailError(TransferDetailsDataError):
     pass
 
 

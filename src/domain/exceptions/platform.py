@@ -1,9 +1,13 @@
 from src.domain.exceptions.base import DomainError
 
 
-class InvalidDescriptionError(DomainError):
+class PlatformDataError(DomainError):
     pass
 
 
-class InvalidPlatformNameError(DomainError):
+class InvalidDescriptionError(PlatformDataError):
+    pass
+
+
+class InvalidPlatformNameError(PlatformDataError):
     pass

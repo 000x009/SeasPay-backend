@@ -1,11 +1,15 @@
-from src.domain.exceptions import DomainError, ValueObjectError
+from src.domain.exceptions import DomainError
 
 
 class NotAuthorizedError(DomainError):
     pass
 
 
-class EmptyValueError(ValueObjectError):
+class UserDataError(DomainError):
+    pass
+
+
+class EmptyValueError(UserDataError):
     pass
 
 
@@ -13,5 +17,5 @@ class UserNotFoundError(DomainError):
     pass
 
 
-class WithdrawAmountError(DomainError):
+class WithdrawAmountError(UserDataError):
     pass

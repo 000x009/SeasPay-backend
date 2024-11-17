@@ -18,6 +18,7 @@ from src.application.dto.order import (
     CreateWithdrawOrderDTO,
     CreateTransferOrderDTO,
     CreateDigitalProductOrderDTO,
+    PurchasePlatformProductDTO,
 )
 from src.application.common.dto import Pagination
 from src.presentation.web_api.schema.order import (
@@ -35,16 +36,16 @@ router = APIRouter(
 
 
 @router.get('/')
-@cache(expire=60 * 60 * 24)
+@cache(expire=60)
 async def get_order_list(
     limit: int,
     offset: int,
     order_service: FromDishka[OrderService],
-    user_data: WebAppInitData = Depends(user_init_data_provider),
+    # user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> Optional[List[OrderDTO]]:
     response = await order_service.list_orders(
         ListOrderDTO(
-            user_id=user_data.user.id,
+            user_id=1111,
             pagination=Pagination(
                 limit=limit,
                 offset=offset,
@@ -56,7 +57,7 @@ async def get_order_list(
 
 
 @router.get('/{order_id}')
-@cache(expire=60 * 60 * 24)
+@cache(expire=60)
 async def get_order(
     order_id: UUID,
     order_service: FromDishka[OrderService],
@@ -136,8 +137,8 @@ async def purchase_platform_product(
     order_service: FromDishka[OrderService],
     # user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderDTO:
-    response = await order_service.create_digital_product_order(
-        CreateDigitalProductOrderDTO(
+    response = await order_service.purchase_platform_product(
+        PurchasePlatformProductDTO(
             user_id=22223,
             platform_product_id=data.platform_product_id,
             payment_receipt_url=data.payment_receipt_url,

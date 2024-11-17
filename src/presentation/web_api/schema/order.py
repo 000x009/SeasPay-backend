@@ -28,6 +28,6 @@ class CreateDigitalProductOrderSchema(BaseModel):
 
 
 class PurchasePlatformProductSchema(BaseModel):
-    platform_product_id: UUID4
+    platform_product_id: int
     payment_receipt_url: str
     login_data: Dict[str, str]

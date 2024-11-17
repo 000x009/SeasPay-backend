@@ -1,7 +1,11 @@
 from src.domain.exceptions.base import DomainError
 
 
-class WrongCommissionError(DomainError):
+class UserCommissionDataError(DomainError):
+    pass
+
+
+class WrongCommissionError(UserCommissionDataError):
     pass
 
 

@@ -8,7 +8,7 @@ from fastapi_redis_cache import FastApiRedisCache
 from dishka.integrations.fastapi import setup_dishka
 
 from src.main.di import get_di_container
-from src.presentation import include_all_routers
+from src.presentation import include_all_routers, include_exception_handlers
 
 
 logging.basicConfig(
@@ -34,7 +34,11 @@ logging.basicConfig(
 
 def create_app() -> FastAPI:
     app = FastAPI()
-    origins = ["*"]
+    origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -43,6 +47,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     include_all_routers(app)
+    include_exception_handlers(app)
     setup_dishka(get_di_container(), app)
 
     return app

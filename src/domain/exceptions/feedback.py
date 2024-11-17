@@ -1,11 +1,15 @@
 from src.domain.exceptions.base import DomainError
 
 
-class InvalidFeedbackCommentError(DomainError):
+class FeedbackDataError(DomainError):
     pass
 
 
-class InvalidFeedbackStarsError(DomainError):
+class InvalidFeedbackCommentError(FeedbackDataError):
+    pass
+
+
+class InvalidFeedbackStarsError(FeedbackDataError):
     pass
 
 

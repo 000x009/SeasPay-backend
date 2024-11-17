@@ -1,21 +1,25 @@
 from src.domain.exceptions.base import DomainError
 
 
+class WithdrawDetailsDataError(DomainError):
+    pass
+
+
 class WithdrawDetailsNotFound(DomainError):
     pass
 
 
-class CardNumberError(DomainError):
+class CardNumberError(WithdrawDetailsDataError):
     pass
 
 
-class CardHolderNameError(DomainError):
+class CardHolderNameError(WithdrawDetailsDataError):
     pass
 
 
-class CryptoAddressError(DomainError):
+class CryptoAddressError(WithdrawDetailsDataError):
     pass
 
 
-class CryptoNetworkError(DomainError):
+class CryptoNetworkError(WithdrawDetailsDataError):
     pass

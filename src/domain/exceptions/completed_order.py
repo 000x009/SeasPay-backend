@@ -1,15 +1,19 @@
 from src.domain.exceptions.base import DomainError
 
 
-class InvalidTakenCommissionError(DomainError):
+class CompletedOrderDataError(DomainError):
     pass
 
 
-class InvalidUserReceivedAmountError(DomainError):
+class InvalidTakenCommissionError(CompletedOrderDataError):
     pass
 
 
-class InvalidPaypalReceivedAmountError(DomainError):
+class InvalidUserReceivedAmountError(CompletedOrderDataError):
+    pass
+
+
+class InvalidPaypalReceivedAmountError(CompletedOrderDataError):
     pass
 
 

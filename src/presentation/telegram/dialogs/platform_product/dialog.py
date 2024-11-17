@@ -184,6 +184,7 @@ platform_product_dialog = Dialog(
         Const("Отправьте новое изображение:"),
         MessageInput(
             func=on_edit_platform_product_image,
+            content_types=("photo",),
         ),
         SwitchTo(
             Const("◀️ Назад"),
@@ -243,6 +244,7 @@ platform_product_dialog = Dialog(
         Const("Отправьте изображение:"),
         MessageInput(
             func=on_new_platform_product_image,
+            content_types=("photo",),
         ),
         state=PlatformProductManagementSG.ADD_PRODUCT_IMAGE,
     ),

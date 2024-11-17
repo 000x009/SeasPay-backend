@@ -1,17 +1,21 @@
 from src.domain.exceptions.base import DomainError
 
 
-class InvalidImageURLError(DomainError):
+class PlatformProductDataError(DomainError):
     pass
 
 
-class InvalidProductPriceError(DomainError):
+class InvalidImageURLError(PlatformProductDataError):
     pass
 
 
-class InvalidProductNameError(DomainError):
+class InvalidProductPriceError(PlatformProductDataError):
     pass
 
 
-class InvalidImageURL(DomainError):
+class InvalidProductNameError(PlatformProductDataError):
+    pass
+
+
+class InvalidImageURL(PlatformProductDataError):
     pass
