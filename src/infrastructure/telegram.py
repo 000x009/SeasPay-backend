@@ -64,7 +64,8 @@ class TelegramClient(TelegramClientInterface):
                 id=str(uuid.uuid4()),
                 title=title,
                 input_message_content=InputTextMessageContent(
-                    message_text=message_text
+                    message_text=message_text,
+                    disable_web_page_preview=False,
                 )
             ),
             allow_channel_chats=True,

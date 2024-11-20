@@ -8,6 +8,7 @@ from src.domain.value_objects.user import (
     JoinedAt,
     TotalWithdrawn,
     ReferralURL,
+    ReferralID,
 )
 from src.infrastructure.config import app_settings
 
@@ -17,6 +18,7 @@ class User:
         'user_id',
         'joined_at',
         'total_withdrawn',
+        'referral_id',
     )
 
     def __init__(
@@ -24,10 +26,12 @@ class User:
         user_id: UserID,
         joined_at: Optional[JoinedAt] = None,
         total_withdrawn: Optional[TotalWithdrawn] = None,
+        referral_id: Optional[ReferralID] = None,
     ) -> None:
         self.user_id = user_id
         self.joined_at = joined_at
         self.total_withdrawn = total_withdrawn
+        self.referral_id = referral_id
 
         if not self.total_withdrawn:
             self.total_withdrawn = TotalWithdrawn(0)
@@ -43,4 +47,4 @@ class User:
         return False
 
     def get_referral_url(self) -> ReferralURL:
-        return ReferralURL(f"{app_settings.bot.bot_url}/join?startapp={self.user_id}")
+        return ReferralURL(f"{app_settings.bot.bot_url}/?startapp={self.user_id.value}")

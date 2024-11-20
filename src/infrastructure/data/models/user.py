@@ -28,6 +28,7 @@ class UserModel(Base):
         default=datetime.now(UTC),
     )
     total_withdrawn: Mapped[Decimal] = mapped_column(DECIMAL, nullable=True, default=0)
+    referral_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
 
     orders: Mapped[Optional[List["OrderModel"]]] = relationship(
         'OrderModel',

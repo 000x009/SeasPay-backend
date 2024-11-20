@@ -4,5 +4,5 @@ from src.domain.common.value_objects import ValueObject
 
 
 @dataclass(frozen=True)
-class ReferralURL(ValueObject[str]):
-    value: str
+class ReferralID(ValueObject[int]):
+    value: int

@@ -3,18 +3,21 @@ from decimal import Decimal
 from datetime import datetime, UTC
 from dataclasses import dataclass, field
 
+from typing import Optional
+
 
 @dataclass(frozen=True)
 class UserDTO:
     user_id: int
     joined_at: datetime = field(default=datetime.now(UTC))
     total_withdrawn: Decimal = field(default=0)
+    referral_id: Optional[int] = field(default=None)
 
 
 @dataclass(frozen=True, kw_only=True)
 class CreateUserDTO:
     user_id: int
-
+    referral_id: Optional[int] = field(default=None)
 
 @dataclass(frozen=True)
 class UpdateUserDTO:
@@ -66,3 +69,9 @@ class ShareReferralDTO:
 @dataclass(frozen=True)
 class ReferralDTO:
     prepared_message_id: str
+
+
+@dataclass(frozen=True)
+class LoginDTO:
+    user_id: int
+    referral_id: Optional[int] = field(default=None)

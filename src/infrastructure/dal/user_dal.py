@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseUserDAL
 from src.domain.entity.user import User
-from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn
+from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn, ReferralID
 from src.infrastructure.data.models import UserModel
 from src.domain.value_objects.statistics import TimeSpan
 
@@ -19,7 +19,8 @@ class UserDAL(BaseUserDAL):
         user_model = UserModel(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            total_withdrawn=user.total_withdrawn.value
+            total_withdrawn=user.total_withdrawn.value,
+            referral_id=user.referral_id.value if user.referral_id else None,
         )
         self._session.add(user_model)
         await self._session.flush(objects=[user_model])
@@ -35,7 +36,8 @@ class UserDAL(BaseUserDAL):
         return User(
             user_id=UserID(db_user.user_id),
             joined_at=JoinedAt(db_user.joined_at),
-            total_withdrawn=TotalWithdrawn(db_user.total_withdrawn)
+            total_withdrawn=TotalWithdrawn(db_user.total_withdrawn),
+            referral_id=ReferralID(db_user.referral_id) if db_user.referral_id else None,
         )
 
     async def get_all_users(self) -> Optional[List[User]]:
@@ -49,7 +51,8 @@ class UserDAL(BaseUserDAL):
             User(
                 user_id=UserID(db_user.user_id),
                 joined_at=JoinedAt(db_user.joined_at),
-                total_withdrawn=TotalWithdrawn(db_user.total_withdrawn)
+                total_withdrawn=TotalWithdrawn(db_user.total_withdrawn),
+                referral_id=ReferralID(db_user.referral_id) if db_user.referral_id else None,
             )
             for db_user in db_users
         ]

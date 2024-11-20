@@ -9,9 +9,10 @@ from src.application.dto.user import (
     NewUsersDTO,
     ShareReferralDTO,
     ReferralDTO,
+    LoginDTO,
 )
 from src.domain.entity.user import User
-from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn
+from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn, ReferralID
 from src.domain.exceptions.user import UserNotFoundError
 from src.domain.value_objects.statistics import TimeSpan
 from src.application.common.uow import UoW
@@ -60,7 +61,8 @@ class UserService:
         return UserDTO(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            total_withdrawn=user.total_withdrawn.value
+            total_withdrawn=user.total_withdrawn.value,
+            referral_id=user.referral_id.value if user.referral_id else None,
         )
 
     async def get_all_users(self) -> List[UserDTO]:
@@ -69,7 +71,8 @@ class UserService:
         return [UserDTO(
             user_id=user.user_id.value,
             joined_at=user.joined_at.value,
-            total_withdrawn=user.total_withdrawn.value
+            total_withdrawn=user.total_withdrawn.value,
+            referral_id=user.referral_id.value if user.referral_id else None,
         ) for user in users]
     
     async def update_user(self, data: UpdateUserDTO) -> None:
@@ -103,13 +106,30 @@ class UserService:
             user_id=UserID(data.user_id),
             joined_at=JoinedAt(user.joined_at),
             total_withdrawn=TotalWithdrawn(user.total_withdrawn),
+            referral_id=ReferralID(user.referral_id) if user.referral_id else None,
         )
         message = await self.telegram_service.save_prepared_inline_message(
             SavePreparedInlineMessageDTO(
                 user_id=data.user_id,
                 title="Share your referral link",
-                message_text=user.get_referral_url(),
+                message_text=user.get_referral_url().value,
             )
         )
         
         return ReferralDTO(prepared_message_id=message.prepared_message_id)
+
+    async def login(self, data: LoginDTO) -> UserDTO:
+        user = await self._user_dal.get_one(UserID(data.user_id))
+        if user is None:
+            insert_user = User(UserID(data.user_id))
+            if data.referral_id is not None:
+                insert_user.referral_id = ReferralID(data.referral_id)
+            user = await self._user_dal.insert(insert_user)
+        await self.uow.commit()
+
+        return UserDTO(
+            user_id=user.user_id.value,
+            joined_at=user.joined_at.value,
+            total_withdrawn=user.total_withdrawn.value,
+            referral_id=user.referral_id.value if user.referral_id else None,
+        )
