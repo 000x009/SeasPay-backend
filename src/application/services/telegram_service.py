@@ -2,7 +2,12 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from src.application.services.user_topic import UserTopicService
 from src.application.dto.user_topic import GetUserTopicByUserIdDTO, CreateUserTopicDTO
-from src.application.dto.telegram import SendMessageDTO, SendPurchaseRequestMessageDTO
+from src.application.dto.telegram import (
+    SendMessageDTO,
+    SendPurchaseRequestMessageDTO,
+    SavePreparedInlineMessageDTO,
+    PreparedInlineMessageDTO,
+)
 from src.infrastructure.config import load_bot_settings
 from src.application.common.telegram import TelegramClientInterface
 
@@ -96,3 +101,12 @@ class TelegramService:
             )
 
         return message
+
+    async def save_prepared_inline_message(self, data: SavePreparedInlineMessageDTO) -> PreparedInlineMessageDTO:
+        prepared_message = await self._telegram_client.save_prepared_inline_message(
+            user_id=data.user_id,
+            title=data.title,
+            message_text=data.message_text,
+        )
+
+        return PreparedInlineMessageDTO(prepared_message_id=prepared_message.id)

@@ -7,9 +7,8 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from aiogram.utils.web_app import WebAppInitData
 
 from src.application.services.user import UserService
-from src.application.dto.user import CreateUserDTO, GetUserDTO, UserDTO
+from src.application.dto.user import CreateUserDTO, GetUserDTO, UserDTO, ShareReferralDTO
 from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
-from src.presentation.web_api.schema.user import CreateUserSchema
 
 
 router = APIRouter(
@@ -34,7 +33,18 @@ async def register_user(
 async def get_user(
     user_service: FromDishka[UserService],
     user_data: WebAppInitData = Depends(user_init_data_provider),
-) -> UserDTO:
+) -> UserDTO | None:
     response = await user_service.get_user(GetUserDTO(user_id=user_data.user.id))
+
+    return response
+
+
+@router.get('/share-referral')
+@cache(expire=60 * 60 * 24)
+async def share_referral(
+    user_service: FromDishka[UserService],
+    user_data: WebAppInitData = Depends(user_init_data_provider),
+) -> UserDTO:
+    response = await user_service.share_referral(ShareReferralDTO(user_id=user_data.user.id))
 
     return response

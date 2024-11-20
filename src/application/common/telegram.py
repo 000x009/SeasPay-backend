@@ -1,8 +1,7 @@
 from typing import Protocol, Optional
 from abc import abstractmethod
-from uuid import UUID
 
-from aiogram.types import ForumTopic, Message, InlineKeyboardMarkup
+from aiogram.types import ForumTopic, Message, InlineKeyboardMarkup, PreparedInlineMessage
 
 
 class TelegramClientInterface(Protocol):
@@ -28,4 +27,13 @@ class TelegramClientInterface(Protocol):
         filename: Optional[str] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
     ) -> Message:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def save_prepared_inline_message(
+        self,
+        user_id: int,
+        title: str,
+        message_text: str,
+    ) -> PreparedInlineMessage:
         raise NotImplementedError

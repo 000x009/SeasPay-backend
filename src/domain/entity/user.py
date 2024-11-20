@@ -7,7 +7,9 @@ from src.domain.value_objects.user import (
     UserID,
     JoinedAt,
     TotalWithdrawn,
+    ReferralURL,
 )
+from src.infrastructure.config import app_settings
 
 
 class User:
@@ -40,14 +42,5 @@ class User:
             return True
         return False
 
-    # def update_withdraw_commission(self, paypal_received_amount: PaypalReceivedAmount) -> None:
-    #     total_withdrawn = TotalWithdrawn(self.total_withdrawn.value + paypal_received_amount.value)
-    #
-    #     if self.withdraw_commission.value == load_settings().commission.paypal.min_percentage_to_withdraw:
-    #         return
-    #     elif total_withdrawn.value >= 10 and total_withdrawn.value < 20:
-    #         self.withdraw_commission = WithdrawCommission(13)
-    #     elif total_withdrawn.value >= 20 and total_withdrawn.value < 50:
-    #         self.withdraw_commission = WithdrawCommission(10)
-    #     elif total_withdrawn.value >= 100 and total_withdrawn.value < 200:
-    #         self.withdraw_commission = WithdrawCommission(7)
+    def get_referral_url(self) -> ReferralURL:
+        return ReferralURL(f"{app_settings.bot.bot_url}/join?startapp={self.user_id}")

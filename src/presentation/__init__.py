@@ -46,7 +46,7 @@ def include_all_routers(app: FastAPI) -> None:
     app.include_router(product_application.router)
     app.include_router(platform.router)
     app.include_router(platform_product.router)
-    
+
     logging.info('All API routers was included.')
 
 

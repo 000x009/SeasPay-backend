@@ -41,11 +41,11 @@ async def get_order_list(
     limit: int,
     offset: int,
     order_service: FromDishka[OrderService],
-    # user_data: WebAppInitData = Depends(user_init_data_provider),
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> Optional[List[OrderDTO]]:
     response = await order_service.list_orders(
         ListOrderDTO(
-            user_id=1111,
+            user_id=user_data.user.id,
             pagination=Pagination(
                 limit=limit,
                 offset=offset,

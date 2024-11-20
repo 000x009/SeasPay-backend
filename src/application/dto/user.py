@@ -56,3 +56,13 @@ class NewUsersDTO:
     month: int
     week: int
     day: int
+
+
+@dataclass(frozen=True)
+class ShareReferralDTO:
+    user_id: int
+
+
+@dataclass(frozen=True)
+class ReferralDTO:
+    prepared_message_id: str

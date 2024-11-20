@@ -7,6 +7,8 @@ from src.application.dto.user import (
     UserDTO,
     UpdateUserDTO,
     NewUsersDTO,
+    ShareReferralDTO,
+    ReferralDTO,
 )
 from src.domain.entity.user import User
 from src.domain.value_objects.user import UserID, JoinedAt, TotalWithdrawn
@@ -16,6 +18,9 @@ from src.application.common.uow import UoW
 from src.application.services.user_commission import UserCommissionService
 from src.application.dto.user_commission import CreateUserCommissionDTO
 from src.infrastructure.config import app_settings
+from src.application.services.telegram_service import TelegramService
+from src.application.dto.telegram import SavePreparedInlineMessageDTO
+from src.domain.exceptions.user import UserNotFoundError
 
 
 class UserService:
@@ -24,10 +29,12 @@ class UserService:
         user_dal: UserDAL,
         uow: UoW,
         user_commission_service: UserCommissionService,
+        telegram_service: TelegramService,
     ) -> None:
         self._user_dal = user_dal
         self.uow = uow
         self.user_commission_service = user_commission_service
+        self.telegram_service = telegram_service
 
     async def add(self, data: CreateUserDTO) -> UserDTO:
         user = await self._user_dal.insert(User(UserID(data.user_id)))
@@ -48,7 +55,7 @@ class UserService:
     async def get_user(self, data: GetUserDTO) -> Optional[UserDTO]:
         user = await self._user_dal.get_one(UserID(data.user_id))
         if user is None:
-            return None
+            raise UserNotFoundError(f"User with id {data.user_id} not found.")
         
         return UserDTO(
             user_id=user.user_id.value,
@@ -89,3 +96,20 @@ class UserService:
             week=week_users,
             day=day_users,
         )
+
+    async def share_referral(self, data: ShareReferralDTO) -> ReferralDTO:
+        user = await self.get_user(GetUserDTO(user_id=data.user_id))
+        user = User(
+            user_id=UserID(data.user_id),
+            joined_at=JoinedAt(user.joined_at),
+            total_withdrawn=TotalWithdrawn(user.total_withdrawn),
+        )
+        message = await self.telegram_service.save_prepared_inline_message(
+            SavePreparedInlineMessageDTO(
+                user_id=data.user_id,
+                title="Share your referral link",
+                message_text=user.get_referral_url(),
+            )
+        )
+        
+        return ReferralDTO(prepared_message_id=message.prepared_message_id)

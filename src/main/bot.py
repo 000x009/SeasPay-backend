@@ -36,11 +36,11 @@ async def setup_bot_dishka(dispatcher: Dispatcher) -> AsyncGenerator[None, None]
 
 
 def get_dispatcher() -> Dispatcher:
-    storage = RedisStorage.from_url(
-        'redis://redis:6379/0',
-        key_builder=DefaultKeyBuilder(with_destiny=True),
-    )
-    dispatcher = Dispatcher(storage=storage)
+    # storage = RedisStorage.from_url(
+    #     'redis://redis:6379/0',
+    #     key_builder=DefaultKeyBuilder(with_destiny=True),
+    # )
+    dispatcher = Dispatcher()
     dispatcher.include_routers(*all_handlers)
     dispatcher.include_routers(*dialogs)
     LoginMiddleware(dishka_container=get_di_container(), router=dispatcher)

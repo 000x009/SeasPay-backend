@@ -1,7 +1,16 @@
 from typing import Optional
+import uuid
 
 from aiogram import Bot
-from aiogram.types import ForumTopic, Message, BufferedInputFile, InlineKeyboardMarkup
+from aiogram.types import (
+    ForumTopic,
+    Message,
+    BufferedInputFile,
+    InlineKeyboardMarkup,
+    PreparedInlineMessage,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+)
 
 from src.application.common.telegram import TelegramClientInterface
 from src.infrastructure.config import BotSettings
@@ -46,4 +55,19 @@ class TelegramClient(TelegramClientInterface):
             message_thread_id=thread_id,
             caption=caption,
             reply_markup=reply_markup,
+        )
+
+    async def save_prepared_inline_message(self, user_id: int, title: str, message_text: str) -> PreparedInlineMessage:
+        return await self.bot.save_prepared_inline_message(
+            user_id=user_id,
+            result=InlineQueryResultArticle(
+                id=str(uuid.uuid4()),
+                title=title,
+                input_message_content=InputTextMessageContent(
+                    message_text=message_text
+                )
+            ),
+            allow_channel_chats=True,
+            allow_group_chats=True,
+            allow_user_chats=True,
         )

@@ -36,6 +36,7 @@ class BotSettings:
     """Telegram bot settings"""
 
     bot_token: str
+    bot_url: str
     orders_group_id: int
     webhook_url: str
     terms_of_use_url: str
@@ -91,7 +92,6 @@ class WebSettings:
     web_app_url: str
     application_fulfilling_url: str
 
-
 @dataclass
 class Settings:
     """App settings"""
@@ -121,6 +121,7 @@ def load_settings() -> Settings:
         api_base_url=os.environ['PAYPAL_BASE_URL'],
     )
     bot = BotSettings(
+        bot_url=os.environ['BOT_URL'],
         bot_token=os.environ['BOT_TOKEN'],
         orders_group_id=int(os.environ['ORDERS_GROUP_ID']),
         webhook_url=os.environ['WEBHOOK_URL'],
