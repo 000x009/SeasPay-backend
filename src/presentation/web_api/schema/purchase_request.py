@@ -1,5 +1,5 @@
-from pydantic import BaseModel, AnyUrl
+from pydantic import BaseModel
 
 
 class CreatePurchaseRequestSchema(BaseModel):
-    purchase_url: AnyUrl
+    purchase_url: str

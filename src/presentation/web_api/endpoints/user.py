@@ -34,7 +34,6 @@ async def get_user(
     user_service: FromDishka[UserService],
     user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> UserDTO:
-    print(user_data.start_param)
     response = await user_service.get_user(GetUserDTO(user_id=user_data.user.id))
 
     return response
