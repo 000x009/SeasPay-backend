@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
@@ -8,6 +6,7 @@ from src.application.dto.platform import (
     PlatformDTO,
     GetPlatformDTO,
     ListPlatformDTO,
+    PlatformListResultDTO
 )
 from src.application.services.platform import PlatformService
 from src.application.common.dto import Pagination
@@ -24,7 +23,7 @@ async def list_platforms(
     limit: int,
     offset: int,
     platform_service: FromDishka[PlatformService],
-) -> List[PlatformDTO]:
+) -> PlatformListResultDTO:
     response = await platform_service.list_platform(
         ListPlatformDTO(
             pagination=Pagination(

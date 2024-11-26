@@ -9,5 +9,5 @@ class Description(ValueObject[str]):
     value: str
 
     def _validate(self) -> None:
-        if len(self.value) > 500:
+        if self.value and len(self.value) > 500:
             raise InvalidDescriptionError('Description cannot be longer than 500 characters')
