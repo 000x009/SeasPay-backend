@@ -8,9 +8,7 @@ from src.domain.value_objects.yandex_cloud import (
     ObjectKey,
     File,
     PresignedURL,
-    PresignedPostPolicy,
-    PresignedPostSignature,
-    AccessKeyId,
+    PostData,
 )
 
 
@@ -49,8 +47,5 @@ class YandexCloudStorage(CloudStorage):
 
         return PresignedPost(
             presigned_url=PresignedURL(response['url']),
-            key=ObjectKey(response['fields']['key']),
-            access_key_id=AccessKeyId(response['fields']['AWSAccessKeyId']),
-            signature=PresignedPostSignature(response['fields']['signature']),
-            policy=PresignedPostPolicy(response['fields']['policy']),
+            data=PostData(response['fields']),
         )

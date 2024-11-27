@@ -74,19 +74,20 @@ async def get_order(
 
 @router.post('/withdraw', response_model=OrderDTO)
 async def create_withdraw_order(
-    order_service: FromDishka[OrderService],
     data: CreateWithdrawOrderSchema,
+    order_service: FromDishka[OrderService],
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderDTO:
     response = await order_service.create_withdraw_order(
         CreateWithdrawOrderDTO(
-            user_id=22223,
+            user_id=user_data.user.id,
             method=data.method,
             card_number=data.card_number,
             card_holder_name=data.card_holder_name,
             crypto_address=data.crypto_address,
             crypto_network=data.crypto_network,
             payment_receipt_url=data.payment_receipt_url,
-            username='username',
+            username=user_data.user.username if user_data.user.username else user_data.user.first_name,
         )
     )
 
@@ -95,15 +96,15 @@ async def create_withdraw_order(
 
 @router.post('/transfer', response_model=OrderDTO)
 async def create_transfer_order(
-    order_service: FromDishka[OrderService],
     data: CreateTransferOrderSchema,
-    # user_data: WebAppInitData = Depends(user_init_data_provider),
+    order_service: FromDishka[OrderService],
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderDTO:
     response = await order_service.create_transfer_order(
         CreateTransferOrderDTO(
-            user_id=22223,
+            user_id=user_data.user.id,
             receiver_email=data.receiver_email,
-            username='some username',
+            username=user_data.user.username if user_data.user.username else user_data.user.first_name,
             transfer_amount=data.amount,
             payment_receipt_url=data.payment_receipt_url,
         )
@@ -116,34 +117,34 @@ async def create_transfer_order(
 async def create_digital_product_order(
     data: CreateDigitalProductOrderSchema,
     order_service: FromDishka[OrderService],
-    # user_data: WebAppInitData = Depends(user_init_data_provider),
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderDTO:
     response = await order_service.create_digital_product_order(
         CreateDigitalProductOrderDTO(
-            user_id=22223,
+            user_id=user_data.user.id,
             application_id=data.application_id,
             payment_receipt_url=data.payment_receipt_url,
             login_data=data.login_data,
-            username='some username',
+            username=user_data.user.username if user_data.user.username else user_data.user.first_name,
         )
     )
 
     return response
 
 
-@router.post('/purchase/platform-product', response_model=OrderDTO)
-async def purchase_platform_product(
+@router.post('/platform-product/card', response_model=OrderDTO)
+async def purchase_platform_product_card(
     data: PurchasePlatformProductSchema,
     order_service: FromDishka[OrderService],
-    # user_data: WebAppInitData = Depends(user_init_data_provider),
+    user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderDTO:
     response = await order_service.purchase_platform_product(
         PurchasePlatformProductDTO(
-            user_id=22223,
-            platform_product_id=data.platform_product_id,
+            user_id=user_data.user.id,
+            platform_product_id=data.product_id,
             payment_receipt_url=data.payment_receipt_url,
             login_data=data.login_data,
-            username='some username',
+            username=user_data.user.username if user_data.user.username else user_data.user.first_name,
         )
     )
 

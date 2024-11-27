@@ -8,7 +8,7 @@ from src.application.dto.cloud import (
     ObjectDTO,
 )
 from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey, File
-from src.domain.entity.yandex_cloud import StorageObject
+from src.domain.entity.yandex_cloud import StorageObject, PresignedObject
 from src.infrastructure.config import app_settings
 from src.domain.value_objects.yandex_cloud import ObjectURL
 
@@ -22,13 +22,15 @@ class CloudService:
             bucket=Bucket(app_settings.cloud_settings.receipts_bucket_name),
             name=ObjectKey(data.filename),
         )
+        presigned_object = PresignedObject(
+            bucket=Bucket(app_settings.cloud_settings.receipts_bucket_name),
+            key=ObjectKey(data.filename),
+        )
 
         return PresignedPostDTO(
             url=presigned_post.presigned_url.value,
-            key=presigned_post.key.value,
-            access_key_id=presigned_post.access_key_id.value,
-            signature=presigned_post.signature.value,
-            policy=presigned_post.policy.value,
+            object_url=presigned_object.get_object_url(app_settings.cloud_settings.base_storage_url).value,
+            data=presigned_post.data.value,
         )
 
     def upload_object(self, data: UploadObjectDTO) -> UploadedObjectResultDTO:

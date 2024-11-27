@@ -144,6 +144,20 @@ class APIClientProvider(Provider):
             aws_access_key_id=settings.cloud_settings.access_key_id,
             aws_secret_access_key=settings.cloud_settings.access_secret_key,
         )
+        cors_configuration = {
+            'CORSRules': [{
+                'AllowedHeaders': ['*'],
+                'AllowedMethods': ['POST', 'PUT', 'GET'],
+                'AllowedOrigins': ['*'],
+                'ExposeHeaders': ['ETag'],
+                'MaxAgeSeconds': 3000
+            }]
+        }
+
+        s3_client.put_bucket_cors(
+            Bucket=settings.cloud_settings.receipts_bucket_name,
+            CORSConfiguration=cors_configuration
+        )
 
         return YandexCloudStorage(client=s3_client)
 

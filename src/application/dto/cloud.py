@@ -1,4 +1,4 @@
-from typing import BinaryIO
+from typing import BinaryIO, Mapping
 from dataclasses import dataclass
 
 
@@ -10,10 +10,8 @@ class GetPresignedPostDTO:
 @dataclass(frozen=True)
 class PresignedPostDTO:
     url: str
-    key: str
-    access_key_id: str
-    signature: str
-    policy: str
+    object_url: str
+    data: Mapping[str, str]
 
 
 @dataclass(frozen=True)

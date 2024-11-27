@@ -34,7 +34,6 @@ async def list_platform_products(
             )
         )
     )
-    print("response", response)
 
     return response
 
@@ -49,6 +48,5 @@ async def get_platform_product(
             id=id,
         )
     )
-    print("response 52", response)
 
     return response
