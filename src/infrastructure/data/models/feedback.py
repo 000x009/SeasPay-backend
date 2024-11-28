@@ -1,7 +1,7 @@
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, List
 from datetime import datetime, UTC
 
-from sqlalchemy import Integer, BigInteger, ForeignKey, String, TIMESTAMP, func
+from sqlalchemy import Integer, BigInteger, ForeignKey, String, TIMESTAMP, func, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.data.models import Base
@@ -27,6 +27,6 @@ class FeedbackModel(Base):
         default=datetime.now(UTC),
         nullable=False,
     )
-    photo_url: Mapped[str] = mapped_column(String, nullable=True)
+    photo: Mapped[List[str]] = mapped_column(JSON, nullable=True)
 
     user: Mapped['UserModel'] = relationship(back_populates='feedbacks')

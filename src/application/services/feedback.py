@@ -1,15 +1,12 @@
-from typing import List, Optional
+from typing import List
 
 from src.infrastructure.dal import FeedbackDAL
 from src.application.dto.feedback import FeedbackDTO, ListInputDTO, GetFeedbackDTO, CreateFeedbackDTO
-from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt, PhotoURL
+from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt, Photo
 from src.domain.value_objects.user import UserID
 from src.domain.entity.feedback import Feedback
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
-from src.domain.entity.yandex_cloud import StorageObject
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey, File
-from src.infrastructure.config import load_settings
 from src.domain.exceptions.feedback import FeedbackNotFoundError
 
 
@@ -36,7 +33,7 @@ class FeedbackService:
                 stars=feedback.stars.value,
                 comment=feedback.comment.value,
                 created_at=feedback.created_at,
-                photo_url=feedback.photo_url.value if feedback.photo_url else None,
+                photo=feedback.photo.value if feedback.photo else None,
             )
             for feedback in feedbacks
         ]
@@ -52,7 +49,7 @@ class FeedbackService:
             stars=feedback.stars.value,
             comment=feedback.comment.value,
             created_at=feedback.created_at.value,
-            photo_url=feedback.photo_url.value,
+            photo=feedback.photo.value,
         )
     
     async def create(self, data: CreateFeedbackDTO) -> FeedbackDTO:
@@ -61,7 +58,7 @@ class FeedbackService:
             stars=Stars(data.stars),
             comment=Comment(data.comment),
             created_at=CreatedAt(data.created_at),
-            photo_url=PhotoURL(data.photo_url) if data.photo_url else None,
+            photo=Photo(data.photo) if data.photo else None,
         ))
         await self.uow.commit()
 
@@ -71,5 +68,5 @@ class FeedbackService:
             stars=feedback.stars.value,
             comment=feedback.comment.value,
             created_at=feedback.created_at.value,
-            photo_url=feedback.photo_url.value,
+            photo=feedback.photo.value if feedback.photo else None,
         )

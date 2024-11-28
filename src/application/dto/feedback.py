@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime, UTC
 
 
@@ -10,7 +10,7 @@ class FeedbackDTO:
     stars: int
     comment: Optional[str] = field(default=None)
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
-    photo_url: Optional[str] = field(default=None)
+    photo: Optional[List[str]] = field(default=None)
 
 
 @dataclass
@@ -30,4 +30,4 @@ class CreateFeedbackDTO:
     stars: int
     comment: Optional[str] = field(default=None)
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
-    photo_url: Optional[str] = field(default=None)
+    photo: Optional[List[str]] = field(default=None)

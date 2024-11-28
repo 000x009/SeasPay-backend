@@ -2,7 +2,7 @@ from typing import Optional
 from datetime import datetime, UTC
 
 from src.domain.value_objects.user import UserID
-from src.domain.value_objects.feedback import FeedbackID, Comment, CreatedAt, Stars, PhotoURL
+from src.domain.value_objects.feedback import FeedbackID, Comment, CreatedAt, Stars, Photo
 
 
 class Feedback:
@@ -11,7 +11,7 @@ class Feedback:
         'stars',
         'comment',
         'created_at',
-        'photo_url',
+        'photo',
     )
 
     def __init__(
@@ -20,13 +20,13 @@ class Feedback:
         stars: Stars,
         comment: Optional[Comment] = None,
         created_at: Optional[CreatedAt] = None,
-        photo_url: Optional[PhotoURL] = None,
+        photo: Optional[Photo] = None,
     ) -> None:
         self.user_id = user_id
         self.stars = stars
         self.comment = comment
         self.created_at = created_at
-        self.photo_url = photo_url
+        self.photo = photo
 
         if self.created_at is None:
             self.created_at = datetime.now(UTC)
@@ -42,9 +42,9 @@ class FeedbackDB(Feedback):
         stars: Stars,
         comment: Optional[Comment] = None,
         created_at: Optional[CreatedAt] = None,
-        photo_url: Optional[PhotoURL] = None,
+        photo: Optional[Photo] = None,
     ) -> None:
         self.id = id
         super().__init__(
-            user_id, stars, comment, created_at, photo_url
+            user_id, stars, comment, created_at, photo
         )

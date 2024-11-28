@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.data.models import FeedbackModel
-from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt, PhotoURL
+from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, CreatedAt, Photo
 from src.domain.value_objects.user import UserID
 from src.domain.entity.feedback import Feedback, FeedbackDB
 from src.application.common.dal.feedback import BaseFeedbackDAL
@@ -20,7 +20,7 @@ class FeedbackDAL(BaseFeedbackDAL):
             stars=feedback.stars.value,
             comment=feedback.comment.value,
             created_at=feedback.created_at.value,
-            photo_url=feedback.photo_url.value,
+            photo=feedback.photo.value if feedback.photo else None,
         )
         self._session.add(db_feedback)
         await self._session.flush(objects=[db_feedback])
@@ -31,7 +31,7 @@ class FeedbackDAL(BaseFeedbackDAL):
             stars=Stars(db_feedback.stars),
             comment=Comment(db_feedback.comment),
             created_at=CreatedAt(db_feedback.created_at),
-            photo_url=PhotoURL(db_feedback.photo_url),
+            photo=Photo(db_feedback.photo) if db_feedback.photo else None,
         )
 
     async def get(self, feedback_id: FeedbackID) -> Optional[FeedbackDB]:
@@ -48,7 +48,7 @@ class FeedbackDAL(BaseFeedbackDAL):
             stars=Stars(db_feedback.stars),
             comment=Comment(db_feedback.comment),
             created_at=CreatedAt(db_feedback.created_at),
-            photo_url=PhotoURL(db_feedback.photo_url),
+            photo=Photo(db_feedback.photo) if db_feedback.photo else None,
         )
 
     async def list_(
@@ -73,7 +73,7 @@ class FeedbackDAL(BaseFeedbackDAL):
                     stars=Stars(db_feedback.stars),
                     comment=Comment(db_feedback.comment),
                     created_at=CreatedAt(db_feedback.created_at),
-                    photo_url=PhotoURL(db_feedback.photo_url)
+                    photo=Photo(db_feedback.photo) if db_feedback.photo else None,
                 )
                 for db_feedback in db_feedbacks
             ]
