@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.data.models import FeedbackModel
@@ -8,6 +8,7 @@ from src.domain.value_objects.feedback import FeedbackID, Stars, Comment, Create
 from src.domain.value_objects.user import UserID
 from src.domain.entity.feedback import Feedback, FeedbackDB
 from src.application.common.dal.feedback import BaseFeedbackDAL
+from src.domain.entity.pagination import Limit, Offset
 
 
 class FeedbackDAL(BaseFeedbackDAL):
@@ -53,14 +54,14 @@ class FeedbackDAL(BaseFeedbackDAL):
 
     async def list_(
         self,
-        limit: int,
-        offset: int,
+        limit: Limit,
+        offset: Offset,
     ) -> Optional[List[FeedbackDB]]:
         query = (
             select(FeedbackModel)
-            .limit(limit + 1)
-            .offset(offset)
-            .order_by(FeedbackModel.created_at)
+            .limit(limit.value)
+            .offset(offset.value)
+            .order_by(desc(FeedbackModel.created_at))
         )
         result = await self._session.execute(query)
 

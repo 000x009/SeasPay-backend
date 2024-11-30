@@ -15,8 +15,7 @@ class FeedbackDTO:
 
 @dataclass
 class ListInputDTO:
-    limit: int
-    offset: int
+    page: int
 
 
 @dataclass

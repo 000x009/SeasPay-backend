@@ -57,6 +57,7 @@ class PlatformDALImpl(PlatformDAL):
             select(PlatformModel)
             .limit(limit)
             .offset(offset)
+            .order_by(PlatformModel.web_place)
         )
         result = await self.session.execute(query)
         platforms = result.scalars().all()

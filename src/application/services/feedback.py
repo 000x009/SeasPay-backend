@@ -8,6 +8,8 @@ from src.domain.entity.feedback import Feedback
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.exceptions.feedback import FeedbackNotFoundError
+from src.domain.entity.pagination import Page
+from src.domain.value_objects.pagination import PageNumber
 
 
 class FeedbackService:
@@ -21,10 +23,14 @@ class FeedbackService:
         self.uow = uow
         self.cloud_storage = cloud_storage
 
-    async def list_(self, data: ListInputDTO) -> List[FeedbackDTO]:
-        feedbacks = await self._feedback_dal.list_(limit=data.limit, offset=data.offset)
-        if not feedbacks:
-            raise FeedbackNotFoundError('Feedbacks not found')
+    async def list_feedbacks(self, data: ListInputDTO) -> List[FeedbackDTO]:
+        page = Page(PageNumber(data.page))
+        feedbacks = await self._feedback_dal.list_(
+            limit=page.get_limit(),
+            offset=page.get_offset(),
+        )
+        # if not feedbacks:
+        #     raise FeedbackNotFoundError('Feedbacks not found')
 
         return [
             FeedbackDTO(
