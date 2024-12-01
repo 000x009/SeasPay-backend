@@ -12,6 +12,7 @@ from src.presentation.web_api.endpoints import (
     platform,
     platform_product,
     user_commission,
+    requisite,
 )
 from src.presentation.web_api.exception_handlers import (
     user as user_exception,
@@ -24,7 +25,7 @@ from src.presentation.web_api.exception_handlers import (
     purchase_request as purchase_request_exception,
     completed_order as completed_order_exception,
     order as order_exception,
-
+    requisite as requisite_exception,
 )
 from src.domain.exceptions.user import UserDataError, UserNotFoundError, NotAuthorizedError
 from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenError
@@ -36,6 +37,7 @@ from src.domain.exceptions.platform import PlatformDataError
 from src.domain.exceptions.platform_product import PlatformProductDataError
 from src.domain.exceptions.purchase_request import PurchaseRequestAlreadyTaken, PurchaseRequestNotFound
 from src.domain.exceptions.completed_order import CompletedOrderNotFoundError, CompletedOrderDataError
+from src.domain.exceptions.requisite import RequisiteNotFound
 
 
 def include_all_routers(app: FastAPI) -> None:
@@ -48,6 +50,7 @@ def include_all_routers(app: FastAPI) -> None:
     app.include_router(platform.router)
     app.include_router(platform_product.router)
     app.include_router(user_commission.router)
+    app.include_router(requisite.router)
 
     logging.info('All API routers was included.')
 
@@ -115,4 +118,7 @@ def include_exception_handlers(app: FastAPI) -> None:
     )
     app.add_exception_handler(
         CompletedOrderDataError, completed_order_exception.completed_order_data_exception_handler,
+    )
+    app.add_exception_handler(
+        RequisiteNotFound, requisite_exception.requisite_not_found_handler,
     )

@@ -233,10 +233,10 @@ class OrderService:
             total=total,
         )
 
-    async def get(self, data: GetOrderDTO) -> Optional[OrderDTO]:
+    async def get(self, data: GetOrderDTO) -> OrderDTO:
         order = await self._order_dal.get(OrderID(data.order_id))
         if not order:
-            return None
+            raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
 
         return OrderDTO(
             id=order.id.value,

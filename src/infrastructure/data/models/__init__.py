@@ -12,6 +12,7 @@ from .purchase_request import PurchaseRequestModel
 from .product_application import ProductApplicationModel
 from .platform import PlatformModel
 from .platform_product import PlatformProductModel
+from .requisite import RequisiteModel
 
 __all__ = [
     'Base',
@@ -28,4 +29,5 @@ __all__ = [
     'ProductApplicationModel',
     'PlatformModel',
     'PlatformProductModel',
+    'RequisiteModel',
 ]

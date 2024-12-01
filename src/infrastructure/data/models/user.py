@@ -13,6 +13,7 @@ if TYPE_CHECKING:
         UserCommissionModel,
         OrderModel,
         FeedbackModel,
+        RequisiteModel,
     )
     from src.infrastructure.data.models import PurchaseRequestModel
     from src.infrastructure.data.models import ProductApplicationModel
@@ -57,5 +58,8 @@ class UserModel(Base):
         back_populates='user', uselist=True, lazy='joined'
     )
     product_applications: Mapped[Optional[List["ProductApplicationModel"]]] = relationship(
+        back_populates='user', uselist=True, lazy='joined'
+    )
+    requisites: Mapped[Optional[List["RequisiteModel"]]] = relationship(
         back_populates='user', uselist=True, lazy='joined'
     )

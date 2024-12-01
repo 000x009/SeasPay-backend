@@ -5,6 +5,7 @@ from .completed_order_dal import CompletedOrderDAL
 from .user_topic_dal import UserTopicDAL
 from .withdraw_details_dal import WithdrawDetailsDAL
 from .user_commission import UserCommissionDALImpl
+from .requisite import RequisiteDALImpl
 
 __all__ = [
     'UserDAL',
@@ -14,4 +15,5 @@ __all__ = [
     'UserTopicDAL',
     'WithdrawDetailsDAL',
     'UserCommissionDALImpl',
+    'RequisiteDALImpl',
 ]

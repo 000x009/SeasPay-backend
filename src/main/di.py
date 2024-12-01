@@ -19,7 +19,9 @@ from src.infrastructure.dal import (
     CompletedOrderDAL,
     WithdrawDetailsDAL,
     UserCommissionDALImpl,
+    RequisiteDALImpl,
 )
+from src.application.common.dal.requisite import RequisiteDAL
 from src.application.common.dal.platform_product import PlatformProductDAL
 from src.infrastructure.dal.platform_product import PlatformProductDALImpl
 from src.application.services.platform_product import PlatformProductService
@@ -52,6 +54,7 @@ from src.application.common.uow import UoW
 from src.infrastructure.data.uow import SAUoW
 from src.application.common.cloud_storage import CloudStorage
 from src.infrastructure.cloud_storage import YandexCloudStorage
+from src.application.services.requisite import RequisiteService
 
 
 class DatabaseProvider(Provider):
@@ -85,6 +88,7 @@ class DALProvider(Provider):
     user_commission_dal = provide(UserCommissionDALImpl, scope=Scope.REQUEST, provides=UserCommissionDAL)
     uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
     platform_product_dal = provide(PlatformProductDALImpl, scope=Scope.REQUEST, provides=PlatformProductDAL)
+    requisite_dal = provide(RequisiteDALImpl, scope=Scope.REQUEST, provides=RequisiteDAL)
     product_application_dal = provide(
         ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl
     )
@@ -108,6 +112,7 @@ class ServiceProvider(Provider):
     platform_service = provide(PlatformService, scope=Scope.REQUEST, provides=PlatformService)
     user_commission_service = provide(UserCommissionService, scope=Scope.REQUEST, provides=UserCommissionService)
     platform_product_service = provide(PlatformProductService, scope=Scope.REQUEST, provides=PlatformProductService)
+    requisite_service = provide(RequisiteService, scope=Scope.REQUEST, provides=RequisiteService)
     product_application_service = provide(
         ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService
     )

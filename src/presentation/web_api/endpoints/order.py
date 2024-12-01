@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -63,12 +63,8 @@ async def get_order(
     order_id: UUID,
     order_service: FromDishka[OrderService],
     user_data: WebAppInitData = Depends(user_init_data_provider),
-) -> Optional[OrderDTO]:
-    response = await order_service.get(
-        GetOrderDTO(
-            order_id=order_id,
-        )
-    )
+) -> OrderDTO:
+    response = await order_service.get(GetOrderDTO(order_id=order_id))
 
     return response
 
