@@ -6,6 +6,8 @@ from .user_topic_dal import UserTopicDAL
 from .withdraw_details_dal import WithdrawDetailsDAL
 from .user_commission import UserCommissionDALImpl
 from .requisite import RequisiteDALImpl
+from .crypto_requisite import CryptoRequisiteDALImpl
+from .card_requisite import CardRequisiteDALImpl
 
 __all__ = [
     'UserDAL',
@@ -16,4 +18,6 @@ __all__ = [
     'WithdrawDetailsDAL',
     'UserCommissionDALImpl',
     'RequisiteDALImpl',
+    'CryptoRequisiteDALImpl',
+    'CardRequisiteDALImpl',
 ]

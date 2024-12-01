@@ -20,8 +20,12 @@ from src.infrastructure.dal import (
     WithdrawDetailsDAL,
     UserCommissionDALImpl,
     RequisiteDALImpl,
+    CryptoRequisiteDALImpl,
+    CardRequisiteDALImpl,
 )
 from src.application.common.dal.requisite import RequisiteDAL
+from src.application.common.dal.crypto_requisite import CryptoRequisiteDAL
+from src.application.common.dal.card_requisite import CardRequisiteDAL
 from src.application.common.dal.platform_product import PlatformProductDAL
 from src.infrastructure.dal.platform_product import PlatformProductDALImpl
 from src.application.services.platform_product import PlatformProductService
@@ -40,6 +44,8 @@ from src.infrastructure.dal.purchase_request import PurchaseRequestDalImpl
 from src.application.services.withdraw_details import WithdrawService
 from src.application.services.cloud import CloudService
 from src.application.services.transfer_details import TransferDetailsService
+from src.application.services.crypto_requisite import CryptoRequisiteService
+from src.application.services.card_requisite import CardRequisiteService
 from src.infrastructure.dal.tranfer_details import TransferDetailsDAL
 from src.application.services.statistics import StatisticsService
 from src.application.services.digital_product_details import DigitalProductDetailsService
@@ -89,6 +95,8 @@ class DALProvider(Provider):
     uow = provide(SAUoW, scope=Scope.REQUEST, provides=UoW)
     platform_product_dal = provide(PlatformProductDALImpl, scope=Scope.REQUEST, provides=PlatformProductDAL)
     requisite_dal = provide(RequisiteDALImpl, scope=Scope.REQUEST, provides=RequisiteDAL)
+    crypto_requisite_dal = provide(CryptoRequisiteDALImpl, scope=Scope.REQUEST, provides=CryptoRequisiteDAL)
+    card_requisite_dal = provide(CardRequisiteDALImpl, scope=Scope.REQUEST, provides=CardRequisiteDAL)
     product_application_dal = provide(
         ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl
     )
@@ -113,6 +121,8 @@ class ServiceProvider(Provider):
     user_commission_service = provide(UserCommissionService, scope=Scope.REQUEST, provides=UserCommissionService)
     platform_product_service = provide(PlatformProductService, scope=Scope.REQUEST, provides=PlatformProductService)
     requisite_service = provide(RequisiteService, scope=Scope.REQUEST, provides=RequisiteService)
+    crypto_requisite_service = provide(CryptoRequisiteService, scope=Scope.REQUEST, provides=CryptoRequisiteService)
+    card_requisite_service = provide(CardRequisiteService, scope=Scope.REQUEST, provides=CardRequisiteService)
     product_application_service = provide(
         ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService
     )

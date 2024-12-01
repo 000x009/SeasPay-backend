@@ -19,7 +19,7 @@ class RequisiteDALImpl(RequisiteDAL):
         model = RequisiteModel(
             id=requisite.id.value,
             user_id=requisite.user_id.value,
-            type=requisite.type.value,
+            type=requisite.type.value.value,
             created_at=requisite.created_at.value,
         )
         self.session.add(model)

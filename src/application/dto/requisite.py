@@ -30,3 +30,9 @@ class RequisiteListDTO:
 @dataclass(frozen=True)
 class GetRequisiteDTO:
     requisite_id: UUID
+
+
+@dataclass(frozen=True)
+class CreateRequisiteDTO:
+    user_id: int
+    type: RequisiteTypeEnum

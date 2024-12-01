@@ -13,6 +13,8 @@ from .product_application import ProductApplicationModel
 from .platform import PlatformModel
 from .platform_product import PlatformProductModel
 from .requisite import RequisiteModel
+from .card_requisite import CardRequisiteModel
+from .crypto_requisite import CryptoRequisiteModel
 
 __all__ = [
     'Base',
@@ -30,4 +32,6 @@ __all__ = [
     'PlatformModel',
     'PlatformProductModel',
     'RequisiteModel',
+    'CardRequisiteModel',
+    'CryptoRequisiteModel',
 ]
