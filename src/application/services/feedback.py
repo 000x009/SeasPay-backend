@@ -29,8 +29,6 @@ class FeedbackService:
             limit=page.get_limit(),
             offset=page.get_offset(),
         )
-        # if not feedbacks:
-        #     raise FeedbackNotFoundError('Feedbacks not found')
 
         return [
             FeedbackDTO(

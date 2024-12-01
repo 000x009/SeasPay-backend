@@ -19,6 +19,7 @@ from src.application.dto.order import (
     CreateTransferOrderDTO,
     CreateDigitalProductOrderDTO,
     PurchasePlatformProductDTO,
+    OrderListResultDTO,
 )
 from src.application.common.dto import Pagination
 from src.presentation.web_api.schema.order import (
@@ -42,7 +43,7 @@ async def get_order_list(
     offset: int,
     order_service: FromDishka[OrderService],
     user_data: WebAppInitData = Depends(user_init_data_provider),
-) -> Optional[List[OrderDTO]]:
+) -> OrderListResultDTO:
     response = await order_service.list_orders(
         ListOrderDTO(
             user_id=user_data.user.id,

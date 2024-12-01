@@ -16,6 +16,7 @@ from src.application.dto.order import (
     CreateDigitalProductOrderDTO,
     FulfillDigitalProductOrderDTO,
     PurchasePlatformProductDTO,
+    OrderListResultDTO,
 )
 from src.application.dto.user import UpdateUserDTO
 from src.domain.value_objects.user import UserID
@@ -209,24 +210,28 @@ class OrderService:
             telegram_message_id=updated_order.telegram_message_id.value,
         )
 
-    async def list_orders(self, data: ListOrderDTO) -> Optional[List[OrderDTO]]:
+    async def list_orders(self, data: ListOrderDTO) -> OrderListResultDTO:
         orders = await self._order_dal.list_(
             user_id=UserID(data.user_id),
             limit=data.pagination.limit if data.pagination else None,
             offset=data.pagination.offset if data.pagination else None,
         )
-        if not orders:
-            return None
+        total = await self._order_dal.get_total(UserID(data.user_id))
         
-        return [OrderDTO(
-            id=order.id.value,
-            user_id=order.user_id.value,
-            payment_receipt=order.payment_receipt.value,
-            type=order.type_.value,
-            created_at=order.created_at.value,
-            status=order.status.value,
-            telegram_message_id=order.telegram_message_id.value,
-        ) for order in orders]
+        return OrderListResultDTO(
+            orders=[
+                OrderDTO(
+                    id=order.id.value,
+                    user_id=order.user_id.value,
+                    payment_receipt=order.payment_receipt.value,
+                    type=order.type_.value,
+                    created_at=order.created_at.value,
+                    status=order.status.value,
+                    telegram_message_id=order.telegram_message_id.value,
+                ) for order in orders
+            ],
+            total=total,
+        )
 
     async def get(self, data: GetOrderDTO) -> Optional[OrderDTO]:
         order = await self._order_dal.get(OrderID(data.order_id))

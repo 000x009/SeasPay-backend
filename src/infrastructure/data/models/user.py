@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from src.infrastructure.data.models import PurchaseRequestModel
     from src.infrastructure.data.models import ProductApplicationModel
 
+
 class UserModel(Base):
     __tablename__ = 'user'
 

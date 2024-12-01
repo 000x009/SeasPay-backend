@@ -1,6 +1,6 @@
 from src.domain.value_objects.pagination import PageNumber, Limit, Offset
 
-PAGE_SIZE = 3
+PAGE_SIZE = 5
 
 
 class Page:

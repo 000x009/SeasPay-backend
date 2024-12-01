@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from decimal import Decimal
 from uuid import UUID
 
@@ -118,3 +118,9 @@ class PurchasePlatformProductDTO:
 @dataclass(frozen=True)
 class FulfillDigitalProductOrderDTO:
     order_id: UUID
+
+
+@dataclass(frozen=True)
+class OrderListResultDTO:
+    orders: List[OrderDTO]
+    total: int

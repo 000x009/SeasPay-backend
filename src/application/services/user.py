@@ -121,11 +121,7 @@ class UserService:
     async def login(self, data: LoginDTO) -> UserDTO:
         user = await self._user_dal.get_one(UserID(data.user_id))
         if user is None:
-            insert_user = User(UserID(data.user_id))
-            if data.referral_id is not None:
-                insert_user.referral_id = ReferralID(data.referral_id)
-            user = await self._user_dal.insert(insert_user)
-        await self.uow.commit()
+            await self.add(CreateUserDTO(user_id=data.user_id, referral_id=data.referral_id))
 
         return UserDTO(
             user_id=user.user_id.value,

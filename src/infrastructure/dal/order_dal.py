@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseOrderDAL
@@ -23,7 +23,10 @@ class OrderDAL(BaseOrderDAL):
         self._session = session
 
     async def list_(
-        self, user_id: UserID, limit: Optional[int] = None, offset: Optional[int] = None
+        self,
+        user_id: UserID,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> Optional[List[Order]]:
         if limit is not None and offset is not None:
             query = (
@@ -31,7 +34,7 @@ class OrderDAL(BaseOrderDAL):
                 .filter_by(
                     user_id=user_id.value,
                 )
-                .limit(limit + 1)
+                .limit(limit)
                 .offset(offset)
                 .order_by(OrderModel.created_at)
             )
@@ -46,8 +49,6 @@ class OrderDAL(BaseOrderDAL):
 
         result = await self._session.execute(query)
         orders = result.scalars().all()
-        if not orders:
-            return None
 
         return [
             Order(
@@ -132,6 +133,12 @@ class OrderDAL(BaseOrderDAL):
             type_=OrderType(order.type),
             telegram_message_id=MessageID(order.telegram_message_id),
         ) for order in orders]
+    
+    async def get_total(self, user_id: UserID) -> int:
+        query = select(func.count(OrderModel.id)).filter_by(user_id=user_id.value)
+        result = await self._session.execute(query)
+
+        return result.scalar_one()
     
     async def list_processing(self) -> Optional[List[Order]]:
         query = (
