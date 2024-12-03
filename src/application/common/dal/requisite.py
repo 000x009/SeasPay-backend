@@ -25,3 +25,7 @@ class RequisiteDAL(Protocol):
     @abstractmethod
     async def get_user_total(self, user_id: UserID) -> int:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, requisite_id: RequisiteId) -> None:
+        raise NotImplementedError

@@ -58,3 +58,8 @@ class GetRequisiteDTO:
 class CreateRequisiteDTO:
     user_id: int
     type: RequisiteTypeEnum
+
+
+@dataclass(frozen=True)
+class DeleteRequisiteDTO:
+    requisite_id: UUID

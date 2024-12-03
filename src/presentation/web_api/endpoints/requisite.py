@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
@@ -15,6 +16,7 @@ from src.application.dto.requisite import (
     RequisiteListDTO,
     GetRequisiteDTO,
     RequisiteListResultDTO,
+    DeleteRequisiteDTO,
 )
 from src.application.dto.crypto_requisite import CryptoRequisiteCreateDTO, CryptoRequisiteDTO
 from src.application.dto.card_requisite import CardRequisiteCreateDTO, CardRequisiteDTO
@@ -57,6 +59,17 @@ async def list_requisites(
     )
 
     return response
+
+
+@router.delete('/{id}')
+async def delete_requisite(
+    id: UUID,
+    requisite_service: FromDishka[RequisiteService],
+    user_data: WebAppInitData = Depends(user_init_data_provider),
+) -> JSONResponse:
+    await requisite_service.delete_requisite(DeleteRequisiteDTO(requisite_id=id))
+
+    return JSONResponse(status_code=200, content={"message": "success"})
 
 
 @router.post('/crypto')

@@ -5,6 +5,7 @@ from src.application.dto.requisite import (
     GetRequisiteDTO,
     RequisiteDTO,
     CreateRequisiteDTO,
+    DeleteRequisiteDTO,
 )
 from src.domain.value_objects.user import UserID
 from src.domain.value_objects.pagination import Limit, Offset
@@ -59,3 +60,7 @@ class RequisiteService:
             type=requisite.type.value,
             created_at=requisite.created_at.value,
         )
+
+    async def delete_requisite(self, data: DeleteRequisiteDTO) -> None:
+        await self.dal.delete(RequisiteId(data.requisite_id))
+        await self.uow.commit()

@@ -1,7 +1,6 @@
 from typing import Optional, List
-import logging
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -90,3 +89,7 @@ class RequisiteDALImpl(RequisiteDAL):
         total = result.scalar_one_or_none()
 
         return total
+
+    async def delete(self, requisite_id: RequisiteId) -> None:
+        query = delete(RequisiteModel).where(RequisiteModel.id == requisite_id.value)
+        await self.session.execute(query)
