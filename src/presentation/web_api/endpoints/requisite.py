@@ -27,6 +27,7 @@ router = APIRouter(
     route_class=DishkaRoute,
 )
 
+
 @router.get('/{id}')
 async def get_one_requisite(
     id: UUID,

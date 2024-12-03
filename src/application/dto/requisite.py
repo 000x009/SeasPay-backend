@@ -1,7 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from uuid import UUID
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from src.domain.value_objects.requisite import RequisiteTypeEnum
 from src.application.common.dto import Pagination
@@ -16,8 +16,30 @@ class RequisiteDTO:
 
 
 @dataclass(frozen=True)
+class RequisiteReadDTO:
+    id: UUID
+    user_id: int
+    type: RequisiteTypeEnum
+    created_at: datetime
+
+
+@dataclass(frozen=True)
+class CardRequisiteListDTO(RequisiteReadDTO):
+    number: str
+    holder: str
+
+
+@dataclass(frozen=True)
+class CryptoRequisiteListDTO(RequisiteReadDTO):
+    wallet_address: str
+    network: str
+    asset: str
+    memo: Optional[str]
+
+
+@dataclass(frozen=True)
 class RequisiteListResultDTO:
-    requisites: List[RequisiteDTO]
+    requisites: List[CryptoRequisiteListDTO | CardRequisiteListDTO]
     total: int
 
 

@@ -28,15 +28,7 @@ class RequisiteService:
         total = await self.dal.get_user_total(UserID(data.user_id))
 
         return RequisiteListResultDTO(
-            requisites=[
-                RequisiteDTO(
-                    id=requisite.id.value,
-                    user_id=requisite.user_id.value,
-                    type=requisite.type.value,
-                    created_at=requisite.created_at.value,
-                )
-                for requisite in requisites
-            ],
+            requisites=requisites,
             total=total,
         )
 
