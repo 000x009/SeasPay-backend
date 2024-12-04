@@ -1,18 +1,13 @@
-from typing import Optional, Dict
+from typing import Dict
 from decimal import Decimal
+from uuid import UUID
 
-from pydantic import BaseModel, Field, EmailStr, UUID4
-
-from src.domain.value_objects.withdraw_method import MethodEnum
+from pydantic import BaseModel, EmailStr
 
 
 class CreateWithdrawOrderSchema(BaseModel):
-    method: MethodEnum
+    requisite_id: UUID
     payment_receipt_url: str
-    card_number: Optional[str] = Field(default=None)
-    card_holder_name: Optional[str] = Field(default=None)
-    crypto_address: Optional[str] = Field(default=None)
-    crypto_network: Optional[str] = Field(default=None)
 
 
 class CreateTransferOrderSchema(BaseModel):
@@ -22,7 +17,7 @@ class CreateTransferOrderSchema(BaseModel):
 
 
 class CreateDigitalProductOrderSchema(BaseModel):
-    application_id: UUID4
+    application_id: UUID
     payment_receipt_url: str
     login_data: Dict[str, str]
 

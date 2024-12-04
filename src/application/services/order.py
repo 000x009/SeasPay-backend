@@ -249,13 +249,11 @@ class OrderService:
         )
 
     async def create_withdraw_order(self, data: CreateWithdrawOrderDTO) -> OrderDTO:
-        settings = load_settings()
         user_commission = await self.user_commission_service.get(GetUserCommissionDTO(
             user_id=data.user_id,
         ))
         order = await self._order_dal.insert(
             Order(
-                id=OrderID(uuid.uuid4()),
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
                 created_at=CreatedAt(data.created_at),
@@ -268,15 +266,11 @@ class OrderService:
                 order_id=order.id.value,
                 payment_receipt=data.payment_receipt_url,
                 commission=user_commission.withdraw,
-                method=data.method,
-                card_number=data.card_number,
-                card_holder_name=data.card_holder_name,
-                crypto_address=data.crypto_address,
-                crypto_network=data.crypto_network,
+                requisite_id=data.requisite_id,
             )
         )
         payment_receipt_object = self.cloud_storage.get_object_file(
-            Bucket(settings.cloud_settings.receipts_bucket_name),
+            Bucket(app_settings.cloud_settings.receipts_bucket_name),
             ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
         telegram_message = await self._telegram_service.send_message(

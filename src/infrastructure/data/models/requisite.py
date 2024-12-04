@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import Enum, TIMESTAMP, UUID, func, BigInteger, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -9,7 +9,12 @@ from src.infrastructure.data.models.base import Base
 from src.domain.value_objects.requisite import RequisiteTypeEnum
 
 if TYPE_CHECKING:
-    from src.infrastructure.data.models import UserModel, CardRequisiteModel, CryptoRequisiteModel
+    from src.infrastructure.data.models import (
+        UserModel,
+        CardRequisiteModel,
+        CryptoRequisiteModel,
+        WithdrawDetailsModel,
+    )
 
 
 class RequisiteModel(Base):
@@ -34,3 +39,4 @@ class RequisiteModel(Base):
     user: Mapped["UserModel"] = relationship(back_populates="requisites")
     card_requisite: Mapped[Optional["CardRequisiteModel"]] = relationship(back_populates='requisite', uselist=False)
     crypto_requisite: Mapped[Optional["CryptoRequisiteModel"]] = relationship(back_populates='requisite', uselist=False)
+    withdraw_details: Mapped[Optional[List["WithdrawDetailsModel"]]] = relationship(back_populates='requisite', uselist=True)

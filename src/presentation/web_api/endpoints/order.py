@@ -78,11 +78,7 @@ async def create_withdraw_order(
     response = await order_service.create_withdraw_order(
         CreateWithdrawOrderDTO(
             user_id=user_data.user.id,
-            method=data.method,
-            card_number=data.card_number,
-            card_holder_name=data.card_holder_name,
-            crypto_address=data.crypto_address,
-            crypto_network=data.crypto_network,
+            requisite_id=data.requisite_id,
             payment_receipt_url=data.payment_receipt_url,
             username=user_data.user.username if user_data.user.username else user_data.user.first_name,
         )

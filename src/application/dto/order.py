@@ -35,16 +35,9 @@ class GetOrderDTO:
 @dataclass(frozen=True)
 class CreateWithdrawOrderDTO:
     user_id: int
+    requisite_id: UUID
     username: str
     payment_receipt_url: str
-    method: MethodEnum
-    created_at: datetime = field(default=datetime.now(UTC))
-    status: OrderStatusEnum = field(default=OrderStatusEnum.NEW)
-    telegram_message_id: Optional[int] = field(default=None)
-    card_number: Optional[str] = field(default=None)
-    card_holder_name: Optional[str] = field(default=None)
-    crypto_address: Optional[str] = field(default=None)
-    crypto_network: Optional[str] = field(default=None)
 
 
 @dataclass(frozen=True)

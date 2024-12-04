@@ -5,16 +5,8 @@ from sqlalchemy import select
 from src.application.common.dal.withdraw_details import BaseWithdrawDetailsDAL
 from src.domain.entity.withdraw_details import WithdrawDetails
 from src.domain.value_objects.order import OrderID
-from src.domain.value_objects.withdraw_method import (
-    MethodEnum,
-    Method,
-    CardNumber,
-    CardHolderName,
-    CryptoAddress,
-    CryptoNetwork,
-    WithdrawCommission,
-    PaymentReceipt,
-)
+from src.domain.value_objects.requisite import RequisiteId
+from src.domain.value_objects.withdraw_method import WithdrawCommission, PaymentReceipt
 from src.infrastructure.data.models import WithdrawDetailsModel
 
 
@@ -25,11 +17,7 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
     async def insert(self, withdraw_method: WithdrawDetails) -> WithdrawDetails:
         model = WithdrawDetailsModel(
             order_id=withdraw_method.order_id.value,
-            method=withdraw_method.method.value,
-            card_number=withdraw_method.card_number.value,
-            card_holder_name=withdraw_method.card_holder_name.value,
-            crypto_address=withdraw_method.crypto_address.value,
-            crypto_network=withdraw_method.crypto_network.value,
+            requisite_id=withdraw_method.requisite_id.value,
             payment_receipt=withdraw_method.payment_receipt.value,
             commission=withdraw_method.commission.value,
         )
@@ -37,11 +25,7 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
 
         return WithdrawDetails(
             order_id=OrderID(model.order_id),
-            method=Method(MethodEnum(model.method)),
-            card_number=CardNumber(model.card_number),
-            card_holder_name=CardHolderName(model.card_holder_name),
-            crypto_address=CryptoAddress(model.crypto_address),
-            crypto_network=CryptoNetwork(model.crypto_network),
+            requisite_id=RequisiteId(model.requisite_id),
             payment_receipt=PaymentReceipt(model.payment_receipt),
             commission=WithdrawCommission(model.commission),
         )
@@ -55,11 +39,7 @@ class WithdrawDetailsDAL(BaseWithdrawDetailsDAL):
 
         return WithdrawDetails(
             order_id=OrderID(db_withdraw_method.order_id),
-            method=Method(db_withdraw_method.method),
-            card_number=CardNumber(db_withdraw_method.card_number),
-            card_holder_name=CardHolderName(db_withdraw_method.card_holder_name),
-            crypto_address=CryptoAddress(db_withdraw_method.crypto_address),
-            crypto_network=CryptoNetwork(db_withdraw_method.crypto_network),
+            requisite_id=RequisiteId(db_withdraw_method.requisite_id),
             payment_receipt=PaymentReceipt(db_withdraw_method.payment_receipt),
             commission=WithdrawCommission(db_withdraw_method.commission),
         )

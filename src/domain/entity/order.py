@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import uuid
 from datetime import datetime, UTC
 from typing import Union, Any, Optional
 from decimal import Decimal
@@ -31,10 +33,10 @@ class Order:
 
     def __init__(
         self,
-        id: OrderID,
         user_id: UserID,
         payment_receipt: PaymentReceipt,
         type_: OrderType,
+        id: Optional[OrderID] = None,
         created_at: Optional[CreatedAt] = None,
         status: Optional[OrderStatus] = None,
         telegram_message_id: Optional[MessageID] = None,
@@ -51,6 +53,8 @@ class Order:
             self.created_at = CreatedAt(datetime.now(UTC))
         if not status:
             self.status = OrderStatus(OrderStatusEnum.NEW)
+        if not id:
+            self.id = OrderID(uuid.uuid4())
 
     def __str__(self):
         return f'Order <{self.id}>'
