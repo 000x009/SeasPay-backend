@@ -91,6 +91,8 @@ class YandexCloudSettings:
 class WebSettings:
     web_app_url: str
     application_fulfilling_url: str
+    post_feedback_url: str
+
 
 @dataclass
 class Settings:
@@ -129,13 +131,15 @@ def load_settings() -> Settings:
         web_app_url=os.environ['WEB_APP_URL'],
         technical_support_url=os.environ['TECHNICAL_SUPPORT_URL'],
     )
-    web = WebSettings(
-        web_app_url=os.environ['WEB_APP_URL'],
-        application_fulfilling_url=os.environ['APPLICATION_FULFILLING_URL'],
-    )
 
     config_path = Path(os.environ['TOML_CONFIG_PATH'])
     toml_cfg = load_toml_config(config_path)
+
+    web = WebSettings(
+        web_app_url=os.environ['WEB_APP_URL'],
+        application_fulfilling_url=os.environ['APPLICATION_FULFILLING_URL'],
+        post_feedback_url=toml_cfg['web']['post-feedback-url'],
+    )
     commission = Commission(
             min_withdraw_percentage=toml_cfg['commission']['paypal']['min-withdraw-percentage'],
             max_withdraw_percentage=toml_cfg['commission']['paypal']['max-withdraw-percentage'],

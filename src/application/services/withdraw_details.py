@@ -44,7 +44,7 @@ class WithdrawService:
             commission=withdraw_method.commission.value,
         )
 
-    async def get_withdraw_method(self, data: GetWithdrawDetailsDTO) -> WithdrawDetailsDTO:
+    async def get_withdraw_details(self, data: GetWithdrawDetailsDTO) -> WithdrawDetailsDTO:
         method = await self.dal.get(OrderID(data.order_id))
         if method is None:
             raise WithdrawDetailsNotFound(f"Withdraw method not found for order: {data.order_id}")
@@ -57,7 +57,7 @@ class WithdrawService:
         )
 
     async def calculate_commission(self, data: CalculateWithdrawCommissionDTO) -> WithdrawCalculationsDTO:
-        withdraw_details = await self.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
+        withdraw_details = await self.get_withdraw_details(GetWithdrawDetailsDTO(order_id=data.order_id))
         withdraw_details = WithdrawDetails(
             order_id=OrderID(withdraw_details.order_id),
             requisite_id=RequisiteId(withdraw_details.requisite_id),

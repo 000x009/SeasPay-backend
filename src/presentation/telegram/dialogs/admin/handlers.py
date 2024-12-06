@@ -54,7 +54,7 @@ async def switch_to_fulfillment(
 ) -> None:
     await dialog_manager.start(
         state=OrderFulfillmentSG.ORDER_INFO,
-        data={'order_id': int(dialog_manager.dialog_data.get('order_id'))},
+        data={'order_id': dialog_manager.dialog_data.get('order_id')},
         mode=StartMode.RESET_STACK,
         show_mode=ShowMode.EDIT,
     )

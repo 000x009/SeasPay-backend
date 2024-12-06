@@ -12,7 +12,7 @@ from src.application.services.product_application import ProductApplicationServi
 
 
 router = APIRouter(
-    prefix='/product_application',
+    prefix='/product-application',
     tags=['Product Application'],
     route_class=DishkaRoute,
 )

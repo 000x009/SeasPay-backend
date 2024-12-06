@@ -43,7 +43,7 @@ from src.application.dto.user import GetUserDTO
 from src.infrastructure.json_text_getter import get_paypal_order_text
 from src.application.services.completed_order import CompletedOrderService
 from src.domain.entity.user import User
-from src.domain.value_objects.user import JoinedAt, TotalWithdrawn
+from src.domain.value_objects.user import JoinedAt, TotalWithdrawn, ReferralID
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
 from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey
@@ -120,10 +120,6 @@ class OrderService:
             purchase_url=purchase_request.purchase_url,
             login_data=data.login_data,
         ))
-        payment_receipt_object = self.cloud_storage.get_object_file(
-            Bucket(app_settings.cloud_settings.receipts_bucket_name),
-            ObjectKey(data.payment_receipt_url.split('/')[-1])
-        )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
                 user_id=data.user_id,
@@ -136,10 +132,6 @@ class OrderService:
                     order_type=order.type_.value,
                 ),
                 username=data.username,
-                photo=FileDTO(
-                    filename=data.payment_receipt_url.split('/')[-1],
-                    input_file=payment_receipt_object.file.value,
-                )
             )
         )
         order.telegram_message_id = MessageID(telegram_message.message_id)
@@ -174,10 +166,6 @@ class OrderService:
             purchase_url=product.purchase_url,
             login_data=data.login_data,
         ))
-        payment_receipt_object = self.cloud_storage.get_object_file(
-            Bucket(app_settings.cloud_settings.receipts_bucket_name),
-            ObjectKey(data.payment_receipt_url.split('/')[-1])
-        )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
                 user_id=data.user_id,
@@ -190,10 +178,6 @@ class OrderService:
                     order_type=order.type_.value,
                 ),
                 username=data.username,
-                photo=FileDTO(
-                    filename=data.payment_receipt_url.split('/')[-1],
-                    input_file=payment_receipt_object.file.value,
-                )
             )
         )
         order.telegram_message_id = MessageID(telegram_message.message_id)
@@ -256,22 +240,16 @@ class OrderService:
             Order(
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
-                created_at=CreatedAt(data.created_at),
-                status=OrderStatus(data.status),
                 type_=OrderType(OrderTypeEnum.WITHDRAW),
             )
         )
-        await self._withdraw_service.add_method(
+        await self._withdraw_service.add_details(
             AddWithdrawDetailsDTO(
                 order_id=order.id.value,
                 payment_receipt=data.payment_receipt_url,
                 commission=user_commission.withdraw,
                 requisite_id=data.requisite_id,
             )
-        )
-        payment_receipt_object = self.cloud_storage.get_object_file(
-            Bucket(app_settings.cloud_settings.receipts_bucket_name),
-            ObjectKey(data.payment_receipt_url.split('/')[-1])
         )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
@@ -285,10 +263,6 @@ class OrderService:
                     order_type=order.type_.value,
                 ),
                 username=data.username,
-                photo=FileDTO(
-                    filename=data.payment_receipt_url.split('/')[-1],
-                    input_file=payment_receipt_object.file.value,
-                )
             )
         )
         order.telegram_message_id = MessageID(telegram_message.message_id)
@@ -340,7 +314,18 @@ class OrderService:
             user_id=UserID(user.user_id),
             joined_at=JoinedAt(user.joined_at),
             total_withdrawn=TotalWithdrawn(user.total_withdrawn),
+            referral_id=ReferralID(user.referral_id),
         )
+        if user.referral_id.value is not None:
+            user_referral_commission = await self.user_commission_service.get(GetUserCommissionDTO(user_id=user.referral_id.value))
+            if user_referral_commission.withdraw > app_settings.commission.min_withdraw_percentage:
+                await self.user_commission_service.update(UpdateUserCommissionDTO(
+                    user_id=user.referral_id.value,
+                    transfer=user_referral_commission.transfer,
+                    withdraw=user_referral_commission.withdraw - 1,
+                    digital_product=user_referral_commission.digital_product,
+                ))
+
         if not order:
             raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
 
@@ -348,7 +333,7 @@ class OrderService:
         updated_order = await self._order_dal.update(order)
 
         user.total_withdrawn = TotalWithdrawn(user.total_withdrawn.value + data.payment_system_received_amount)
-        user_commission.update_withdraw_commission(user_total_withdrawn=user.total_withdrawn)
+        user_commission.update_withdraw_commission()
         await self.user_commission_service.update(UpdateUserCommissionDTO(
             user_id=user.user_id.value,
             transfer=user_commission.transfer.value,
@@ -401,11 +386,43 @@ class OrderService:
     
     async def fulfill_transfer_order(self, data: FulfillTransferOrderDTO) -> OrderDTO:
         order = await self._order_dal.get(OrderID(data.order_id))
+        user = await self._user_service.get_user(GetUserDTO(user_id=order.user_id.value))
+        user_commission = await self.user_commission_service.get(GetUserCommissionDTO(user_id=user.user_id))
+        user_commission = UserCommission(
+            user_id=UserID(user.user_id),
+            transfer=UserTransferCommission(user_commission.transfer),
+            withdraw=UserWithdrawCommission(user_commission.withdraw),
+            digital_product=UserDigitalProductCommission(user_commission.digital_product),
+        )
+        user = User(
+            user_id=UserID(user.user_id),
+            joined_at=JoinedAt(user.joined_at),
+            total_withdrawn=TotalWithdrawn(user.total_withdrawn),
+            referral_id=ReferralID(user.referral_id),
+        )
         if not order:
             raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
         
         order.status = OrderStatus(OrderStatusEnum.COMPLETE)
         updated_order = await self._order_dal.update(order)
+
+        if user.referral_id.value is not None:
+            user_referral_commission = await self.user_commission_service.get(GetUserCommissionDTO(user_id=user.referral_id.value))
+            if user_referral_commission.withdraw > app_settings.commission.min_withdraw_percentage:
+                await self.user_commission_service.update(UpdateUserCommissionDTO(
+                    user_id=user.referral_id.value,
+                    transfer=user_referral_commission.transfer,
+                    withdraw=user_referral_commission.withdraw - 1,
+                    digital_product=user_referral_commission.digital_product,
+                ))
+        user_commission.update_transfer_commission()
+        await self.user_commission_service.update(UpdateUserCommissionDTO(
+            user_id=user.user_id.value,
+            transfer=user_commission.transfer.value,
+            withdraw=user_commission.withdraw.value,
+            digital_product=user_commission.digital_product.value,
+        ))
+
         await self._completed_order_service.add(AddCompletedOrderDTO(order_id=updated_order.id.value))
         await self.uow.commit()
 
@@ -426,7 +443,6 @@ class OrderService:
         
         order.status = OrderStatus(OrderStatusEnum.CANCEL)
         updated_order = await self._order_dal.update(order)
-        await self._withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=data.order_id))
         await self.uow.commit()
 
         return OrderDTO(
@@ -444,15 +460,17 @@ class OrderService:
         if not orders:
             return None
         
-        return [OrderDTO(
-            id=order.id.value,
-            user_id=order.user_id.value,
-            payment_receipt=order.payment_receipt.value,
-            type=order.type_.value,
-            created_at=order.created_at.value,
-            status=order.status.value,
-            telegram_message_id=order.telegram_message_id.value,
-        ) for order in orders]
+        return [
+            OrderDTO(
+                id=order.id.value,
+                user_id=order.user_id.value,
+                payment_receipt=order.payment_receipt.value,
+                type=order.type_.value,
+                created_at=order.created_at.value,
+                status=order.status.value,
+                telegram_message_id=order.telegram_message_id.value,
+            ) for order in orders
+        ]
 
     async def get_processing_orders(self) -> Optional[List[OrderDTO]]:
         orders = await self._order_dal.list_processing()
@@ -521,10 +539,6 @@ class OrderService:
                 commission=user_commission.transfer,
             )
         )
-        payment_receipt_object = self.cloud_storage.get_object_file(
-            Bucket(settings.cloud_settings.receipts_bucket_name),
-            ObjectKey(data.payment_receipt_url.split('/')[-1])
-        )
         telegram_message = await self._telegram_service.send_message(
             SendMessageDTO(
                 user_id=data.user_id,
@@ -537,10 +551,6 @@ class OrderService:
                     order_type=order.type_.value,
                 ),
                 username=data.username,
-                photo=FileDTO(
-                    filename=data.payment_receipt_url.split('/')[-1],
-                    input_file=payment_receipt_object.file.value,
-                )
             )
         )
         order.telegram_message_id = MessageID(telegram_message.message_id)

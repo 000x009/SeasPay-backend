@@ -56,7 +56,6 @@ async def login(
     user_service: FromDishka[UserService],
     user_data: WebAppInitData = Depends(user_init_data_provider)
 ) -> UserDTO:
-    print(user_data.start_param, flush=True)
     response = await user_service.login(
         LoginDTO(
             user_id=user_data.user.id,

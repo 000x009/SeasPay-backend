@@ -49,11 +49,20 @@ def get_dispatcher() -> Dispatcher:
     return dispatcher
 
 
-async def main() -> None:
+def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
         format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+        ]
     )
+    logging.getLogger('aiogram').setLevel(logging.INFO)
+    logging.getLogger('dishka').setLevel(logging.INFO)
+
+
+async def main() -> None:
+    setup_logging()
     dispatcher = get_dispatcher()
     config = load_bot_settings()
     bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))

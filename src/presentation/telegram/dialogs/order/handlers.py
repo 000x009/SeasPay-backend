@@ -22,11 +22,17 @@ from src.presentation.telegram.dialogs.common.injection import inject_on_click
 from src.presentation.telegram.states.admin_order import OrderFulfillmentSG
 from src.infrastructure.config import load_bot_settings
 from src.infrastructure.json_text_getter import get_paypal_order_text
+from src.infrastructure.json_text_getter import (
+    get_order_successfully_fulfilled_text,
+    get_transfer_successfully_fulfilled_text,
+    get_digital_product_successfully_fulfilled_text,
+)
 from src.domain.value_objects.order import OrderTypeEnum
 from src.application.services.transfer_details import TransferDetailsService
 from src.application.services.withdraw_details import WithdrawService
 from src.application.dto.transfer_details import CalculateTransferCommissionDTO
 from src.application.dto.withdraw_details import CalculateWithdrawCommissionDTO
+from src.presentation.telegram.buttons import inline
 
 
 async def calculate_commission(
@@ -123,10 +129,10 @@ async def confirm_fulfillment(
             order = await order_service.fulfill_digital_product_order(FulfillDigitalProductOrderDTO(
                 order_id=order_id,
             ))
-        await bot.edit_message_caption(
+        await bot.edit_message_text(
             chat_id=bot_settings.orders_group_id,
             message_id=order.telegram_message_id,
-            caption=get_paypal_order_text(
+            text=get_paypal_order_text(
                 order_id=order.id,
                 user_id=order.user_id,
                 created_at=order.created_at,
@@ -144,9 +150,18 @@ async def confirm_fulfillment(
         )
 
         order = await order_service.get(GetOrderDTO(order_id=order_id))
+        successfully_fulfilled_text = None
+        if order.type == OrderTypeEnum.TRANSFER:
+            successfully_fulfilled_text = get_transfer_successfully_fulfilled_text(order_id=order_id)
+        elif order.type == OrderTypeEnum.DIGITAL_PRODUCT:
+            successfully_fulfilled_text = get_digital_product_successfully_fulfilled_text(order_id=order_id)
+        elif order.type == OrderTypeEnum.WITHDRAW:
+            successfully_fulfilled_text = get_order_successfully_fulfilled_text(amount=received_amount)
+
         await bot.send_message(
             chat_id=order.user_id,
-            text=f"Ваш запрос <code>№{order.id}</code> успешно был выполнен!"
+            text=successfully_fulfilled_text,
+            reply_markup=inline.post_feedback_kb_markup,
         )
     except Exception as e:
         logging.error(f"Error sending message: {e}")
@@ -167,10 +182,10 @@ async def cancel_order_handler(
 
     try:
         order = await order_service.cancel_order(CancelOrderDTO(order_id=order_id))
-        await bot.edit_message_caption(
+        await bot.edit_message_text(
             chat_id=bot_settings.orders_group_id,
             message_id=order.telegram_message_id,
-            caption=get_paypal_order_text(
+            text=get_paypal_order_text(
                 order_id=order.id,
                 user_id=order.user_id,
                 created_at=order.created_at,

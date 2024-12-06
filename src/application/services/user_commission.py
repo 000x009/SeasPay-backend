@@ -60,6 +60,7 @@ class UserCommissionService:
             withdraw=UserWithdrawCommission(data.withdraw),
             digital_product=UserDigitalProductCommission(data.digital_product),
         ))
+        await self.uow.commit()
 
         return UserCommissionDTO(
             user_id=user_commission.user_id.value,

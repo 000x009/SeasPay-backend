@@ -15,10 +15,16 @@ from src.application.services.user import UserService
 from src.application.services.withdraw_details import WithdrawService
 from src.application.dto.withdraw_details import GetWithdrawDetailsDTO
 from src.application.services.transfer_details import TransferDetailsService
+from src.application.services.requisite import RequisiteService
+from src.application.dto.requisite import GetRequisiteDTO
+from src.application.dto.card_requisite import GetCardRequisiteDTO
+from src.application.dto.crypto_requisite import GetCryptoRequisiteDTO
+from src.domain.value_objects.requisite import RequisiteTypeEnum
+from src.application.services.card_requisite import CardRequisiteService
+from src.application.services.crypto_requisite import CryptoRequisiteService
 from src.application.dto.transfer_details import GetTransferDetailsDTO
 from src.application.dto.order import GetOrderDTO, OrderDTO
 from src.presentation.telegram.dialogs.common.injection import inject_getter
-from src.domain.value_objects.withdraw_method import MethodEnum
 from src.domain.value_objects.order import OrderTypeEnum
 from src.infrastructure.json_text_getter import (
     get_paypal_order_text,
@@ -68,6 +74,9 @@ async def order_text_getter(
     withdraw_service: FromDishka[WithdrawService],
     transfer_details_service: FromDishka[TransferDetailsService],
     digital_product_service: FromDishka[DigitalProductDetailsService],
+    requisite_service: FromDishka[RequisiteService],
+    card_requisite_service: FromDishka[CardRequisiteService],
+    crypto_requisite_service: FromDishka[CryptoRequisiteService],
     **_,
 ) -> Dict[str, str]:
     order_id = uuid.UUID(dialog_manager.start_data.get("order_id"))
@@ -75,25 +84,31 @@ async def order_text_getter(
     details_text = ""
 
     if order.type == OrderTypeEnum.WITHDRAW:
-        db_details = await withdraw_service.get_withdraw_method(GetWithdrawDetailsDTO(order_id=order.id))
+        db_details = await withdraw_service.get_withdraw_details(GetWithdrawDetailsDTO(order_id=order.id))
+        requisite = await requisite_service.get_requisite(GetRequisiteDTO(requisite_id=db_details.requisite_id))
         user_must_receive = dialog_manager.dialog_data.get("user_must_receive")
+    
         if user_must_receive:
             received_amount = dialog_manager.dialog_data.get("received_amount")
-            if db_details.method == MethodEnum.CARD:
+            if requisite.type == RequisiteTypeEnum.CARD.value:
+                card_requisite = await card_requisite_service.get_requisite(GetCardRequisiteDTO(requisite_id=db_details.requisite_id))
                 details_text = get_withdraw_card_text(
-                    card_number=db_details.card_number,
-                    card_holder=db_details.card_holder_name,
+                    card_number=card_requisite.number,
+                    card_holder=card_requisite.holder,
                     user_must_receive=round(user_must_receive, 2),
                     commission=db_details.commission,
-                    profit=round(received_amount - user_must_receive, 2),
+                    profit=round(Decimal(received_amount) - Decimal(user_must_receive), 2),
                 )
-            elif db_details.method == MethodEnum.CRYPTO:
+            elif requisite.type == RequisiteTypeEnum.CRYPTO.value:
+                crypto_requisite = await crypto_requisite_service.get_requisite(GetCryptoRequisiteDTO(requisite_id=db_details.requisite_id))
                 details_text = get_withdraw_crypto_text(
-                    address=db_details.crypto_address,
-                    network=db_details.crypto_network,
+                    address=crypto_requisite.wallet_address,
+                    network=crypto_requisite.network,
+                    asset=crypto_requisite.asset,
+                    memo=crypto_requisite.memo,
                     user_must_receive=round(user_must_receive, 2),
                     commission=db_details.commission,
-                    profit=round(Decimal(received_amount) - user_must_receive, 2),
+                    profit=round(Decimal(received_amount) - Decimal(user_must_receive), 2),
                 )
     elif order.type == OrderTypeEnum.TRANSFER:
         db_details = await transfer_details_service.get_details(GetTransferDetailsDTO(order_id=order.id))
@@ -118,6 +133,7 @@ async def order_text_getter(
             status=order.status,
             order_type=order.type,
         ),
+        "platform_link": db_details.purchase_url if order.type == OrderTypeEnum.DIGITAL_PRODUCT else None,
     }
 
 

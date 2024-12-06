@@ -71,10 +71,10 @@ async def take_order_handler(
             ),
             reply_markup=inline.get_order_fulfillment_kb_markup(order_id=order_id),
         )
-        await bot.edit_message_caption(
+        await bot.edit_message_text(
             chat_id=bot_settings.orders_group_id,
             message_id=updated_order.telegram_message_id,
-            caption=get_paypal_order_text(
+            text=get_paypal_order_text(
                 order_id=updated_order.id,
                 user_id=updated_order.user_id,
                 order_type=updated_order.type,

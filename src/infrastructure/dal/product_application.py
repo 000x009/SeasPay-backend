@@ -32,7 +32,9 @@ class ProductApplicationDALImpl(ProductApplicationDAL):
         return product_application
 
     async def get_one(self, id: ProductApplicationID) -> ProductApplication:
-        product_application_model = await self.session.get(ProductApplicationModel, id.value)
+        query = select(ProductApplicationModel).filter_by(id=id.value)
+        result = await self.session.execute(query)
+        product_application_model = result.scalar_one_or_none()
         
         return ProductApplication(
             id=ProductApplicationID(product_application_model.id),

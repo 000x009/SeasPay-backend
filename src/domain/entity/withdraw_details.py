@@ -24,13 +24,11 @@ class WithdrawDetails:
     def __init__(
         self,
         order_id: OrderID,
-        method: Method,
         requisite_id: Optional[RequisiteId] = None,
         payment_receipt: Optional[PaymentReceipt] = None,
         commission: Optional[WithdrawCommission] = None,
     ) -> None:
         self.order_id = order_id
-        self.method = method
         self.requisite_id = requisite_id
         self.payment_receipt = payment_receipt
         self.commission = commission

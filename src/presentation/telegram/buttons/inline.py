@@ -29,7 +29,7 @@ def fulfill_product_application_kb_markup(application_id: UUID) -> InlineKeyboar
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text='Заполнить форму', web_app=WebAppInfo(
+                InlineKeyboardButton(text='📝 Заполнить форму', web_app=WebAppInfo(
                     url=app_settings.web.application_fulfilling_url.format(id=application_id)
                 )),
             ],
@@ -157,6 +157,15 @@ mailing_choice_kb_markup = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="✅ Да", callback_data="confirm_mailing"),
             InlineKeyboardButton(text="❌ Нет", callback_data="cancel_mailing"),
+        ],
+    ]
+)
+
+
+post_feedback_kb_markup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="💬 Оставить отзыв", web_app=WebAppInfo(url=app_settings.web.post_feedback_url)),
         ],
     ]
 )

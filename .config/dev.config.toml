@@ -20,3 +20,6 @@ platforms-bucket-name = 'overseaspay-platforms'
 products-bucket-name = 'overseas-pay-products'
 yandex-access-key-id = 'YCAJE0myJzwMRGXSKyLNelnrx'
 yandex-access-secret-key = 'YCN2tGHqL5ozoIUmaWFbHPICSjS4cBO1Xm1jaj_a'
+
+[web]
+post-feedback-url = 'https://192.168.68.110:5173/feedbacks/post'

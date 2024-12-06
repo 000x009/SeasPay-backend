@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 from decimal import Decimal
+from typing import Optional
 from uuid import UUID
 
 from src.domain.value_objects.order import OrderStatusEnum, OrderTypeEnum
@@ -101,6 +102,8 @@ def get_withdraw_crypto_text(
     user_must_receive: float,
     commission: Decimal,
     profit: float,
+    asset: str,
+    memo: Optional[str],
 ) -> str:
     return get_text_by_key("withdraw_crypto_text").format(
         address=address,
@@ -108,6 +111,8 @@ def get_withdraw_crypto_text(
         user_must_receive=user_must_receive,
         commission=commission,
         profit=profit,
+        asset=asset,
+        memo=memo,
     )
 
 
@@ -282,3 +287,15 @@ def get_platform_product_text(
         price=price,
         instruction=instruction,
     )
+
+
+def get_order_successfully_fulfilled_text(amount: float) -> str:
+    return get_text_by_key("order_successfully_fulfilled_text").format(amount=amount)
+
+
+def get_transfer_successfully_fulfilled_text(order_id: UUID) -> str:
+    return get_text_by_key("transfer_successfully_fulfilled_text").format(order_id=order_id)
+
+
+def get_digital_product_successfully_fulfilled_text(order_id: UUID) -> str:
+    return get_text_by_key("digital_product_successfully_fulfilled_text").format(order_id=order_id)

@@ -8,6 +8,7 @@ from aiogram_dialog.widgets.kbd import (
     Back,
     Button,
     SwitchTo,
+    Url,
 )
 from aiogram_dialog.widgets.text import Format, Const
 
@@ -39,7 +40,7 @@ order_dialog = Dialog(
             text=Const("🧮 Рассчитать комиссию"),
             id="calculate_commission",
             on_click=calculate_commission,
-            when=F['order_type'].in_((OrderTypeEnum.TRANSFER, OrderTypeEnum.WITHDRAW)),
+            when=F['order_type'].in_((OrderTypeEnum.WITHDRAW)),
         ),
         Button(
             text=Const("🖇️ Прикрепить фото чека"),
@@ -58,6 +59,12 @@ order_dialog = Dialog(
             id="user_received_amount",
             state=OrderFulfillmentSG.USER_RECEIVED_AMOUNT,
             when=F['order'].type == OrderTypeEnum.WITHDRAW,
+        ),
+        Url(
+            text=Const("🔗 Ссылка на покупку"),
+            id="platform_link",
+            url=Format("{platform_link}"),
+            when=F['order'].type == OrderTypeEnum.DIGITAL_PRODUCT,
         ),
         Button(
             text=Const("✅ Подтвердить выполнение"),
