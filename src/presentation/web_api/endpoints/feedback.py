@@ -8,7 +8,13 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from aiogram.utils.web_app import WebAppInitData
 
-from src.application.dto.feedback import FeedbackDTO, ListInputDTO, GetFeedbackDTO, CreateFeedbackDTO
+from src.application.dto.feedback import (
+    FeedbackDTO,
+    ListInputDTO,
+    GetFeedbackDTO,
+    CreateFeedbackDTO,
+    FeedbackListResultDTO
+)
 from src.application.services.feedback import FeedbackService
 from src.presentation.web_api.schema.feedback import CreateFeedbackSchema
 from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
@@ -21,12 +27,12 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[FeedbackDTO])
+@router.get('/', response_model=FeedbackListResultDTO)
 @cache(expire=60)
 async def get_feedback_list(
     page: int,
     feedback_service: FromDishka[FeedbackService],
-) -> List[FeedbackDTO]:
+) -> FeedbackListResultDTO:
     response = await feedback_service.list_feedbacks(ListInputDTO(page=page))
 
     return response

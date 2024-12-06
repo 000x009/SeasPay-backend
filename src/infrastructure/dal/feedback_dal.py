@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.data.models import FeedbackModel
@@ -80,3 +80,10 @@ class FeedbackDAL(BaseFeedbackDAL):
             ]
         else:
             return None
+    
+    async def get_total(self) -> Optional[int]:
+        query = select(func.count(FeedbackModel.id))
+        result = await self._session.execute(query)
+        total = result.scalar_one_or_none()
+
+        return total

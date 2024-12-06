@@ -30,3 +30,9 @@ class CreateFeedbackDTO:
     comment: Optional[str] = field(default=None)
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     photo: Optional[List[str]] = field(default=None)
+
+
+@dataclass
+class FeedbackListResultDTO:
+    feedbacks: List[FeedbackDTO]
+    total: int
