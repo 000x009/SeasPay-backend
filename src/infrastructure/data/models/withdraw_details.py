@@ -22,7 +22,7 @@ class WithdrawDetailsModel(Base):
     requisite_id: Mapped[uuid.UUID] = mapped_column(
         UUID,
         ForeignKey('requisite.id', ondelete='SET NULL'),
-        nullable=False,
+        nullable=True,
     )
     payment_receipt: Mapped[str] = mapped_column(String, nullable=False)
     commission: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
