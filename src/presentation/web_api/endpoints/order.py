@@ -39,18 +39,14 @@ router = APIRouter(
 @router.get('/')
 @cache(expire=60)
 async def get_order_list(
-    limit: int,
-    offset: int,
+    page: int,
     order_service: FromDishka[OrderService],
     user_data: WebAppInitData = Depends(user_init_data_provider),
 ) -> OrderListResultDTO:
     response = await order_service.list_orders(
         ListOrderDTO(
             user_id=user_data.user.id,
-            pagination=Pagination(
-                limit=limit,
-                offset=offset,
-            )
+            page=page,
         )
     )
 

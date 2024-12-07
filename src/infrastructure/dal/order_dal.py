@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.common.dal import BaseOrderDAL
@@ -34,9 +34,9 @@ class OrderDAL(BaseOrderDAL):
                 .filter_by(
                     user_id=user_id.value,
                 )
-                .limit(limit)
-                .offset(offset)
-                .order_by(OrderModel.created_at)
+                .limit(limit.value)
+                .offset(offset.value)
+                .order_by(desc(OrderModel.created_at))
             )
         else:
             query = (
@@ -44,7 +44,7 @@ class OrderDAL(BaseOrderDAL):
                 .filter_by(
                     user_id=user_id.value,
                 )
-                .order_by(OrderModel.created_at)
+                .order_by(desc(OrderModel.created_at))
             )
 
         result = await self._session.execute(query)

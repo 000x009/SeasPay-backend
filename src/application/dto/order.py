@@ -6,8 +6,6 @@ from uuid import UUID
 
 from src.domain.entity.order import OrderStatusEnum
 from src.domain.value_objects.order import OrderTypeEnum
-from src.application.common.dto import Pagination
-from src.domain.value_objects.withdraw_method import MethodEnum
 
 
 @dataclass(frozen=True)
@@ -24,7 +22,7 @@ class OrderDTO:
 @dataclass(frozen=True)
 class ListOrderDTO:
     user_id: int
-    pagination: Optional[Pagination] = field(default=None)
+    page: int
 
 
 @dataclass(frozen=True)

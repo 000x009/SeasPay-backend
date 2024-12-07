@@ -66,7 +66,10 @@ from src.application.services.purchase_request import PurchaseRequestService
 from src.application.dto.purchase_request import GetOnePurchaseRequestDTO
 from src.application.services.platform_product import PlatformProductService
 from src.application.dto.platform_product import GetPlatformProductDTO
+from src.domain.value_objects.pagination import PageNumber
+from src.domain.entity.pagination import Page
 
+PAGE_SIZE = 5
 
 class OrderService:
     def __init__(
@@ -195,10 +198,11 @@ class OrderService:
         )
 
     async def list_orders(self, data: ListOrderDTO) -> OrderListResultDTO:
+        page = Page(PageNumber(data.page))
         orders = await self._order_dal.list_(
             user_id=UserID(data.user_id),
-            limit=data.pagination.limit if data.pagination else None,
-            offset=data.pagination.offset if data.pagination else None,
+            limit=page.get_limit(PAGE_SIZE),
+            offset=page.get_offset(PAGE_SIZE),
         )
         total = await self._order_dal.get_total(UserID(data.user_id))
         

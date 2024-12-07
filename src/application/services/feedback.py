@@ -15,6 +15,7 @@ from src.domain.exceptions.feedback import FeedbackNotFoundError
 from src.domain.entity.pagination import Page
 from src.domain.value_objects.pagination import PageNumber
 
+PAGE_SIZE = 3
 
 class FeedbackService:
     def __init__(
@@ -30,8 +31,8 @@ class FeedbackService:
     async def list_feedbacks(self, data: ListInputDTO) -> FeedbackListResultDTO:
         page = Page(PageNumber(data.page))
         feedbacks = await self._feedback_dal.list_(
-            limit=page.get_limit(),
-            offset=page.get_offset(),
+            limit=page.get_limit(PAGE_SIZE),
+            offset=page.get_offset(PAGE_SIZE),
         )
         total = await self._feedback_dal.get_total()
 
