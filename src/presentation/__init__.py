@@ -13,6 +13,7 @@ from src.presentation.web_api.endpoints import (
     platform_product,
     user_commission,
     requisite,
+    payment,
 )
 from src.presentation.web_api.exception_handlers import (
     user as user_exception,
@@ -51,6 +52,7 @@ def include_all_routers(app: FastAPI) -> None:
     app.include_router(platform_product.router)
     app.include_router(user_commission.router)
     app.include_router(requisite.router)
+    app.include_router(payment.router)
 
     logging.info('All API routers was included.')
 

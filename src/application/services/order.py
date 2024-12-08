@@ -2,7 +2,6 @@ import uuid
 from typing import Optional, List
 
 from src.infrastructure.dal import OrderDAL
-from src.application.common.dto import FileDTO
 from src.application.dto.order import (
     ListOrderDTO,
     OrderDTO,
@@ -34,7 +33,7 @@ from src.domain.exceptions.order import OrderNotFoundError, OrderAlreadyTakenErr
 from src.domain.value_objects.order_message import MessageID
 from src.application.services.withdraw_details import WithdrawService
 from src.application.services.transfer_details import TransferDetailsService
-from src.application.dto.withdraw_details import AddWithdrawDetailsDTO, GetWithdrawDetailsDTO
+from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
 from src.application.services.telegram_service import TelegramService
 from src.application.dto.telegram import SendMessageDTO
 from src.application.services.user import UserService
@@ -46,7 +45,6 @@ from src.domain.entity.user import User
 from src.domain.value_objects.user import JoinedAt, TotalWithdrawn, ReferralID
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
-from src.domain.value_objects.yandex_cloud import Bucket, ObjectKey
 from src.infrastructure.config import load_settings
 from src.application.dto.transfer_details import AddTransferDetailsDTO
 from src.application.services.user_commission import UserCommissionService
@@ -68,6 +66,7 @@ from src.application.services.platform_product import PlatformProductService
 from src.application.dto.platform_product import GetPlatformProductDTO
 from src.domain.value_objects.pagination import PageNumber
 from src.domain.entity.pagination import Page
+from src.domain.value_objects.payment import PaymentID
 
 PAGE_SIZE = 5
 
@@ -115,6 +114,7 @@ class OrderService:
                 user_id=UserID(application.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
                 type_=OrderType(OrderTypeEnum.DIGITAL_PRODUCT),
+                payment_id=PaymentID(data.payment_id),
             )
         )
         await self.digital_product_details_service.insert(AddDigitalProductDetailsDTO(
@@ -161,6 +161,7 @@ class OrderService:
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
                 type_=OrderType(OrderTypeEnum.DIGITAL_PRODUCT),
+                payment_id=PaymentID(data.payment_id),
             )
         )
         await self.digital_product_details_service.insert(AddDigitalProductDetailsDTO(
@@ -195,6 +196,7 @@ class OrderService:
             created_at=updated_order.created_at.value,
             status=updated_order.status,
             telegram_message_id=updated_order.telegram_message_id.value,
+            payment_id=updated_order.payment_id.value,
         )
 
     async def list_orders(self, data: ListOrderDTO) -> OrderListResultDTO:
@@ -216,6 +218,7 @@ class OrderService:
                     created_at=order.created_at.value,
                     status=order.status.value,
                     telegram_message_id=order.telegram_message_id.value,
+                    payment_id=order.payment_id.value if order.payment_id else None,
                 ) for order in orders
             ],
             total=total,
@@ -234,6 +237,7 @@ class OrderService:
             created_at=order.created_at.value,
             status=order.status.value,
             telegram_message_id=order.telegram_message_id.value,
+            payment_id=order.payment_id.value if order.payment_id else None,
         )
 
     async def create_withdraw_order(self, data: CreateWithdrawOrderDTO) -> OrderDTO:

@@ -11,6 +11,8 @@ from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
+from aiocryptopay import AioCryptoPay, Networks
+
 from src.infrastructure.dal import (
     UserDAL,
     OrderDAL,
@@ -22,7 +24,9 @@ from src.infrastructure.dal import (
     RequisiteDALImpl,
     CryptoRequisiteDALImpl,
     CardRequisiteDALImpl,
+    PaymentDALImpl,
 )
+from src.application.common.dal.payment import PaymentDAL
 from src.application.common.dal.requisite import RequisiteDAL
 from src.application.common.dal.crypto_requisite import CryptoRequisiteDAL
 from src.application.common.dal.card_requisite import CardRequisiteDAL
@@ -61,6 +65,10 @@ from src.infrastructure.data.uow import SAUoW
 from src.application.common.cloud_storage import CloudStorage
 from src.infrastructure.cloud_storage import YandexCloudStorage
 from src.application.services.requisite import RequisiteService
+from src.application.services.payment import PaymentService
+from src.infrastructure.cryptopay import CryptopayClientImpl
+from src.application.common.cryptopay import CryptopayClient
+from src.application.services.cryptopay import CryptopayService
 
 
 class DatabaseProvider(Provider):
@@ -97,6 +105,7 @@ class DALProvider(Provider):
     requisite_dal = provide(RequisiteDALImpl, scope=Scope.REQUEST, provides=RequisiteDAL)
     crypto_requisite_dal = provide(CryptoRequisiteDALImpl, scope=Scope.REQUEST, provides=CryptoRequisiteDAL)
     card_requisite_dal = provide(CardRequisiteDALImpl, scope=Scope.REQUEST, provides=CardRequisiteDAL)
+    payment_dal = provide(PaymentDALImpl, scope=Scope.REQUEST, provides=PaymentDAL)
     product_application_dal = provide(
         ProductApplicationDALImpl, scope=Scope.REQUEST, provides=ProductApplicationDALImpl
     )
@@ -123,12 +132,31 @@ class ServiceProvider(Provider):
     requisite_service = provide(RequisiteService, scope=Scope.REQUEST, provides=RequisiteService)
     crypto_requisite_service = provide(CryptoRequisiteService, scope=Scope.REQUEST, provides=CryptoRequisiteService)
     card_requisite_service = provide(CardRequisiteService, scope=Scope.REQUEST, provides=CardRequisiteService)
+    payment_service = provide(PaymentService, scope=Scope.REQUEST, provides=PaymentService)
+    cryptopay_service = provide(CryptopayService, scope=Scope.REQUEST, provides=CryptopayService)
     product_application_service = provide(
         ProductApplicationService, scope=Scope.REQUEST, provides=ProductApplicationService
     )
     digital_product_details_service = provide(
         DigitalProductDetailsService, scope=Scope.REQUEST, provides=DigitalProductDetailsService
     )
+
+
+class CryptopayProvider(Provider):
+    @asynccontextmanager
+    async def _get_cryptopay_client(self) -> AsyncGenerator[AioCryptoPay, None]:
+        settings = load_settings()
+        crypto = AioCryptoPay(
+            network=Networks.TEST_NET,
+            token=settings.cryptopay.testnet_api_key,
+        )
+        yield crypto
+        await crypto.close()
+
+    @provide(scope=Scope.REQUEST, provides=CryptopayClient)
+    async def get_cryptopay_client(self) -> AsyncGenerator[CryptopayClient, None]:
+        async with self._get_cryptopay_client() as client:
+            yield CryptopayClientImpl(client=client)
 
 
 class TelegramProvider(Provider):
@@ -184,6 +212,7 @@ def setup_providers() -> List[Provider]:
         ServiceProvider(),
         TelegramProvider(),
         APIClientProvider(),
+        CryptopayProvider(),
     ]
 
 

@@ -94,6 +94,13 @@ class WebSettings:
     post_feedback_url: str
 
 
+
+@dataclass
+class CryptopaySettings:
+    testnet_api_key: str
+    mainnet_api_key: str
+
+
 @dataclass
 class Settings:
     """App settings"""
@@ -104,6 +111,7 @@ class Settings:
     commission: Commission
     cloud_settings: YandexCloudSettings
     web: WebSettings
+    cryptopay: CryptopaySettings
 
 
 def load_settings() -> Settings:
@@ -159,6 +167,11 @@ def load_settings() -> Settings:
         receipts_bucket_name=toml_cfg['yandex-cloud']['receipts-bucket-name'],
         feedbacks_bucket_name=toml_cfg['yandex-cloud']['feedbacks-bucket-name'],
     )
+    cryptopay = CryptopaySettings(
+        testnet_api_key=os.environ['CRYPTO_PAY_TESTNET_API_KEY'],
+        mainnet_api_key=os.environ['CRYPTO_PAY_MAINNET_API_KEY'],
+    )
+
 
     return Settings(
         db=db,
@@ -167,6 +180,7 @@ def load_settings() -> Settings:
         commission=commission,
         cloud_settings=cloud_settings,
         web=web,
+        cryptopay=cryptopay,
     )
 
 

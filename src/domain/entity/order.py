@@ -14,6 +14,7 @@ from src.domain.value_objects.order import (
     OrderStatusEnum,
     Commission,
 )
+from src.domain.value_objects.payment import PaymentID
 from src.domain.value_objects.order_message import MessageID
 from src.domain.value_objects.completed_order import PaymentSystemReceivedAmount
 from src.domain.value_objects.order import MustReceiveAmount, OrderType
@@ -23,6 +24,7 @@ class Order:
     __slots__ = (
         'id',
         'user_id',
+        'payment_id',
         'type_',
         'payment_receipt',
         'created_at',
@@ -34,8 +36,9 @@ class Order:
     def __init__(
         self,
         user_id: UserID,
-        payment_receipt: PaymentReceipt,
         type_: OrderType,
+        payment_receipt: Optional[PaymentReceipt] = None,
+        payment_id: Optional[PaymentID] = None,
         id: Optional[OrderID] = None,
         created_at: Optional[CreatedAt] = None,
         status: Optional[OrderStatus] = None,
@@ -43,6 +46,7 @@ class Order:
     ) -> None:
         self.id = id
         self.user_id = user_id
+        self.payment_id = payment_id
         self.payment_receipt = payment_receipt
         self.created_at = created_at
         self.status = status
@@ -65,9 +69,9 @@ class Order:
         return False
 
     def calculate_commission(
-            self,
-            commission: Commission,
-            payment_system_received_amount: PaymentSystemReceivedAmount,
+        self,
+        commission: Commission,
+        payment_system_received_amount: PaymentSystemReceivedAmount,
     ) -> MustReceiveAmount:
         commission_percentage = Decimal(commission.value / 100)
         commission_amount = payment_system_received_amount.value * commission_percentage

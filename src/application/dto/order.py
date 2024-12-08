@@ -12,8 +12,9 @@ from src.domain.value_objects.order import OrderTypeEnum
 class OrderDTO:
     id: UUID
     user_id: int
-    payment_receipt: str
     type: OrderTypeEnum
+    payment_receipt: Optional[str] = field(default=None)
+    payment_id: Optional[UUID] = field(default=None)
     created_at: Optional[datetime] = field(default=datetime.now(UTC))
     status: Optional[OrderStatusEnum] = field(default=OrderStatusEnum.NEW)
     telegram_message_id: Optional[int] = field(default=None)
@@ -44,7 +45,8 @@ class CreateTransferOrderDTO:
     receiver_email: str
     username: str
     transfer_amount: Decimal
-    payment_receipt_url: str
+    payment_receipt_url: Optional[str] = field(default=None)
+    payment_id: Optional[UUID] = field(default=None)
     created_at: datetime = field(default=datetime.now(UTC))
 
 
@@ -92,18 +94,20 @@ class CancelOrderDTO:
 class CreateDigitalProductOrderDTO:
     application_id: UUID
     user_id: int
-    payment_receipt_url: str
     login_data: Dict[str, str]
     username: str
+    payment_receipt_url: Optional[str] = field(default=None)
+    payment_id: Optional[UUID] = field(default=None)
 
 
 @dataclass(frozen=True)
 class PurchasePlatformProductDTO:
     platform_product_id: int
     user_id: int
-    payment_receipt_url: str
     login_data: Dict[str, str]
     username: str
+    payment_receipt_url: Optional[str] = field(default=None)
+    payment_id: Optional[UUID] = field(default=None)
 
 
 @dataclass(frozen=True)

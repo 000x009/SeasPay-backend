@@ -8,6 +8,7 @@ from .user_commission import UserCommissionDALImpl
 from .requisite import RequisiteDALImpl
 from .crypto_requisite import CryptoRequisiteDALImpl
 from .card_requisite import CardRequisiteDALImpl
+from .payment import PaymentDALImpl
 
 __all__ = [
     'UserDAL',
@@ -20,4 +21,5 @@ __all__ = [
     'RequisiteDALImpl',
     'CryptoRequisiteDALImpl',
     'CardRequisiteDALImpl',
+    'PaymentDALImpl',
 ]

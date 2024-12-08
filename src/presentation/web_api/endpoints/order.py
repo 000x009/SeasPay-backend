@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -21,7 +20,6 @@ from src.application.dto.order import (
     PurchasePlatformProductDTO,
     OrderListResultDTO,
 )
-from src.application.common.dto import Pagination
 from src.presentation.web_api.schema.order import (
     CreateWithdrawOrderSchema,
     CreateTransferOrderSchema,
@@ -96,6 +94,7 @@ async def create_transfer_order(
             username=user_data.user.username if user_data.user.username else user_data.user.first_name,
             transfer_amount=data.amount,
             payment_receipt_url=data.payment_receipt_url,
+            payment_id=data.payment_id,
         )
     )
 
@@ -113,6 +112,7 @@ async def create_digital_product_order(
             user_id=user_data.user.id,
             application_id=data.application_id,
             payment_receipt_url=data.payment_receipt_url,
+            payment_id=data.payment_id,
             login_data=data.login_data,
             username=user_data.user.username if user_data.user.username else user_data.user.first_name,
         )
@@ -121,8 +121,8 @@ async def create_digital_product_order(
     return response
 
 
-@router.post('/platform-product/card', response_model=OrderDTO)
-async def purchase_platform_product_card(
+@router.post('/platform-product', response_model=OrderDTO)
+async def purchase_platform_product(
     data: PurchasePlatformProductSchema,
     order_service: FromDishka[OrderService],
     user_data: WebAppInitData = Depends(user_init_data_provider),
@@ -132,6 +132,7 @@ async def purchase_platform_product_card(
             user_id=user_data.user.id,
             platform_product_id=data.product_id,
             payment_receipt_url=data.payment_receipt_url,
+            payment_id=data.payment_id,
             login_data=data.login_data,
             username=user_data.user.username if user_data.user.username else user_data.user.first_name,
         )

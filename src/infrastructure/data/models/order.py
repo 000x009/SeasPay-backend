@@ -27,7 +27,12 @@ class OrderModel(Base):
         ForeignKey('user.user_id', ondelete='CASCADE'),
         nullable=False,
     )
-    payment_receipt: Mapped[str] = mapped_column(String, nullable=False)
+    payment_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID,
+        ForeignKey('payment.id', ondelete='SET NULL'),
+        nullable=True,
+    )
+    payment_receipt: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,

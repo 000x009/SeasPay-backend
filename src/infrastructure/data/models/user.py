@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         OrderModel,
         FeedbackModel,
         RequisiteModel,
+        PaymentModel,
     )
     from src.infrastructure.data.models import PurchaseRequestModel
     from src.infrastructure.data.models import ProductApplicationModel
@@ -61,5 +62,8 @@ class UserModel(Base):
         back_populates='user', uselist=True, lazy='joined'
     )
     requisites: Mapped[Optional[List["RequisiteModel"]]] = relationship(
+        back_populates='user', uselist=True, lazy='joined'
+    )
+    payments: Mapped[Optional[List["PaymentModel"]]] = relationship(
         back_populates='user', uselist=True, lazy='joined'
     )
