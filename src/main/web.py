@@ -18,26 +18,21 @@ logging.basicConfig(
 )
 
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     redis_cache = FastApiRedisCache()
-#     redis_cache.init(
-#         host_url="redis://localhost:6379",
-#         prefix="myapi-cache",
-#         response_header="X-MyAPI-Cache",
-#         ignore_arg_types=[Request, Response]
-#     )
-#     # redis = aioredis.from_url("redis://redis", encoding="utf8", decode_responses=True)
-#     # FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-#     yield
-
-
 def create_app() -> FastAPI:
     app = FastAPI()
+    origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://176.124.214.52:5173",
+        "https://seaspayment.com",
+        "https://www.seaspayment.com",
+        "http://seaspayment.com",
+        "http://www.seaspayment.com",
+    ]
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
