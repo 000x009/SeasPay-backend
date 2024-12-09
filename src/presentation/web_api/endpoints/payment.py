@@ -5,6 +5,7 @@ from aiogram.utils.web_app import WebAppInitData
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from src.application.services.payment import PaymentService
+from src.application.services.cryptopay import CryptopayService
 from src.presentation.web_api.dependencies.user_init_data import user_init_data_provider
 from src.application.dto.payment import CreatePaymentDTO, PaymentDTO
 from src.presentation.web_api.schema.payment import CreateCryptoPayInvoiceSchema
@@ -30,3 +31,10 @@ async def create_crypto_pay_invoice(
     )
 
     return response
+
+@router.get('/crypto-pay/exchange-rates')
+async def get_exchange_rates(
+    cryptopay_service: FromDishka[CryptopayService],
+) -> None:
+    await cryptopay_service.get_exchange_rates()
+

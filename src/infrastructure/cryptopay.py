@@ -1,14 +1,12 @@
 from aiocryptopay import AioCryptoPay
+from aiocryptopay.models.rates import ExchangeRate
 
 from src.application.common.cryptopay import CryptopayClient
 from src.domain.entity.cryptopay import Invoice, ActiveInvoice
 
 
 class CryptopayClientImpl(CryptopayClient):
-    def __init__(
-        self,
-        client: AioCryptoPay,
-    ) -> None:
+    def __init__(self, client: AioCryptoPay) -> None:
         self.client = client
 
     async def create_invoice(self, invoice: Invoice) -> ActiveInvoice:
@@ -34,5 +32,7 @@ class CryptopayClientImpl(CryptopayClient):
             id=response.invoice_id,
         )
 
-    async def get_exchange_rates(self, currency: str) -> dict:
-        pass
+    async def get_rub_usd_rate(self) -> ExchangeRate:
+        response = await self.client.get_exchange_rates()
+
+        return response[0]
