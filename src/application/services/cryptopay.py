@@ -1,4 +1,4 @@
-from src.application.dto.cryptopay import CreateInvoiceDTO, InvoiceDTO
+from src.application.dto.cryptopay import CreateInvoiceDTO, InvoiceDTO, ExchangeRateDTO
 from src.application.common.cryptopay import CryptopayClient
 from src.domain.value_objects.payment import PaymentID
 from src.domain.value_objects.cryptopay import (
@@ -38,3 +38,8 @@ class CryptopayService:
             asset=invoice.asset,
             fiat=invoice.fiat,
         )
+
+    async def get_rub_usd_rate(self) -> ExchangeRateDTO:
+        rate = await self.client.get_rub_usd_rate()
+
+        return ExchangeRateDTO(rate=rate.rate)

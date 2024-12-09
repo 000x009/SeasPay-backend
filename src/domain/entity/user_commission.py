@@ -46,3 +46,18 @@ class UserCommission:
         self.transfer = UserTransferCommission(Decimal(commission))
 
         return self.transfer
+
+    def count_withdraw_commission(self, amount: Decimal) -> Decimal:
+        commission_amount = amount / 100 * self.withdraw.value
+        final_amount = round(amount + commission_amount, 1)
+
+        return Decimal(final_amount)
+
+    def count_transfer_commission(self, amount: Decimal) -> Decimal:
+        commission_amount = amount / 100 * self.transfer.value
+        final_amount = round(amount + commission_amount, 1)
+
+        return Decimal(final_amount)
+
+    def count_digital_product_commission(self, amount_usd: Decimal) -> Decimal:
+        return Decimal(amount_usd)

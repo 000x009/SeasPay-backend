@@ -42,3 +42,20 @@ class CalculateWithdrawCommissionDTO:
 class CalculateTransferCommissionDTO:
     order_id: UUID
     payment_system_received_amount: Decimal
+
+
+@dataclass(frozen=True)
+class CountCommissionDTO:
+    amount: Decimal
+    user_id: int
+
+
+@dataclass(frozen=True)
+class CountCommissionResultDTO:
+    withdraw_final_rub: Decimal
+    transfer_final_rub: Decimal
+    digital_product_final_rub: Decimal
+    withdraw_final_usd: Decimal
+    transfer_final_usd: Decimal
+    digital_product_final_usd: Decimal
+

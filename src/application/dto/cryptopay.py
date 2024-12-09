@@ -29,3 +29,8 @@ class CreateInvoiceDTO:
     currency_type: CryptoPayCurrencyType
     asset: Optional[str] = field(default=None)
     fiat: Optional[str] = field(default=None)
+
+
+@dataclass(frozen=True)
+class ExchangeRateDTO:
+    rate: Decimal
