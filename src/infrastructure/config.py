@@ -132,7 +132,7 @@ def load_settings() -> Settings:
     )
     bot = BotSettings(
         bot_url=os.environ['BOT_URL'],
-        bot_token=os.environ['TEST_BOT_TOKEN'],
+        bot_token=os.environ['BOT_TOKEN'],
         orders_group_id=int(os.environ['ORDERS_GROUP_ID']),
         webhook_url=os.environ['WEBHOOK_URL'],
         terms_of_use_url=os.environ['TELEGRAPH_TERMS_OF_USE_URL'],
