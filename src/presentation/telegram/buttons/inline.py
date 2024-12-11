@@ -41,7 +41,7 @@ def get_start_kb_markup(config: BotSettings) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text='🌊 Открыть SeasPay', web_app=WebAppInfo(url=config.web_app_url)),
+                InlineKeyboardButton(text='🌊 Открыть', web_app=WebAppInfo(url=config.web_app_url)),
             ],
             [
                 InlineKeyboardButton(text='📑 Условия пользования', url=config.terms_of_use_url),

@@ -1,7 +1,8 @@
-import logging
+import os
+from pathlib import Path
 
 from aiogram import Router, Bot
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
 from aiogram.filters import CommandStart
 from aiogram.enums import ChatType
 
@@ -24,9 +25,10 @@ async def start_handler(
     user_service: FromDishka[UserService],
 ) -> None:
     bot_config = load_bot_settings()
-    await bot.send_message(
+    await bot.send_animation(
         chat_id=message.from_user.id,
-        text='OverseasPay!',
+        animation=FSInputFile(Path(os.path.normpath('files/image/animation.mp4'))),
+        caption='<b>Приступим!</b>\n\nДля открытия приложения нажмите на кнопку ниже.',
         reply_markup=get_start_kb_markup(config=bot_config),
     )
 
