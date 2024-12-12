@@ -200,14 +200,17 @@ class OrderService:
         )
 
     async def list_orders(self, data: ListOrderDTO) -> OrderListResultDTO:
-        page = Page(PageNumber(data.page))
-        orders = await self._order_dal.list_(
-            user_id=UserID(data.user_id),
-            limit=page.get_limit(PAGE_SIZE),
-            offset=page.get_offset(PAGE_SIZE),
-        )
+        if data.page:
+            page = Page(PageNumber(data.page))
+            orders = await self._order_dal.list_(
+                user_id=UserID(data.user_id),
+                limit=page.get_limit(PAGE_SIZE),
+                offset=page.get_offset(PAGE_SIZE),
+            )
+        else:
+            orders = await self._order_dal.list_(user_id=UserID(data.user_id))
         total = await self._order_dal.get_total(UserID(data.user_id))
-        
+
         return OrderListResultDTO(
             orders=[
                 OrderDTO(

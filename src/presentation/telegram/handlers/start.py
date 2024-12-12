@@ -13,6 +13,7 @@ from src.infrastructure.config import load_bot_settings
 from src.presentation.telegram.filters import ChatFilter
 from src.application.services.user import UserService
 from src.application.dto.user import GetUserDTO, CreateUserDTO
+from src.domain.exceptions.user import UserNotFoundError
 
 
 router = Router()
@@ -34,8 +35,6 @@ async def start_handler(
 
     try:
         user_id = message.from_user.id
-        user = await user_service.get_user(GetUserDTO(user_id=user_id))
-        if not user:
-            await user_service.add(CreateUserDTO(user_id=user_id))
-    except Exception as e:
-        print(e)
+        await user_service.get_user(GetUserDTO(user_id=user_id))
+    except UserNotFoundError:
+        await user_service.add(CreateUserDTO(user_id=user_id))

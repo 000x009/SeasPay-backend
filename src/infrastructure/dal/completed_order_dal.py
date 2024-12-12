@@ -40,13 +40,13 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
 
         return CompletedOrder(
             order_id=OrderID(completed_order.order_id),
-            payment_system_received_amount=PaymentSystemReceivedAmount(completed_order.paypal_received_amount),
+            payment_system_received_amount=PaymentSystemReceivedAmount(completed_order.payment_system_received_amount),
             user_received_amount=UserReceivedAmount(completed_order.user_received_amount),
             completed_at=CompletedAt(completed_order.completed_at),
         )
 
     async def count_total_withdraw(self) -> Decimal:
-        query = select(func.sum(CompletedOrderModel.paypal_received_amount))
+        query = select(func.sum(CompletedOrderModel.payment_system_received_amount))
         result = await self._session.execute(query)
         total_user_received = result.scalar_one_or_none()
 
@@ -55,12 +55,12 @@ class CompletedOrderDAL(BaseCompletedOrderDAL):
     async def count_profit(self, timespan: Optional[TimeSpan] = None) -> Decimal:
         if timespan is None:
             query = (
-                select(func.sum(CompletedOrderModel.paypal_received_amount - CompletedOrderModel.user_received_amount))
+                select(func.sum(CompletedOrderModel.payment_system_received_amount - CompletedOrderModel.user_received_amount))
             )
         else:
             query = (
                 select(
-                    func.sum(CompletedOrderModel.paypal_received_amount - CompletedOrderModel.user_received_amount)
+                    func.sum(CompletedOrderModel.payment_system_received_amount - CompletedOrderModel.user_received_amount)
                 )
                 .filter(CompletedOrderModel.completed_at > func.now() - timedelta(days=timespan.value))
             )

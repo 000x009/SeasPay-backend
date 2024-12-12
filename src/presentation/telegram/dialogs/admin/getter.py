@@ -123,7 +123,7 @@ async def user_getter(
             user_id=user.user_id,
             total_withdrawn=user.total_withdrawn,
             transfer_commission=user_commission.transfer,
-            purchase_commission=user_commission.withdraw,
+            withdraw_commission=user_commission.withdraw,
             product_purchase_commission=user_commission.digital_product,
         )
 
@@ -151,8 +151,9 @@ async def user_orders_getter(
     **_,
 ) -> Dict[str, list[OrderDTO]]:
     user_id = dialog_manager.dialog_data.get('search_user_id')
-    orders = await order_service.list_orders(ListOrderDTO(user_id=user_id))
+    data = await order_service.list_orders(ListOrderDTO(user_id=user_id))
 
     return {
-        'orders': orders,
+        'orders': data.orders,
+        'total': data.total,
     }

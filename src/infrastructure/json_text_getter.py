@@ -120,14 +120,14 @@ def get_user_profile_text(
     user_id: int,
     total_withdrawn: Decimal,
     transfer_commission: Decimal,
-    purchase_commission: Decimal,
+    withdraw_commission: Decimal,
     product_purchase_commission: Decimal,
 ) -> str:
     return get_text_by_key("user_profile_text").format(
         user_id=user_id,
         total_withdrawn=total_withdrawn,
         transfer_commission=transfer_commission,
-        purchase_commission=purchase_commission,
+        withdraw_commission=withdraw_commission,
         product_purchase_commission=product_purchase_commission,
     )
 
