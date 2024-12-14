@@ -1,13 +1,13 @@
 [commission]
 digital_product = 5
 [commission.paypal]
-min-withdraw-percentage = 7
-max-withdraw-percentage = 15
-min-withdraw-usd-amount = 10
+min-withdraw-percentage = 5
+max-withdraw-percentage = 13
+min-withdraw-usd-amount = 20
 max-withdraw-usd-amount = -1
-max-transfer-amount = 3000
-max-transfer-percentage = 15
-min-transfer-percentage = 7
+max-transfer-amount = 2000
+max-transfer-percentage = 13
+min-transfer-percentage = 5
 
 [commission.digital-product]
 usd-amount-commission = 5

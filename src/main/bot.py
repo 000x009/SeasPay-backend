@@ -3,7 +3,6 @@ import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from dishka import Scope
 from dishka.integrations.aiogram import setup_dishka
 
 from aiogram_dialog import setup_dialogs
