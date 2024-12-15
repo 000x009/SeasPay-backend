@@ -133,7 +133,7 @@ class OrderDAL(BaseOrderDAL):
             payment_receipt=order.payment_receipt.value,
             payment_id=order.payment_id.value if order.payment_id else None,
             created_at=order.created_at.value,
-            status=order.status.value.value,
+            status=order.status.value,
             type=order.type_.value,
             telegram_message_id=order.telegram_message_id.value,
         )

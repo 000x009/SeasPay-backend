@@ -68,6 +68,6 @@ async def receive_payment(
     if request_data.get('update_type') == 'invoice_paid':
         invoice = request_data.get('payload')
         payment_id = UUID(invoice.get('payload'))
-        await payment_service.receive_payment(ReceivePaymentDTO(payment_id=UUID(payment_id)))
+        await payment_service.receive_payment(ReceivePaymentDTO(payment_id=payment_id))
 
     return JSONResponse(status_code=200, content={"message": "success"})
