@@ -294,7 +294,7 @@ class OrderService:
         order = await self._order_dal.get(OrderID(data.order_id))
         if not order:
             raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
-        if order.status.value not in (OrderStatusEnum.NEW.value, OrderStatusEnum.DELAY.value):
+        if order.status.value not in (OrderStatusEnum.NEW, OrderStatusEnum.DELAY):
             raise OrderAlreadyTakenError(f"Order with id {data.order_id} already taken.")
 
         order.status = OrderStatus(OrderStatusEnum.PROCESSING)
