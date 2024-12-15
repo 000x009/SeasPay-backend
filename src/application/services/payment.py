@@ -74,6 +74,7 @@ class PaymentService:
         if not payment:
             raise PaymentNotFoundError(f"Payment not found: <{data.payment_id}>")
         
+        print(payment.status.value)
         if payment.status.value == PaymentStatusEnum.ACTIVE.value:
             await self.order_service.pay_order(PayOrderDTO(payment_id=payment.id.value))
             payment.status = PaymentStatus(PaymentStatusEnum.PAID)

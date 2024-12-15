@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from src.domain.common.value_objects import ValueObject
 
 
-class PaymentStatusEnum(Enum):
+class PaymentStatusEnum(StrEnum):
     ACTIVE = "ACTIVE"
     PAID = "PAID"
     FAILED = "FAILED"
