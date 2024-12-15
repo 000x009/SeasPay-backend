@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import StrEnum
 from dataclasses import dataclass
 
 from src.domain.common.value_objects import ValueObject
 
 
-class OrderStatusEnum(Enum):
+class OrderStatusEnum(StrEnum):
     NOT_PAID = "NOT_PAID"
     COMPLETE = "COMPLETE"
     CANCEL = "CANCEL"
