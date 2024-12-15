@@ -37,3 +37,20 @@ class TelegramClientInterface(Protocol):
         message_text: str,
     ) -> PreparedInlineMessage:
         raise NotImplementedError
+
+    @abstractmethod
+    async def edit_message(
+        self,
+        message_id: int,
+        text: str,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+    ) -> Message:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def send_message(
+        self,
+        chat_id: int,
+        message: str,
+    ) -> Message:
+        raise NotImplementedError

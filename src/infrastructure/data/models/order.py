@@ -44,7 +44,7 @@ class OrderModel(Base):
         nullable=False,
     )
     status: Mapped[OrderStatusEnum] = mapped_column(
-        Enum("NEW", "PROCESSING", "COMPLETE", "CANCEL", "DELAY", name="order_status"),
+        Enum("NEW", "PROCESSING", "COMPLETE", "CANCEL", "DELAY", "NOT_PAID", name="order_status"),
         default=OrderStatusEnum.NEW,
         nullable=False,
     )

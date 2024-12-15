@@ -2,7 +2,7 @@ from aiogram.filters import BaseFilter
 from aiogram.types import Message
 
 
-ADMIN_LIST = (5297779345, 6384960822, 563603481)
+ADMIN_LIST = (5297779345, 6384960822, 563603481, 563603481)
 
 
 class AdminFilter(BaseFilter):

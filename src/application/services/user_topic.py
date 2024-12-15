@@ -1,7 +1,13 @@
 from typing import Optional
 
 from src.infrastructure.dal import UserTopicDAL
-from src.application.dto.user_topic import CreateUserTopicDTO, GetUserTopicDTO, GetUserTopicByUserIdDTO, UserTopicDTO
+from src.application.dto.user_topic import (
+    CreateUserTopicDTO,
+    GetUserTopicDTO,
+    GetUserTopicByUserIdDTO,
+    UserTopicDTO,
+    UpdateOrderMessageToPaidDTO,
+)
 from src.domain.entity.user_topic import UserTopic
 from src.domain.value_objects.user_topic import ThreadId, SupergroupChatId, CreatedAt
 from src.domain.value_objects.user import UserID
@@ -14,7 +20,7 @@ class UserTopicService:
         self,
         user_topic_dal: UserTopicDAL,
         uow: UoW,
-    ):
+    ) -> None:
         self.user_topic_dal = user_topic_dal
         self.uow = uow
 

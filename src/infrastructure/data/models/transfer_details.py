@@ -1,5 +1,5 @@
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from decimal import Decimal
 
 from sqlalchemy import String, ForeignKey, UUID, DECIMAL
@@ -19,7 +19,7 @@ class TransferDetailsModel(Base):
     )
     receiver_email: Mapped[str] = mapped_column(String, nullable=False)
     amount: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
-    receipt_photo_url: Mapped[str] = mapped_column(String, nullable=False)
+    receipt_photo_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     commission: Mapped[Decimal] = mapped_column(DECIMAL, nullable=False)
 
     order: Mapped['OrderModel'] = relationship(back_populates='transfer_details', uselist=False)

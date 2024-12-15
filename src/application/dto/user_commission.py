@@ -53,9 +53,13 @@ class CountCommissionDTO:
 @dataclass(frozen=True)
 class CountCommissionResultDTO:
     withdraw_final_rub: Decimal
-    transfer_final_rub: Decimal
-    digital_product_final_rub: Decimal
     withdraw_final_usd: Decimal
+
+    transfer_final_rub: Decimal
     transfer_final_usd: Decimal
+    transfer_crypto_usdt: Decimal
+    
+    digital_product_final_rub: Decimal
     digital_product_final_usd: Decimal
+    digital_product_crypto_usdt: Decimal
 

@@ -1,9 +1,7 @@
 import logging
-from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_redis_cache import FastApiRedisCache
 
 from dishka.integrations.fastapi import setup_dishka
 
@@ -17,7 +15,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
-
 def create_app() -> FastAPI:
     app = FastAPI()
     origins = [
@@ -28,6 +25,8 @@ def create_app() -> FastAPI:
         "https://www.seaspayment.com",
         "http://seaspayment.com",
         "http://www.seaspayment.com",
+        "https://testnet-pay.crypt.bot/",
+        "https://pay.crypt.bot/",
     ]
 
     app.add_middleware(

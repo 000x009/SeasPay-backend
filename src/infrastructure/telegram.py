@@ -72,3 +72,23 @@ class TelegramClient(TelegramClientInterface):
             allow_group_chats=True,
             allow_user_chats=True,
         )
+
+    async def edit_message(
+        self,
+        message_id: int,
+        text: str,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+    ) -> Message:
+        return await self.bot.edit_message_text(
+            text=text,
+            message_id=message_id,
+            chat_id=self.config.orders_group_id,
+            reply_markup=reply_markup,
+        )
+
+    async def send_message(self, chat_id: int, message: str) -> Message:
+        return await self.bot.send_message(
+            chat_id=chat_id,
+            text=message,
+        )
+

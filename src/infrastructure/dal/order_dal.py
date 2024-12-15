@@ -15,6 +15,7 @@ from src.domain.value_objects.order import (
 )
 from src.domain.value_objects.order_message import MessageID
 from src.domain.value_objects.user import UserID
+from src.domain.value_objects.payment import PaymentID
 from src.infrastructure.data.models import OrderModel
 
 
@@ -55,6 +56,7 @@ class OrderDAL(BaseOrderDAL):
                 id=OrderID(order.id),
                 user_id=UserID(order.user_id),
                 payment_receipt=PaymentReceipt(order.payment_receipt),
+                payment_id=PaymentID(order.payment_id),
                 created_at=CreatedAt(order.created_at),
                 status=OrderStatus(order.status),
                 type_=OrderType(order.type),
@@ -74,6 +76,25 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
+            payment_id=PaymentID(order.payment_id),
+            created_at=CreatedAt(order.created_at),
+            status=OrderStatus(order.status),
+            type_=OrderType(order.type),
+            telegram_message_id=MessageID(order.telegram_message_id),
+        )
+    
+    async def get_by_payment_id(self, payment_id: PaymentID) -> Optional[Order]:
+        query = select(OrderModel).filter_by(payment_id=payment_id.value)
+        result = await self._session.execute(query)
+        order = result.scalar_one_or_none()
+        if not order:
+            return None
+        
+        return Order(
+            id=OrderID(order.id),
+            user_id=UserID(order.user_id),
+            payment_receipt=PaymentReceipt(order.payment_receipt),
+            payment_id=PaymentID(order.payment_id),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
             type_=OrderType(order.type),
@@ -85,8 +106,9 @@ class OrderDAL(BaseOrderDAL):
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
+            payment_id=order.payment_id.value if order.payment_id else None,
             created_at=order.created_at.value,
-            status=order.status.value,
+            status=order.status.value.value,
             type=order.type_.value,
             telegram_message_id=order.telegram_message_id.value if order.telegram_message_id else None,
         )
@@ -97,6 +119,7 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order_model.id),
             user_id=UserID(order_model.user_id),
             payment_receipt=PaymentReceipt(order_model.payment_receipt),
+            payment_id=PaymentID(order_model.payment_id),
             created_at=CreatedAt(order_model.created_at),
             status=OrderStatus(order_model.status),
             telegram_message_id=MessageID(order_model.telegram_message_id),
@@ -108,8 +131,9 @@ class OrderDAL(BaseOrderDAL):
             id=order.id.value,
             user_id=order.user_id.value,
             payment_receipt=order.payment_receipt.value,
+            payment_id=order.payment_id.value if order.payment_id else None,
             created_at=order.created_at.value,
-            status=order.status.value,
+            status=order.status.value.value,
             type=order.type_.value,
             telegram_message_id=order.telegram_message_id.value,
         )
@@ -128,6 +152,7 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
+            payment_id=PaymentID(order.payment_id),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
             type_=OrderType(order.type),
@@ -155,6 +180,7 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
+            payment_id=PaymentID(order.payment_id),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
             type_=OrderType(order.type),
@@ -176,6 +202,7 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
+            payment_id=PaymentID(order.payment_id),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
             type_=OrderType(order.type),
@@ -193,6 +220,7 @@ class OrderDAL(BaseOrderDAL):
             id=OrderID(order.id),
             user_id=UserID(order.user_id),
             payment_receipt=PaymentReceipt(order.payment_receipt),
+            payment_id=PaymentID(order.payment_id),
             created_at=CreatedAt(order.created_at),
             status=OrderStatus(order.status),
             type_=OrderType(order.type),

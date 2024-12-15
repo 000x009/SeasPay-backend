@@ -7,6 +7,8 @@ from src.application.dto.telegram import (
     SendPurchaseRequestMessageDTO,
     SavePreparedInlineMessageDTO,
     PreparedInlineMessageDTO,
+    MakeOrderPaidDTO,
+    SendMessageToUserDTO,
 )
 from src.infrastructure.config import load_bot_settings
 from src.application.common.telegram import TelegramClientInterface
@@ -36,7 +38,6 @@ class TelegramService:
                     username=data.username,
                 )
             )
-
         if data.photo is not None:
             message: Message = await self._telegram_client.send_message_photo(
                 thread_id=user_topic.thread_id,
@@ -50,14 +51,17 @@ class TelegramService:
                 ),  
             )
         else:
+            markup = None
+            if data.is_paid:
+                markup = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [InlineKeyboardButton(text='🗃️ Взяться за заказ', callback_data=f"take_order:{data.order_id}")]
+                    ]
+                )
             message = await self._telegram_client.send_topic_message(
                 thread_id=user_topic.thread_id,
                 message=data.text,
-                reply_markup=InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [InlineKeyboardButton(text='🗃️ Взяться за заказ', callback_data=f"take_order:{data.order_id}")]
-                    ]   
-                ),
+                reply_markup=markup,
             )
 
         return message
@@ -110,3 +114,27 @@ class TelegramService:
         )
 
         return PreparedInlineMessageDTO(prepared_message_id=prepared_message.id)
+
+    async def make_order_paid(self, data: MakeOrderPaidDTO) -> Message:
+        markup = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(text='🗃️ Взяться за заказ', callback_data=f"take_order:{data.order_id}"),
+                ]
+            ]
+        )
+        message = await self._telegram_client.edit_message(
+            message_id=data.message_id,
+            text=data.text,
+            reply_markup=markup,
+        )
+        
+        return message
+
+    async def send_message_to_user(self, data: SendMessageToUserDTO) -> Message:
+        message = await self._telegram_client.send_message(
+            chat_id=data.user_id,
+            message=data.message,
+        )
+        return message
+

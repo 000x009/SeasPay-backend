@@ -28,3 +28,10 @@ class GetUserTopicDTO:
 @dataclass(frozen=True)
 class GetUserTopicByUserIdDTO:
     user_id: int
+
+
+@dataclass(frozen=True)
+class UpdateOrderMessageToPaidDTO:
+    thread_id: int
+    order_message_id: int
+    new_text: str

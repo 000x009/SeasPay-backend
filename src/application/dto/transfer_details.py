@@ -1,6 +1,7 @@
 from uuid import UUID
 from decimal import Decimal
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -17,8 +18,8 @@ class AddTransferDetailsDTO:
     order_id: UUID
     receiver_email: str
     amount: Decimal
-    receipt_photo_url: str
     commission: Decimal
+    receipt_photo_url: Optional[str] = field(default=None)
 
 
 @dataclass(frozen=True)

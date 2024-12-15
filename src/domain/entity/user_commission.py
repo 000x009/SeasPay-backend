@@ -8,6 +8,8 @@ from src.domain.value_objects.user_commission import (
 )
 from src.infrastructure.config import app_settings
 
+CRYPTO_USDT_COMMISSION = 3
+
 
 class UserCommission:
     __slots__ = (
@@ -56,6 +58,22 @@ class UserCommission:
     def count_transfer_commission(self, amount: Decimal) -> Decimal:
         commission_amount = amount / 100 * self.transfer.value
         final_amount = round(amount + commission_amount, 1)
+
+        return Decimal(final_amount)
+    
+    def count_transfer_crypto_usdt(self, amount: Decimal) -> Decimal:
+        commission_amount = amount / 100 * self.transfer.value
+        final_amount = round(amount + commission_amount, 1)
+        crypto_usdt_commission = final_amount / 100 * CRYPTO_USDT_COMMISSION
+        final_amount = round(final_amount + crypto_usdt_commission, 1)
+
+        return Decimal(final_amount)
+    
+    def count_digital_product_crypto_usdt(self, amount: Decimal) -> Decimal:
+        commission_amount = amount / 100 * self.digital_product.value
+        final_amount = round(amount + commission_amount, 1)
+        crypto_usdt_commission = final_amount / 100 * CRYPTO_USDT_COMMISSION
+        final_amount = round(final_amount + crypto_usdt_commission, 1)
 
         return Decimal(final_amount)
 

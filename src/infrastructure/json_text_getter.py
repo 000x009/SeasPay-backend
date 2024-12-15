@@ -25,12 +25,14 @@ def get_paypal_order_text(
     status: OrderStatusEnum,
     order_type: OrderTypeEnum,
 ) -> str:
+    print(status)
     status_mapping = {
-        OrderStatusEnum.NEW: "⌛ Ожидание обработки",
-        OrderStatusEnum.PROCESSING: "🔄 На обработке у администратора",
-        OrderStatusEnum.COMPLETE: "✅ Выполнен",
-        OrderStatusEnum.CANCEL: "❌ Отменен",
-        OrderStatusEnum.DELAY: "🕒 Отложен по техническим причинам",
+        "NEW": "⌛ Ожидание обработки",
+        "PROCESSING": "🔄 На обработке у администратора",
+        "COMPLETE": "✅ Выполнен",
+        "CANCEL": "❌ Отменен",
+        "DELAY": "🕒 Отложен по техническим причинам",
+        "NOT_PAID": "💳 Ожидает оплаты",
     }
     type_mapping = {
         OrderTypeEnum.WITHDRAW: "вывод средств",
@@ -162,11 +164,12 @@ def get_order_info_crypto_text(
     network: str,
 ) -> str:
     status_text = {
-        OrderStatusEnum.NEW: "⌛ Ожидание обработки",
-        OrderStatusEnum.PROCESSING: "🔄 На обработке у администратора",
-        OrderStatusEnum.COMPLETE: "✅ Выполнен",
-        OrderStatusEnum.CANCEL: "❌ Отменен",
-        OrderStatusEnum.DELAY: "🕒 Отложен по техническим причинам",
+        "NEW": "⌛ Ожидание обработки",
+        "PROCESSING": "🔄 На обработке у администратора",
+        "COMPLETE": "✅ Выполнен",
+        "CANCEL": "❌ Отменен",
+        "DELAY": "🕒 Отложен по техническим причинам",
+        "NOT_PAID": "💳 Ожидает оплаты",
     }
     return get_text_by_key("order_info_crypto_text").format(
         id=order_id,

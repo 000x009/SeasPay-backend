@@ -1,4 +1,3 @@
-import uuid
 from typing import Optional, List
 
 from src.infrastructure.dal import OrderDAL
@@ -16,6 +15,7 @@ from src.application.dto.order import (
     FulfillDigitalProductOrderDTO,
     PurchasePlatformProductDTO,
     OrderListResultDTO,
+    PayOrderDTO,
 )
 from src.application.dto.user import UpdateUserDTO
 from src.domain.value_objects.user import UserID
@@ -35,7 +35,7 @@ from src.application.services.withdraw_details import WithdrawService
 from src.application.services.transfer_details import TransferDetailsService
 from src.application.dto.withdraw_details import AddWithdrawDetailsDTO
 from src.application.services.telegram_service import TelegramService
-from src.application.dto.telegram import SendMessageDTO
+from src.application.dto.telegram import SendMessageDTO, MakeOrderPaidDTO, SendMessageToUserDTO
 from src.application.services.user import UserService
 from src.application.dto.completed_order import AddCompletedOrderDTO
 from src.application.dto.user import GetUserDTO
@@ -45,7 +45,6 @@ from src.domain.entity.user import User
 from src.domain.value_objects.user import JoinedAt, TotalWithdrawn, ReferralID
 from src.application.common.uow import UoW
 from src.application.common.cloud_storage import CloudStorage
-from src.infrastructure.config import load_settings
 from src.application.dto.transfer_details import AddTransferDetailsDTO
 from src.application.services.user_commission import UserCommissionService
 from src.application.dto.user_commission import GetUserCommissionDTO, UpdateUserCommissionDTO
@@ -69,6 +68,7 @@ from src.domain.entity.pagination import Page
 from src.domain.value_objects.payment import PaymentID
 
 PAGE_SIZE = 5
+
 
 class OrderService:
     def __init__(
@@ -110,7 +110,6 @@ class OrderService:
         ))
         order = await self._order_dal.insert(
             Order(
-                id=OrderID(uuid.uuid4()),
                 user_id=UserID(application.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
                 type_=OrderType(OrderTypeEnum.DIGITAL_PRODUCT),
@@ -157,11 +156,11 @@ class OrderService:
         )
         order = await self._order_dal.insert(
             Order(
-                id=OrderID(uuid.uuid4()),
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
                 type_=OrderType(OrderTypeEnum.DIGITAL_PRODUCT),
                 payment_id=PaymentID(data.payment_id),
+                status=OrderStatus(OrderStatusEnum.NEW if data.payment_id else OrderStatusEnum.NOT_PAID),
             )
         )
         await self.digital_product_details_service.insert(AddDigitalProductDetailsDTO(
@@ -174,6 +173,7 @@ class OrderService:
             SendMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
+                is_paid=False if data.payment_id else True,
                 text=get_paypal_order_text(
                     order_id=order.id.value,
                     user_id=order.user_id.value,
@@ -294,7 +294,7 @@ class OrderService:
         order = await self._order_dal.get(OrderID(data.order_id))
         if not order:
             raise OrderNotFoundError(f"Order with id {data.order_id} not found.")
-        if order.status.value not in (OrderStatusEnum.NEW, OrderStatusEnum.DELAY):
+        if order.status.value not in (OrderStatusEnum.NEW.value, OrderStatusEnum.DELAY.value):
             raise OrderAlreadyTakenError(f"Order with id {data.order_id} already taken.")
 
         order.status = OrderStatus(OrderStatusEnum.PROCESSING)
@@ -527,17 +527,51 @@ class OrderService:
             status=order.status.value,
             telegram_message_id=order.telegram_message_id.value
         ) for order in orders]
+    
+    async def pay_order(self, data: PayOrderDTO) -> OrderDTO:
+        order = await self._order_dal.get_by_payment_id(PaymentID(data.payment_id))
+        if not order:
+            raise OrderNotFoundError(f"Order with payment id {data.payment_id} not found.")
+    
+        order.status = OrderStatus(OrderStatusEnum.NEW)
+        updated_order = await self._order_dal.update(order)
+        await self._telegram_service.make_order_paid(MakeOrderPaidDTO(
+            order_id=order.id.value,
+            message_id=updated_order.telegram_message_id.value,
+            text=get_paypal_order_text(
+                order_id=updated_order.id.value,
+                user_id=updated_order.user_id.value,
+                created_at=updated_order.created_at.value,
+                status=updated_order.status.value,
+                order_type=updated_order.type_.value,
+            ),
+        ))
+        await self._telegram_service.send_message_to_user(SendMessageToUserDTO(
+            user_id=updated_order.user_id.value,
+            message=f"💳 Оплата прошла успешно! Скоро мы начнем выполнение вашего запроса.",
+        ))
+        await self.uow.commit()
+
+        return OrderDTO(
+            id=updated_order.id.value,
+            user_id=updated_order.user_id.value,
+            payment_receipt=updated_order.payment_receipt.value,
+            type=updated_order.type_.value,
+            created_at=updated_order.created_at.value,
+            status=updated_order.status.value,
+            telegram_message_id=updated_order.telegram_message_id.value,
+        )
 
     async def create_transfer_order(self, data: CreateTransferOrderDTO) -> OrderDTO:
-        settings = load_settings()
         await self._user_service.get_user(GetUserDTO(user_id=data.user_id))
         order = await self._order_dal.insert(
             Order(
-                id=OrderID(uuid.uuid4()),
                 user_id=UserID(data.user_id),
                 payment_receipt=PaymentReceipt(data.payment_receipt_url),
+                payment_id=PaymentID(data.payment_id),
                 created_at=CreatedAt(data.created_at),
                 type_=OrderType(OrderTypeEnum.TRANSFER),
+                status=OrderStatus(OrderStatusEnum.NOT_PAID if data.payment_id else OrderStatusEnum.NEW),
             )
         )
         user_commission = await self.user_commission_service.get(GetUserCommissionDTO(user_id=data.user_id))
@@ -554,6 +588,7 @@ class OrderService:
             SendMessageDTO(
                 user_id=data.user_id,
                 order_id=order.id.value,
+                is_paid=False if data.payment_id else True,
                 text=get_paypal_order_text(
                     order_id=order.id.value,
                     user_id=order.user_id.value,

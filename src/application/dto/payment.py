@@ -24,3 +24,8 @@ class GetPaymentDTO:
 class CreatePaymentDTO:
     user_id: int
     amount: int
+
+
+@dataclass(frozen=True)
+class ReceivePaymentDTO:
+    payment_id: UUID

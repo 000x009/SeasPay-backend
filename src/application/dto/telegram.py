@@ -11,7 +11,15 @@ class SendMessageDTO:
     username: str
     order_id: UUID
     text: str
+    is_paid: bool = field(default=True)
     photo: Optional[FileDTO] = field(default=None)
+
+
+@dataclass(frozen=True)
+class MakeOrderPaidDTO:
+    order_id: UUID
+    text: str
+    message_id: int
 
 
 @dataclass(frozen=True)
@@ -32,3 +40,9 @@ class SavePreparedInlineMessageDTO:
 @dataclass(frozen=True)
 class PreparedInlineMessageDTO:
     prepared_message_id: str
+
+
+@dataclass(frozen=True)
+class SendMessageToUserDTO:
+    user_id: int
+    message: str

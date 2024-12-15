@@ -90,6 +90,9 @@ class UserCommissionService:
         digital_product_final_rub = round(digital_product_final_usd * Decimal(rate_usd_rub.rate), 1)
         withdraw_final_usd = user_commission.count_withdraw_commission(data.amount)
         transfer_final_usd = user_commission.count_transfer_commission(data.amount)
+        transfer_crypto_usdt = user_commission.count_transfer_crypto_usdt(data.amount)
+        digital_product_crypto_usdt = user_commission.count_digital_product_crypto_usdt(data.amount)
+
 
         return CountCommissionResultDTO(
             withdraw_final_rub=withdraw_final_rub,
@@ -98,4 +101,6 @@ class UserCommissionService:
             withdraw_final_usd=withdraw_final_usd,
             transfer_final_usd=transfer_final_usd,
             digital_product_final_usd=digital_product_final_usd,
+            transfer_crypto_usdt=transfer_crypto_usdt,
+            digital_product_crypto_usdt=digital_product_crypto_usdt,
         )

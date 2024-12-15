@@ -119,3 +119,8 @@ class FulfillDigitalProductOrderDTO:
 class OrderListResultDTO:
     orders: List[OrderDTO]
     total: int
+
+
+@dataclass(frozen=True)
+class PayOrderDTO:
+    payment_id: UUID
