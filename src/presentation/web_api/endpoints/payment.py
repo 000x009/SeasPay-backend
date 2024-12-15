@@ -64,7 +64,6 @@ async def receive_payment(
     payment_service: FromDishka[PaymentService],
 ) -> JSONResponse:
     request_data = await request.json()
-    print(request_data)
     if request_data.get('update_type') == 'invoice_paid':
         invoice = request_data.get('payload')
         payment_id = UUID(invoice.get('payload'))

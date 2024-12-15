@@ -25,7 +25,6 @@ def get_paypal_order_text(
     status: OrderStatusEnum,
     order_type: OrderTypeEnum,
 ) -> str:
-    print(status)
     status_mapping = {
         "NEW": "⌛ Ожидание обработки",
         "PROCESSING": "🔄 На обработке у администратора",

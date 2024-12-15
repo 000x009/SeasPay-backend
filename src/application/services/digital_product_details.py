@@ -40,7 +40,6 @@ class DigitalProductDetailsService:
             commission=Commission(data.commission),
             login_data=LoginData(data.login_data),
         ))
-        print(details, flush=True)
         await self.uow.commit()
 
         return DigitalProductDetailsDTO(

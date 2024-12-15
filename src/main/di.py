@@ -147,8 +147,8 @@ class CryptopayProvider(Provider):
     async def _get_cryptopay_client(self) -> AsyncGenerator[AioCryptoPay, None]:
         settings = load_settings()
         crypto = AioCryptoPay(
-            network=Networks.TEST_NET,
-            token=settings.cryptopay.testnet_api_key,
+            network=Networks.MAIN_NET,
+            token=settings.cryptopay.mainnet_api_key,
         )
         yield crypto
         await crypto.close()
