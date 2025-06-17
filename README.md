@@ -2,10 +2,6 @@
 
 # Run
 ```
-just run
-```
-or
-```
 docker-compose up --build
 ```
 
